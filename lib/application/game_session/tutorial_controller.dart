@@ -25,8 +25,7 @@ final class TutorialController {
     required int levelNumber,
     required int moveCount,
   }) {
-    final TutorialMoveHint? hint = _activeHint(levelNumber, moveCount);
-    return hint == null || address == hint.source;
+    return true;
   }
 
   bool allowsPlacement(
@@ -34,22 +33,10 @@ final class TutorialController {
     required int levelNumber,
     required int moveCount,
   }) {
-    final TutorialMoveHint? hint = _activeHint(levelNumber, moveCount);
-    return hint == null || address == hint.target;
+    return true;
   }
 
   bool allowsCell(CellAddress address, int levelNumber, {int moveCount = 0}) {
-    final TutorialMoveHint? hint = _activeHint(levelNumber, moveCount);
-    if (hint == null) {
-      return true;
-    }
-    return address == hint.source || address == hint.target;
-  }
-
-  TutorialMoveHint? _activeHint(int levelNumber, int moveCount) {
-    if (moveCount > 0) {
-      return null;
-    }
-    return hintForLevel(levelNumber);
+    return true;
   }
 }

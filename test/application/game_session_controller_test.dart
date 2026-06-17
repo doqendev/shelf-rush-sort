@@ -102,7 +102,7 @@ void main() {
     expect(analytics.events.map((event) => event.name), contains('lane_miss'));
   });
 
-  test('tutorial guides only the first level-one move', () {
+  test('tutorial hint does not block normal level-one moves', () {
     final GameSessionController controller = GameSessionController(
       level: _tutorialLevel(),
       analytics: DebugAnalyticsService(),
@@ -110,27 +110,18 @@ void main() {
 
     controller.selectCell(CellAddress.fromCompartmentIndex(1, 1));
     expect(
-      controller.state.lastInvalidReason,
-      InvalidMoveReason.restrictedByTutorial,
+      controller.state.selectedCell,
+      CellAddress.fromCompartmentIndex(1, 1),
     );
 
-    controller.selectCell(CellAddress.fromCompartmentIndex(1, 0));
-    controller.placeSelectedAt(CellAddress.fromCompartmentIndex(1, 2));
-    expect(
-      controller.state.lastInvalidReason,
-      InvalidMoveReason.restrictedByTutorial,
-    );
-    expect(controller.state.moveCount, 0);
-
-    controller.selectCell(CellAddress.fromCompartmentIndex(1, 0));
     controller.placeSelectedAt(CellAddress.fromCompartmentIndex(0, 2));
     expect(controller.state.moveCount, 1);
     expect(controller.state.lastInvalidReason, isNull);
 
-    controller.selectCell(CellAddress.fromCompartmentIndex(1, 1));
+    controller.selectCell(CellAddress.fromCompartmentIndex(1, 0));
     expect(
       controller.state.selectedCell,
-      CellAddress.fromCompartmentIndex(1, 1),
+      CellAddress.fromCompartmentIndex(1, 0),
     );
   });
 }

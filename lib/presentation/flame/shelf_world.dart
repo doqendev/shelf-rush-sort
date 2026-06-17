@@ -8,6 +8,7 @@ import '../../application/game_session/game_session_state.dart';
 import '../../domain/content/product_def.dart';
 import '../../domain/core/value_objects.dart';
 import '../../domain/game/board_state.dart';
+import '../../domain/game/move.dart';
 import '../../domain/moving_lanes/moving_lane_state.dart';
 import '../../infrastructure/platform/audio_service.dart';
 import '../../infrastructure/platform/haptics_service.dart';
@@ -149,9 +150,7 @@ final class ShelfWorld extends World {
             CellTargetComponent(
               address: address,
               inputRouter: inputRouter,
-              highlighted:
-                  _state.selectedCell != null ||
-                  _state.laneHoldingProduct != null,
+              highlighted: _isLegalTarget(address),
               blocker: shelfCell.blocker,
               position: Vector2(cellRect.left, cellRect.top),
               size: Vector2(cellRect.width, cellRect.height),
@@ -208,6 +207,24 @@ final class ShelfWorld extends World {
       }
       await component.syncLane(lane);
     }
+  }
+
+  bool _isLegalTarget(CellAddress target) {
+    final CellAddress? selected = _state.selectedCell;
+    if (selected != null) {
+      return controller.boardRules
+          .validateMove(
+            _state.board,
+            MoveAction(source: selected, target: target),
+          )
+          .isValid;
+    }
+    if (_state.laneHoldingProduct != null) {
+      return controller.boardRules
+          .validatePlacement(_state.board, target)
+          .isValid;
+    }
+    return false;
   }
 
   String _currentBoardSyncHash() {
