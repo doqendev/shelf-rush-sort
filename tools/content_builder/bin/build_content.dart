@@ -321,6 +321,16 @@ Map<String, Object?> _remoteDefaults() {
     'firstInterstitialLevel': 8,
     'adCooldownSeconds': 180,
     'laneSpeedMultiplier': 1.0,
+    'timerMultiplier': 1.0,
+    'boosterOfferThreshold': 2,
+    'hardLevelFrequency': 5,
+    'tutorialAssistanceLevel': 5,
+    'failRescuePriority': <String>[
+      'timerExpired',
+      'laneExhausted',
+      'noUsefulMoves',
+      'boardJammed',
+    ],
     'featureFlags': <String, bool>{
       'shop': true,
       'collections': true,

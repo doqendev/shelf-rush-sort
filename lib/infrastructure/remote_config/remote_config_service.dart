@@ -10,7 +10,11 @@ final class RemoteConfigService {
   bool isEnabled(String flag) => defaults.featureFlags[flag] ?? false;
 
   LevelDef applyToLevel(LevelDef level) {
-    if (defaults.laneSpeedMultiplier == 1.0 || level.movingLanes.isEmpty) {
+    final bool laneNeutral =
+        defaults.laneSpeedMultiplier == 1.0 || level.movingLanes.isEmpty;
+    final bool timerNeutral =
+        defaults.timerMultiplier == 1.0 || level.timeLimitSeconds == null;
+    if (laneNeutral && timerNeutral) {
       return level;
     }
     return LevelDef(
@@ -20,21 +24,46 @@ final class RemoteConfigService {
       seed: level.seed,
       objective: level.objective,
       compartments: level.compartments,
-      movingLanes: level.movingLanes
-          .map((MovingLaneDef lane) {
-            return MovingLaneDef(
-              id: lane.id,
-              orientation: lane.orientation,
-              behavior: lane.behavior,
-              speedCellsPerSecond:
-                  lane.speedCellsPerSecond * defaults.laneSpeedMultiplier,
-              queue: lane.queue,
-            );
-          })
-          .toList(growable: false),
-      timeLimitSeconds: level.timeLimitSeconds,
+      movingLanes: laneNeutral
+          ? level.movingLanes
+          : level.movingLanes
+                .map((MovingLaneDef lane) {
+                  return MovingLaneDef(
+                    id: lane.id,
+                    orientation: lane.orientation,
+                    behavior: lane.behavior,
+                    speedCellsPerSecond:
+                        lane.speedCellsPerSecond * defaults.laneSpeedMultiplier,
+                    queue: lane.queue,
+                    anchor: lane.anchor,
+                    row: lane.row,
+                    column: lane.column,
+                    visibleWindowCells: lane.visibleWindowCells,
+                    loopsMissedProducts: lane.loopsMissedProducts,
+                    maxMisses: lane.maxMisses,
+                    requiredForObjective: lane.requiredForObjective,
+                  );
+                })
+                .toList(growable: false),
+      timeLimitSeconds: timerNeutral
+          ? level.timeLimitSeconds
+          : (level.timeLimitSeconds! * defaults.timerMultiplier).round(),
       moveLimit: level.moveLimit,
       difficulty: level.difficulty,
+      rules: level.rules,
+      tags: level.tags,
+      humanReview: level.humanReview,
+      validationMetrics: level.validationMetrics,
+      laneFailurePolicy: level.laneFailurePolicy,
     );
+  }
+
+  String rescueForFailReason(String failReason) {
+    if (defaults.failRescuePriority.contains(failReason)) {
+      return failReason;
+    }
+    return defaults.failRescuePriority.isEmpty
+        ? failReason
+        : defaults.failRescuePriority.first;
   }
 }

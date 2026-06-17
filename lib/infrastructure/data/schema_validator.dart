@@ -158,12 +158,33 @@ final class SchemaValidator {
     _requireInt(json, 'schemaVersion', 'remote_defaults', issues);
     _requireInt(json, 'firstInterstitialLevel', 'remote_defaults', issues);
     _requireInt(json, 'adCooldownSeconds', 'remote_defaults', issues);
+    _requireInt(json, 'boosterOfferThreshold', 'remote_defaults', issues);
+    _requireInt(json, 'hardLevelFrequency', 'remote_defaults', issues);
+    _requireInt(json, 'tutorialAssistanceLevel', 'remote_defaults', issues);
     final Object? laneMultiplier = json['laneSpeedMultiplier'];
     if (laneMultiplier is! num || laneMultiplier <= 0) {
       issues.add(
         const ValidationIssue(
           code: 'remote_defaults.lane_speed_multiplier',
           message: 'Remote defaults must include a positive lane multiplier.',
+        ),
+      );
+    }
+    final Object? timerMultiplier = json['timerMultiplier'];
+    if (timerMultiplier is! num || timerMultiplier <= 0) {
+      issues.add(
+        const ValidationIssue(
+          code: 'remote_defaults.timer_multiplier',
+          message: 'Remote defaults must include a positive timer multiplier.',
+        ),
+      );
+    }
+    final Object? rescuePriority = json['failRescuePriority'];
+    if (rescuePriority is! List<Object?> || rescuePriority.isEmpty) {
+      issues.add(
+        const ValidationIssue(
+          code: 'remote_defaults.fail_rescue_priority',
+          message: 'Remote defaults must include fail rescue priority.',
         ),
       );
     }

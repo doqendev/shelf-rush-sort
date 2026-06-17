@@ -53,6 +53,26 @@ void main() {
     expect(service.isEnabled('shop'), isTrue);
     expect(service.isEnabled('unknown'), isFalse);
   });
+
+  test('applies timer multiplier and exposes fail rescue priority', () {
+    final LevelDef level = _laneLevel(speed: 1);
+    final RemoteConfigService service = RemoteConfigService(
+      RemoteConfigDef(
+        firstInterstitialLevel: 8,
+        adCooldownSeconds: 180,
+        laneSpeedMultiplier: 1,
+        timerMultiplier: 1.5,
+        failRescuePriority: const <String>['laneExhausted', 'timerExpired'],
+        featureFlags: const <String, bool>{},
+      ),
+    );
+
+    final LevelDef adjusted = service.applyToLevel(level);
+
+    expect(adjusted.timeLimitSeconds, 270);
+    expect(service.rescueForFailReason('timerExpired'), 'timerExpired');
+    expect(service.rescueForFailReason('noUsefulMoves'), 'laneExhausted');
+  });
 }
 
 LevelDef _laneLevel({required double speed}) {
@@ -61,6 +81,7 @@ LevelDef _laneLevel({required double speed}) {
     levelNumber: 15,
     title: 'Remote Config Test',
     seed: 15,
+    timeLimitSeconds: 180,
     objective: ObjectiveRequirement(type: ObjectiveType.clearAll),
     compartments: <CompartmentDef>[
       for (var index = 0; index < 15; index += 1)

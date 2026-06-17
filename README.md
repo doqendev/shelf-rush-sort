@@ -20,6 +20,7 @@ flutter analyze
 flutter test
 flutter test test/presentation/board_layout_calculator_test.dart
 dart run tools/level_validator/bin/validate_levels.dart
+dart run tools/product_readability/bin/generate_review.dart
 flutter run -d chrome --dart-define=SHELF_RUSH_ENV=qa
 flutter build apk --debug --dart-define=SHELF_RUSH_ENV=qa
 flutter build web --dart-define=SHELF_RUSH_ENV=qa

@@ -129,6 +129,7 @@ final class _GameScreenState extends ConsumerState<GameScreen> {
       productCatalog: contentService.content.productCatalog,
       audio: ref.read(audioServiceProvider),
       haptics: ref.read(hapticsServiceProvider),
+      analytics: analytics,
       reduceMotion: ref.read(playerSaveProvider).reduceMotion,
     );
     _subscription = controller.states.listen((GameSessionState state) {

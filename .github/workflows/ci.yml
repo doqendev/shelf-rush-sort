@@ -29,6 +29,8 @@ jobs:
         run: flutter test test/presentation/board_layout_calculator_test.dart
       - name: Content validation
         run: dart run tools/level_validator/bin/validate_levels.dart
+      - name: Product readability report
+        run: dart run tools/product_readability/bin/generate_review.dart
       - name: Upload validation reports
         uses: actions/upload-artifact@v4
         with:
@@ -36,6 +38,7 @@ jobs:
           path: |
             build/reports/validation_report.json
             build/reports/difficulty_dashboard.csv
+            build/reports/product_readability_review.html
       - name: Android debug build
         run: flutter build apk --debug --dart-define=SHELF_RUSH_ENV=qa
       - name: QA web build
