@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 1,
+  "events": [
+    {
+      "name": "level_start",
+      "required": [
+        "level_id",
+        "level_number",
+        "seed"
+      ]
+    },
+    {
+      "name": "move",
+      "required": [
+        "level_id",
+        "source",
+        "target",
+        "valid"
+      ]
+    },
+    {
+      "name": "triple_clear",
+      "required": [
+        "level_id",
+        "sku_id",
+        "combo"
+      ]
+    },
+    {
+      "name": "level_win",
+      "required": [
+        "level_id",
+        "duration_sec",
+        "moves"
+      ]
+    },
+    {
+      "name": "level_fail",
+      "required": [
+        "level_id",
+        "fail_reason",
+        "moves"
+      ]
+    },
+    {
+      "name": "lane_grab",
+      "required": [
+        "level_id",
+        "lane_id",
+        "sku_id"
+      ]
+    },
+    {
+      "name": "invalid_move",
+      "required": [
+        "level_id",
+        "reason"
+      ]
+    },
+    {
+      "name": "booster_use",
+      "required": [
+        "level_id",
+        "booster",
+        "used"
+      ]
+    },
+    {
+      "name": "level_revive",
+      "required": [
+        "level_id",
+        "level_number",
+        "fail_reason",
+        "moves"
+      ]
+    },
+    {
+      "name": "ad_opportunity",
+      "required": [
+        "level_id",
+        "placement",
+        "flow"
+      ]
+    },
+    {
+      "name": "ad_impression",
+      "required": [
+        "level_id",
+        "placement",
+        "flow",
+        "completed"
+      ]
+    },
+    {
+      "name": "ad_reward",
+      "required": [
+        "level_id",
+        "placement",
+        "flow"
+      ]
+    },
+    {
+      "name": "ad_unavailable",
+      "required": [
+        "level_id",
+        "placement",
+        "flow"
+      ]
+    },
+    {
+      "name": "economy_transaction",
+      "required": [
+        "level_id",
+        "type",
+        "currency",
+        "amount",
+        "reason",
+        "balance"
+      ]
+    },
+    {
+      "name": "performance_level_load",
+      "required": [
+        "level_id",
+        "load_time_ms",
+        "first_playable_ms",
+        "device_tier"
+      ]
+    },
+    {
+      "name": "performance_frame_bucket",
+      "required": [
+        "level_id",
+        "fps_bucket",
+        "frame_spike_count",
+        "device_tier"
+      ]
+    },
+    {
+      "name": "memory_warning",
+      "required": [
+        "level_id",
+        "device_tier"
+      ]
+    },
+    {
+      "name": "asset_load_failure",
+      "required": [
+        "asset_id",
+        "asset_type",
+        "reason"
+      ]
+    }
+  ]
+}

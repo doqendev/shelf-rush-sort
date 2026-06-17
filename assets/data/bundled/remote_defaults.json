@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "firstInterstitialLevel": 8,
+  "adCooldownSeconds": 180,
+  "laneSpeedMultiplier": 1.0,
+  "featureFlags": {
+    "shop": true,
+    "collections": true,
+    "dailyReward": true,
+    "rewardedRevive": true,
+    "debugAnalyticsConsole": true
+  }
+}

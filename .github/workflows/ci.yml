@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Format check
+        run: dart format --set-exit-if-changed lib test tools
+      - name: Architecture guard
+        run: dart run tools/ci_checks/bin/check_architecture.dart
+      - name: Static analysis
+        run: flutter analyze
+      - name: Unit and widget tests
+        run: flutter test
+      - name: Layout screenshot-width guard
+        run: flutter test test/presentation/board_layout_calculator_test.dart
+      - name: Content validation
+        run: dart run tools/level_validator/bin/validate_levels.dart
+      - name: Android debug build
+        run: flutter build apk --debug --dart-define=SHELF_RUSH_ENV=qa
+      - name: QA web build
+        run: flutter build web --dart-define=SHELF_RUSH_ENV=qa
+      - name: Release audit
+        run: dart run tools/release_audit/bin/check_release_readiness.dart

@@ -1,0 +1,665 @@
+{
+  "schemaVersion": 1,
+  "productVisuals": [
+    {
+      "skuId": "sku_000",
+      "renderMode": "procedural",
+      "shape": "bottle",
+      "colorHex": "#E84F5F",
+      "silhouetteTags": [
+        "bottle",
+        "warm",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_001",
+      "renderMode": "procedural",
+      "shape": "box",
+      "colorHex": "#F2C84B",
+      "silhouetteTags": [
+        "box",
+        "cool",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_002",
+      "renderMode": "procedural",
+      "shape": "can",
+      "colorHex": "#56B870",
+      "silhouetteTags": [
+        "can",
+        "warm",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_003",
+      "renderMode": "procedural",
+      "shape": "pouch",
+      "colorHex": "#D94888",
+      "silhouetteTags": [
+        "pouch",
+        "cool",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_004",
+      "renderMode": "procedural",
+      "shape": "jar",
+      "colorHex": "#F28F3B",
+      "silhouetteTags": [
+        "jar",
+        "warm",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_005",
+      "renderMode": "procedural",
+      "shape": "carton",
+      "colorHex": "#4E91D9",
+      "silhouetteTags": [
+        "carton",
+        "cool",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_006",
+      "renderMode": "procedural",
+      "shape": "toy",
+      "colorHex": "#8C6FE8",
+      "silhouetteTags": [
+        "toy",
+        "warm",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_007",
+      "renderMode": "procedural",
+      "shape": "produce",
+      "colorHex": "#D99A3D",
+      "silhouetteTags": [
+        "produce",
+        "cool",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_008",
+      "renderMode": "procedural",
+      "shape": "bottle",
+      "colorHex": "#D94E35",
+      "silhouetteTags": [
+        "bottle",
+        "warm",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_009",
+      "renderMode": "procedural",
+      "shape": "box",
+      "colorHex": "#F6A15A",
+      "silhouetteTags": [
+        "box",
+        "cool",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_010",
+      "renderMode": "procedural",
+      "shape": "can",
+      "colorHex": "#74B843",
+      "silhouetteTags": [
+        "can",
+        "warm",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_011",
+      "renderMode": "procedural",
+      "shape": "pouch",
+      "colorHex": "#9D7053",
+      "silhouetteTags": [
+        "pouch",
+        "cool",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_012",
+      "renderMode": "procedural",
+      "shape": "jar",
+      "colorHex": "#7B67C8",
+      "silhouetteTags": [
+        "jar",
+        "warm",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_013",
+      "renderMode": "procedural",
+      "shape": "carton",
+      "colorHex": "#F06449",
+      "silhouetteTags": [
+        "carton",
+        "cool",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_014",
+      "renderMode": "procedural",
+      "shape": "toy",
+      "colorHex": "#5AA7A7",
+      "silhouetteTags": [
+        "toy",
+        "warm",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_015",
+      "renderMode": "procedural",
+      "shape": "produce",
+      "colorHex": "#3F9E73",
+      "silhouetteTags": [
+        "produce",
+        "cool",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_016",
+      "renderMode": "procedural",
+      "shape": "bottle",
+      "colorHex": "#E36F3F",
+      "silhouetteTags": [
+        "bottle",
+        "warm",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_017",
+      "renderMode": "procedural",
+      "shape": "box",
+      "colorHex": "#7EB7E6",
+      "silhouetteTags": [
+        "box",
+        "cool",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_018",
+      "renderMode": "procedural",
+      "shape": "can",
+      "colorHex": "#9656A1",
+      "silhouetteTags": [
+        "can",
+        "warm",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_019",
+      "renderMode": "procedural",
+      "shape": "pouch",
+      "colorHex": "#4D7CFE",
+      "silhouetteTags": [
+        "pouch",
+        "cool",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_020",
+      "renderMode": "procedural",
+      "shape": "jar",
+      "colorHex": "#7FB069",
+      "silhouetteTags": [
+        "jar",
+        "warm",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_021",
+      "renderMode": "procedural",
+      "shape": "carton",
+      "colorHex": "#F08A5D",
+      "silhouetteTags": [
+        "carton",
+        "cool",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_022",
+      "renderMode": "procedural",
+      "shape": "toy",
+      "colorHex": "#4CB5AE",
+      "silhouetteTags": [
+        "toy",
+        "warm",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_023",
+      "renderMode": "procedural",
+      "shape": "produce",
+      "colorHex": "#A66DD4",
+      "silhouetteTags": [
+        "produce",
+        "cool",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_024",
+      "renderMode": "procedural",
+      "shape": "bottle",
+      "colorHex": "#E84F5F",
+      "silhouetteTags": [
+        "bottle",
+        "warm",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_025",
+      "renderMode": "procedural",
+      "shape": "box",
+      "colorHex": "#F2C84B",
+      "silhouetteTags": [
+        "box",
+        "cool",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_026",
+      "renderMode": "procedural",
+      "shape": "can",
+      "colorHex": "#56B870",
+      "silhouetteTags": [
+        "can",
+        "warm",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_027",
+      "renderMode": "procedural",
+      "shape": "pouch",
+      "colorHex": "#D94888",
+      "silhouetteTags": [
+        "pouch",
+        "cool",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_028",
+      "renderMode": "procedural",
+      "shape": "jar",
+      "colorHex": "#F28F3B",
+      "silhouetteTags": [
+        "jar",
+        "warm",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_029",
+      "renderMode": "procedural",
+      "shape": "carton",
+      "colorHex": "#4E91D9",
+      "silhouetteTags": [
+        "carton",
+        "cool",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_030",
+      "renderMode": "procedural",
+      "shape": "toy",
+      "colorHex": "#8C6FE8",
+      "silhouetteTags": [
+        "toy",
+        "warm",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_031",
+      "renderMode": "procedural",
+      "shape": "produce",
+      "colorHex": "#D99A3D",
+      "silhouetteTags": [
+        "produce",
+        "cool",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_032",
+      "renderMode": "procedural",
+      "shape": "bottle",
+      "colorHex": "#D94E35",
+      "silhouetteTags": [
+        "bottle",
+        "warm",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_033",
+      "renderMode": "procedural",
+      "shape": "box",
+      "colorHex": "#F6A15A",
+      "silhouetteTags": [
+        "box",
+        "cool",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_034",
+      "renderMode": "procedural",
+      "shape": "can",
+      "colorHex": "#74B843",
+      "silhouetteTags": [
+        "can",
+        "warm",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_035",
+      "renderMode": "procedural",
+      "shape": "pouch",
+      "colorHex": "#9D7053",
+      "silhouetteTags": [
+        "pouch",
+        "cool",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_036",
+      "renderMode": "procedural",
+      "shape": "jar",
+      "colorHex": "#7B67C8",
+      "silhouetteTags": [
+        "jar",
+        "warm",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_037",
+      "renderMode": "procedural",
+      "shape": "carton",
+      "colorHex": "#F06449",
+      "silhouetteTags": [
+        "carton",
+        "cool",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_038",
+      "renderMode": "procedural",
+      "shape": "toy",
+      "colorHex": "#5AA7A7",
+      "silhouetteTags": [
+        "toy",
+        "warm",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_039",
+      "renderMode": "procedural",
+      "shape": "produce",
+      "colorHex": "#3F9E73",
+      "silhouetteTags": [
+        "produce",
+        "cool",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_040",
+      "renderMode": "procedural",
+      "shape": "bottle",
+      "colorHex": "#E36F3F",
+      "silhouetteTags": [
+        "bottle",
+        "warm",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_041",
+      "renderMode": "procedural",
+      "shape": "box",
+      "colorHex": "#7EB7E6",
+      "silhouetteTags": [
+        "box",
+        "cool",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_042",
+      "renderMode": "procedural",
+      "shape": "can",
+      "colorHex": "#9656A1",
+      "silhouetteTags": [
+        "can",
+        "warm",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_043",
+      "renderMode": "procedural",
+      "shape": "pouch",
+      "colorHex": "#4D7CFE",
+      "silhouetteTags": [
+        "pouch",
+        "cool",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_044",
+      "renderMode": "procedural",
+      "shape": "jar",
+      "colorHex": "#7FB069",
+      "silhouetteTags": [
+        "jar",
+        "warm",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_045",
+      "renderMode": "procedural",
+      "shape": "carton",
+      "colorHex": "#F08A5D",
+      "silhouetteTags": [
+        "carton",
+        "cool",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_046",
+      "renderMode": "procedural",
+      "shape": "toy",
+      "colorHex": "#4CB5AE",
+      "silhouetteTags": [
+        "toy",
+        "warm",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_047",
+      "renderMode": "procedural",
+      "shape": "produce",
+      "colorHex": "#A66DD4",
+      "silhouetteTags": [
+        "produce",
+        "cool",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_048",
+      "renderMode": "procedural",
+      "shape": "bottle",
+      "colorHex": "#E84F5F",
+      "silhouetteTags": [
+        "bottle",
+        "warm",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_049",
+      "renderMode": "procedural",
+      "shape": "box",
+      "colorHex": "#F2C84B",
+      "silhouetteTags": [
+        "box",
+        "cool",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_050",
+      "renderMode": "procedural",
+      "shape": "can",
+      "colorHex": "#56B870",
+      "silhouetteTags": [
+        "can",
+        "warm",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_051",
+      "renderMode": "procedural",
+      "shape": "pouch",
+      "colorHex": "#D94888",
+      "silhouetteTags": [
+        "pouch",
+        "cool",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_052",
+      "renderMode": "procedural",
+      "shape": "jar",
+      "colorHex": "#F28F3B",
+      "silhouetteTags": [
+        "jar",
+        "warm",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_053",
+      "renderMode": "procedural",
+      "shape": "carton",
+      "colorHex": "#4E91D9",
+      "silhouetteTags": [
+        "carton",
+        "cool",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_054",
+      "renderMode": "procedural",
+      "shape": "toy",
+      "colorHex": "#8C6FE8",
+      "silhouetteTags": [
+        "toy",
+        "warm",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_055",
+      "renderMode": "procedural",
+      "shape": "produce",
+      "colorHex": "#D99A3D",
+      "silhouetteTags": [
+        "produce",
+        "cool",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_056",
+      "renderMode": "procedural",
+      "shape": "bottle",
+      "colorHex": "#D94E35",
+      "silhouetteTags": [
+        "bottle",
+        "warm",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_057",
+      "renderMode": "procedural",
+      "shape": "box",
+      "colorHex": "#F6A15A",
+      "silhouetteTags": [
+        "box",
+        "cool",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_058",
+      "renderMode": "procedural",
+      "shape": "can",
+      "colorHex": "#74B843",
+      "silhouetteTags": [
+        "can",
+        "warm",
+        "size_standard"
+      ]
+    },
+    {
+      "skuId": "sku_059",
+      "renderMode": "procedural",
+      "shape": "pouch",
+      "colorHex": "#9D7053",
+      "silhouetteTags": [
+        "pouch",
+        "cool",
+        "size_standard"
+      ]
+    }
+  ]
+}

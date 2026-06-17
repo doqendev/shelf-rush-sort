@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "startingCoins": 500,
+  "boosterPrices": {
+    "hint": 60,
+    "shuffle": 120,
+    "hammer": 160,
+    "freezeTime": 140,
+    "extraShelf": 220,
+    "revealHidden": 120,
+    "slowConveyor": 140
+  }
+}

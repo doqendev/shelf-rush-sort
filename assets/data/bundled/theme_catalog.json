@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "themes": [
+    {
+      "id": "toy_market",
+      "displayName": "Toy Market",
+      "backgroundColorHex": "#F7F3E8",
+      "shelfColorHex": "#B86F4A"
+    }
+  ]
+}

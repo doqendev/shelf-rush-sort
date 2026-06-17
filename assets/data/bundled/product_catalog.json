@@ -1,0 +1,725 @@
+{
+  "schemaVersion": 1,
+  "products": [
+    {
+      "skuId": "sku_000",
+      "displayName": "Berry Pop",
+      "family": "market_0",
+      "colorHex": "#E84F5F",
+      "shape": "bottle",
+      "readabilityTags": [
+        "bottle",
+        "warm",
+        "set_0"
+      ]
+    },
+    {
+      "skuId": "sku_001",
+      "displayName": "Lemon Fizz",
+      "family": "market_0",
+      "colorHex": "#F2C84B",
+      "shape": "box",
+      "readabilityTags": [
+        "box",
+        "cool",
+        "set_0"
+      ]
+    },
+    {
+      "skuId": "sku_002",
+      "displayName": "Mint Beans",
+      "family": "market_0",
+      "colorHex": "#56B870",
+      "shape": "can",
+      "readabilityTags": [
+        "can",
+        "warm",
+        "set_0"
+      ]
+    },
+    {
+      "skuId": "sku_003",
+      "displayName": "Cherry Jam",
+      "family": "market_0",
+      "colorHex": "#D94888",
+      "shape": "pouch",
+      "readabilityTags": [
+        "pouch",
+        "cool",
+        "set_0"
+      ]
+    },
+    {
+      "skuId": "sku_004",
+      "displayName": "Sunny Cereal",
+      "family": "market_0",
+      "colorHex": "#F28F3B",
+      "shape": "jar",
+      "readabilityTags": [
+        "jar",
+        "warm",
+        "set_0"
+      ]
+    },
+    {
+      "skuId": "sku_005",
+      "displayName": "Blue Soap",
+      "family": "market_0",
+      "colorHex": "#4E91D9",
+      "shape": "carton",
+      "readabilityTags": [
+        "carton",
+        "cool",
+        "set_1"
+      ]
+    },
+    {
+      "skuId": "sku_006",
+      "displayName": "Toy Train",
+      "family": "market_0",
+      "colorHex": "#8C6FE8",
+      "shape": "toy",
+      "readabilityTags": [
+        "toy",
+        "warm",
+        "set_1"
+      ]
+    },
+    {
+      "skuId": "sku_007",
+      "displayName": "Honey Jar",
+      "family": "market_0",
+      "colorHex": "#D99A3D",
+      "shape": "produce",
+      "readabilityTags": [
+        "produce",
+        "cool",
+        "set_1"
+      ]
+    },
+    {
+      "skuId": "sku_008",
+      "displayName": "Apple Box",
+      "family": "market_0",
+      "colorHex": "#D94E35",
+      "shape": "bottle",
+      "readabilityTags": [
+        "bottle",
+        "warm",
+        "set_1"
+      ]
+    },
+    {
+      "skuId": "sku_009",
+      "displayName": "Peach Can",
+      "family": "market_0",
+      "colorHex": "#F6A15A",
+      "shape": "box",
+      "readabilityTags": [
+        "box",
+        "cool",
+        "set_1"
+      ]
+    },
+    {
+      "skuId": "sku_010",
+      "displayName": "Kiwi Pouch",
+      "family": "market_1",
+      "colorHex": "#74B843",
+      "shape": "can",
+      "readabilityTags": [
+        "can",
+        "warm",
+        "set_2"
+      ]
+    },
+    {
+      "skuId": "sku_011",
+      "displayName": "Cocoa Carton",
+      "family": "market_1",
+      "colorHex": "#9D7053",
+      "shape": "pouch",
+      "readabilityTags": [
+        "pouch",
+        "cool",
+        "set_2"
+      ]
+    },
+    {
+      "skuId": "sku_012",
+      "displayName": "Plum Soda",
+      "family": "market_1",
+      "colorHex": "#7B67C8",
+      "shape": "jar",
+      "readabilityTags": [
+        "jar",
+        "warm",
+        "set_2"
+      ]
+    },
+    {
+      "skuId": "sku_013",
+      "displayName": "Star Cookies",
+      "family": "market_1",
+      "colorHex": "#F06449",
+      "shape": "carton",
+      "readabilityTags": [
+        "carton",
+        "cool",
+        "set_2"
+      ]
+    },
+    {
+      "skuId": "sku_014",
+      "displayName": "Milk Buddy",
+      "family": "market_1",
+      "colorHex": "#5AA7A7",
+      "shape": "toy",
+      "readabilityTags": [
+        "toy",
+        "warm",
+        "set_2"
+      ]
+    },
+    {
+      "skuId": "sku_015",
+      "displayName": "Clover Tea",
+      "family": "market_1",
+      "colorHex": "#3F9E73",
+      "shape": "produce",
+      "readabilityTags": [
+        "produce",
+        "cool",
+        "set_3"
+      ]
+    },
+    {
+      "skuId": "sku_016",
+      "displayName": "Carrot Cup",
+      "family": "market_1",
+      "colorHex": "#E36F3F",
+      "shape": "bottle",
+      "readabilityTags": [
+        "bottle",
+        "warm",
+        "set_3"
+      ]
+    },
+    {
+      "skuId": "sku_017",
+      "displayName": "Cloud Rice",
+      "family": "market_1",
+      "colorHex": "#7EB7E6",
+      "shape": "box",
+      "readabilityTags": [
+        "box",
+        "cool",
+        "set_3"
+      ]
+    },
+    {
+      "skuId": "sku_018",
+      "displayName": "Grape Drops",
+      "family": "market_1",
+      "colorHex": "#9656A1",
+      "shape": "can",
+      "readabilityTags": [
+        "can",
+        "warm",
+        "set_3"
+      ]
+    },
+    {
+      "skuId": "sku_019",
+      "displayName": "Rocket Gum",
+      "family": "market_1",
+      "colorHex": "#4D7CFE",
+      "shape": "pouch",
+      "readabilityTags": [
+        "pouch",
+        "cool",
+        "set_3"
+      ]
+    },
+    {
+      "skuId": "sku_020",
+      "displayName": "Pear Wash",
+      "family": "market_2",
+      "colorHex": "#7FB069",
+      "shape": "jar",
+      "readabilityTags": [
+        "jar",
+        "warm",
+        "set_4"
+      ]
+    },
+    {
+      "skuId": "sku_021",
+      "displayName": "Mango Cubes",
+      "family": "market_2",
+      "colorHex": "#F08A5D",
+      "shape": "carton",
+      "readabilityTags": [
+        "carton",
+        "cool",
+        "set_4"
+      ]
+    },
+    {
+      "skuId": "sku_022",
+      "displayName": "Melon Tin",
+      "family": "market_2",
+      "colorHex": "#4CB5AE",
+      "shape": "toy",
+      "readabilityTags": [
+        "toy",
+        "warm",
+        "set_4"
+      ]
+    },
+    {
+      "skuId": "sku_023",
+      "displayName": "Lilac Nuts",
+      "family": "market_2",
+      "colorHex": "#A66DD4",
+      "shape": "produce",
+      "readabilityTags": [
+        "produce",
+        "cool",
+        "set_4"
+      ]
+    },
+    {
+      "skuId": "sku_024",
+      "displayName": "Coral Pasta",
+      "family": "market_2",
+      "colorHex": "#E84F5F",
+      "shape": "bottle",
+      "readabilityTags": [
+        "bottle",
+        "warm",
+        "set_4"
+      ]
+    },
+    {
+      "skuId": "sku_025",
+      "displayName": "Ocean Salt",
+      "family": "market_2",
+      "colorHex": "#F2C84B",
+      "shape": "box",
+      "readabilityTags": [
+        "box",
+        "cool",
+        "set_5"
+      ]
+    },
+    {
+      "skuId": "sku_026",
+      "displayName": "Banana Mix",
+      "family": "market_2",
+      "colorHex": "#56B870",
+      "shape": "can",
+      "readabilityTags": [
+        "can",
+        "warm",
+        "set_5"
+      ]
+    },
+    {
+      "skuId": "sku_027",
+      "displayName": "Rose Juice",
+      "family": "market_2",
+      "colorHex": "#D94888",
+      "shape": "pouch",
+      "readabilityTags": [
+        "pouch",
+        "cool",
+        "set_5"
+      ]
+    },
+    {
+      "skuId": "sku_028",
+      "displayName": "Jelly Star",
+      "family": "market_2",
+      "colorHex": "#F28F3B",
+      "shape": "jar",
+      "readabilityTags": [
+        "jar",
+        "warm",
+        "set_5"
+      ]
+    },
+    {
+      "skuId": "sku_029",
+      "displayName": "Cream Bun",
+      "family": "market_2",
+      "colorHex": "#4E91D9",
+      "shape": "carton",
+      "readabilityTags": [
+        "carton",
+        "cool",
+        "set_5"
+      ]
+    },
+    {
+      "skuId": "sku_030",
+      "displayName": "Tomato Pack",
+      "family": "market_3",
+      "colorHex": "#8C6FE8",
+      "shape": "toy",
+      "readabilityTags": [
+        "toy",
+        "warm",
+        "set_6"
+      ]
+    },
+    {
+      "skuId": "sku_031",
+      "displayName": "Aqua Bites",
+      "family": "market_3",
+      "colorHex": "#D99A3D",
+      "shape": "produce",
+      "readabilityTags": [
+        "produce",
+        "cool",
+        "set_6"
+      ]
+    },
+    {
+      "skuId": "sku_032",
+      "displayName": "Vanilla Box",
+      "family": "market_3",
+      "colorHex": "#D94E35",
+      "shape": "bottle",
+      "readabilityTags": [
+        "bottle",
+        "warm",
+        "set_6"
+      ]
+    },
+    {
+      "skuId": "sku_033",
+      "displayName": "Cactus Chips",
+      "family": "market_3",
+      "colorHex": "#F6A15A",
+      "shape": "box",
+      "readabilityTags": [
+        "box",
+        "cool",
+        "set_6"
+      ]
+    },
+    {
+      "skuId": "sku_034",
+      "displayName": "Cookie Cow",
+      "family": "market_3",
+      "colorHex": "#74B843",
+      "shape": "can",
+      "readabilityTags": [
+        "can",
+        "warm",
+        "set_6"
+      ]
+    },
+    {
+      "skuId": "sku_035",
+      "displayName": "Poppy Soup",
+      "family": "market_3",
+      "colorHex": "#9D7053",
+      "shape": "pouch",
+      "readabilityTags": [
+        "pouch",
+        "cool",
+        "set_7"
+      ]
+    },
+    {
+      "skuId": "sku_036",
+      "displayName": "Avocado Oil",
+      "family": "market_3",
+      "colorHex": "#7B67C8",
+      "shape": "jar",
+      "readabilityTags": [
+        "jar",
+        "warm",
+        "set_7"
+      ]
+    },
+    {
+      "skuId": "sku_037",
+      "displayName": "Rainbow Bar",
+      "family": "market_3",
+      "colorHex": "#F06449",
+      "shape": "carton",
+      "readabilityTags": [
+        "carton",
+        "cool",
+        "set_7"
+      ]
+    },
+    {
+      "skuId": "sku_038",
+      "displayName": "Sprout Cup",
+      "family": "market_3",
+      "colorHex": "#5AA7A7",
+      "shape": "toy",
+      "readabilityTags": [
+        "toy",
+        "warm",
+        "set_7"
+      ]
+    },
+    {
+      "skuId": "sku_039",
+      "displayName": "Berry Brush",
+      "family": "market_3",
+      "colorHex": "#3F9E73",
+      "shape": "produce",
+      "readabilityTags": [
+        "produce",
+        "cool",
+        "set_7"
+      ]
+    },
+    {
+      "skuId": "sku_040",
+      "displayName": "Lime Cube",
+      "family": "market_4",
+      "colorHex": "#E36F3F",
+      "shape": "bottle",
+      "readabilityTags": [
+        "bottle",
+        "warm",
+        "set_8"
+      ]
+    },
+    {
+      "skuId": "sku_041",
+      "displayName": "Orange Foam",
+      "family": "market_4",
+      "colorHex": "#7EB7E6",
+      "shape": "box",
+      "readabilityTags": [
+        "box",
+        "cool",
+        "set_8"
+      ]
+    },
+    {
+      "skuId": "sku_042",
+      "displayName": "Sugar Tin",
+      "family": "market_4",
+      "colorHex": "#9656A1",
+      "shape": "can",
+      "readabilityTags": [
+        "can",
+        "warm",
+        "set_8"
+      ]
+    },
+    {
+      "skuId": "sku_043",
+      "displayName": "Tea Bunny",
+      "family": "market_4",
+      "colorHex": "#4D7CFE",
+      "shape": "pouch",
+      "readabilityTags": [
+        "pouch",
+        "cool",
+        "set_8"
+      ]
+    },
+    {
+      "skuId": "sku_044",
+      "displayName": "Soda Duck",
+      "family": "market_4",
+      "colorHex": "#7FB069",
+      "shape": "jar",
+      "readabilityTags": [
+        "jar",
+        "warm",
+        "set_8"
+      ]
+    },
+    {
+      "skuId": "sku_045",
+      "displayName": "Mint Rocket",
+      "family": "market_4",
+      "colorHex": "#F08A5D",
+      "shape": "carton",
+      "readabilityTags": [
+        "carton",
+        "cool",
+        "set_9"
+      ]
+    },
+    {
+      "skuId": "sku_046",
+      "displayName": "Cocoa Bear",
+      "family": "market_4",
+      "colorHex": "#4CB5AE",
+      "shape": "toy",
+      "readabilityTags": [
+        "toy",
+        "warm",
+        "set_9"
+      ]
+    },
+    {
+      "skuId": "sku_047",
+      "displayName": "Apple Bell",
+      "family": "market_4",
+      "colorHex": "#A66DD4",
+      "shape": "produce",
+      "readabilityTags": [
+        "produce",
+        "cool",
+        "set_9"
+      ]
+    },
+    {
+      "skuId": "sku_048",
+      "displayName": "Lemon Boat",
+      "family": "market_4",
+      "colorHex": "#E84F5F",
+      "shape": "bottle",
+      "readabilityTags": [
+        "bottle",
+        "warm",
+        "set_9"
+      ]
+    },
+    {
+      "skuId": "sku_049",
+      "displayName": "Grape Moon",
+      "family": "market_4",
+      "colorHex": "#F2C84B",
+      "shape": "box",
+      "readabilityTags": [
+        "box",
+        "cool",
+        "set_9"
+      ]
+    },
+    {
+      "skuId": "sku_050",
+      "displayName": "Peach Panda",
+      "family": "market_5",
+      "colorHex": "#56B870",
+      "shape": "can",
+      "readabilityTags": [
+        "can",
+        "warm",
+        "set_10"
+      ]
+    },
+    {
+      "skuId": "sku_051",
+      "displayName": "Plum Pony",
+      "family": "market_5",
+      "colorHex": "#D94888",
+      "shape": "pouch",
+      "readabilityTags": [
+        "pouch",
+        "cool",
+        "set_10"
+      ]
+    },
+    {
+      "skuId": "sku_052",
+      "displayName": "Kiwi Kite",
+      "family": "market_5",
+      "colorHex": "#F28F3B",
+      "shape": "jar",
+      "readabilityTags": [
+        "jar",
+        "warm",
+        "set_10"
+      ]
+    },
+    {
+      "skuId": "sku_053",
+      "displayName": "Mango Mug",
+      "family": "market_5",
+      "colorHex": "#4E91D9",
+      "shape": "carton",
+      "readabilityTags": [
+        "carton",
+        "cool",
+        "set_10"
+      ]
+    },
+    {
+      "skuId": "sku_054",
+      "displayName": "Pear Pillow",
+      "family": "market_5",
+      "colorHex": "#8C6FE8",
+      "shape": "toy",
+      "readabilityTags": [
+        "toy",
+        "warm",
+        "set_10"
+      ]
+    },
+    {
+      "skuId": "sku_055",
+      "displayName": "Cherry Cart",
+      "family": "market_5",
+      "colorHex": "#D99A3D",
+      "shape": "produce",
+      "readabilityTags": [
+        "produce",
+        "cool",
+        "set_11"
+      ]
+    },
+    {
+      "skuId": "sku_056",
+      "displayName": "Honey Hat",
+      "family": "market_5",
+      "colorHex": "#D94E35",
+      "shape": "bottle",
+      "readabilityTags": [
+        "bottle",
+        "warm",
+        "set_11"
+      ]
+    },
+    {
+      "skuId": "sku_057",
+      "displayName": "Melon Mask",
+      "family": "market_5",
+      "colorHex": "#F6A15A",
+      "shape": "box",
+      "readabilityTags": [
+        "box",
+        "cool",
+        "set_11"
+      ]
+    },
+    {
+      "skuId": "sku_058",
+      "displayName": "Berry Badge",
+      "family": "market_5",
+      "colorHex": "#74B843",
+      "shape": "can",
+      "readabilityTags": [
+        "can",
+        "warm",
+        "set_11"
+      ]
+    },
+    {
+      "skuId": "sku_059",
+      "displayName": "Cloud Candy",
+      "family": "market_5",
+      "colorHex": "#9D7053",
+      "shape": "pouch",
+      "readabilityTags": [
+        "pouch",
+        "cool",
+        "set_11"
+      ]
+    }
+  ]
+}

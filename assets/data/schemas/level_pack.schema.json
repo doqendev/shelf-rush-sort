@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "level_pack",
+  "type": "object",
+  "required": [
+    "schemaVersion"
+  ],
+  "additionalProperties": true
+}
