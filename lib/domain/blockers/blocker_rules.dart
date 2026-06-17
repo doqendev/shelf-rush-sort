@@ -7,10 +7,14 @@ final class BlockerRules {
     return blocker == BlockerKind.locked ||
         blocker == BlockerKind.tape ||
         blocker == BlockerKind.frozen ||
-        blocker == BlockerKind.cover;
+        blocker == BlockerKind.frost ||
+        blocker == BlockerKind.cover ||
+        blocker == BlockerKind.crate;
   }
 
   bool blocksPlacement(BlockerKind blocker) {
-    return blocker == BlockerKind.locked || blocker == BlockerKind.cover;
+    return blocker == BlockerKind.locked ||
+        blocker == BlockerKind.cover ||
+        blocker == BlockerKind.crate;
   }
 }

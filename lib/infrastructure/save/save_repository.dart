@@ -202,7 +202,7 @@ final class SaveContentCompatibility {
 
   factory SaveContentCompatibility.initial() {
     return const SaveContentCompatibility(
-      levelPackId: 'pack_000_soft_launch_candidate',
+      levelPackId: 'dev_test_pack_000_generated',
       levelPackVersion: 1,
     );
   }

@@ -9,7 +9,9 @@ import '../infrastructure/analytics/analytics_service.dart';
 import '../infrastructure/consent/consent_service.dart';
 import '../infrastructure/crash/crash_service.dart';
 import '../infrastructure/iap/purchase_service.dart';
+import '../infrastructure/platform/audio_service.dart';
 import '../infrastructure/platform/device_info_service.dart';
+import '../infrastructure/platform/haptics_service.dart';
 import '../infrastructure/remote_config/remote_config_service.dart';
 import '../infrastructure/save/save_repository.dart';
 import 'environment.dart';
@@ -65,4 +67,13 @@ final eventServiceProvider = Provider<EventService>((Ref ref) {
 
 final deviceInfoServiceProvider = Provider<DeviceInfoService>((Ref ref) {
   return const DeviceInfoService();
+});
+
+final audioServiceProvider = Provider<AudioService>((Ref ref) {
+  return const SilentAudioService();
+});
+
+final hapticsServiceProvider = Provider<HapticsService>((Ref ref) {
+  final PlayerSave save = ref.watch(playerSaveProvider);
+  return FlutterHapticsService(enabled: save.haptics);
 });

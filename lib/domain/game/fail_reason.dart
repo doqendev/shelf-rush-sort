@@ -1,9 +1,13 @@
 enum LevelFailReason {
   none,
   timerExpired,
-  moveLimitReached,
   boardJammed,
-  noObjectiveProgress,
+  noUsefulMoves,
+  reserveMismanaged,
+  laneExhausted,
+  objectiveImpossible,
+  moveLimitExceeded,
+  blockerRemaining,
 }
 
 enum LevelEndType { won, failed }

@@ -7,10 +7,10 @@ session controller, a Flame presentation layer, and infrastructure adapters for
 save, analytics, ads, IAP, remote config, consent, audio, haptics, and platform
 services.
 
-Bundled content includes a generated 300-level soft-launch pack, 60 SKU
-metadata entries, a product visual manifest, economy defaults, theme data, event
-catalog metadata, and JSON schemas. The content builder regenerates these assets
-deterministically.
+Bundled content includes a generated 300-level dev-test pack, 60 SKU metadata
+entries, a product visual manifest, economy defaults, theme data, event catalog
+metadata, validation metrics, and JSON schemas. It is not labeled as
+soft-launch content until authored human-review metadata exists.
 
 Useful commands:
 

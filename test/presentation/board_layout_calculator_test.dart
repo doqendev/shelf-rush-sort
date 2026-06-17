@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flame/game.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shelf_rush_sort/domain/core/value_objects.dart';
+import 'package:shelf_rush_sort/domain/moving_lanes/moving_lane_def.dart';
 import 'package:shelf_rush_sort/presentation/flame/board/board_layout_calculator.dart';
 
 void main() {
@@ -35,6 +36,9 @@ void main() {
             in layout.cellRects.entries) {
           expect(entry.value.width, greaterThanOrEqualTo(26));
           expect(entry.value.height, greaterThanOrEqualTo(40));
+          final Rect hitRect = layout.hitCellRect(entry.key);
+          expect(hitRect.width, greaterThanOrEqualTo(minInteractiveTargetPx));
+          expect(hitRect.height, greaterThanOrEqualTo(minInteractiveTargetPx));
           expect(layout.rackRect.contains(entry.value.center), isTrue);
           expect(
             layout.hitTestCell(
@@ -48,6 +52,38 @@ void main() {
       }
     });
   }
+
+  test('top and vertical lane anchors produce playable lane rects', () {
+    final BoardLayout layout = calculator.calculate(
+      Vector2(390, 844),
+      hasLane: true,
+      laneDefs: <MovingLaneDef>[
+        MovingLaneDef(
+          id: 'lane_top',
+          orientation: LaneOrientation.horizontal,
+          behavior: LaneBehavior.finite,
+          speedCellsPerSecond: 1,
+          anchor: LaneAnchor.top,
+          queue: const <MovingLaneProductDef>[],
+        ),
+        MovingLaneDef(
+          id: 'lane_left',
+          orientation: LaneOrientation.vertical,
+          behavior: LaneBehavior.finite,
+          speedCellsPerSecond: 1,
+          anchor: LaneAnchor.left,
+          queue: const <MovingLaneProductDef>[],
+        ),
+      ],
+    );
+
+    expect(
+      layout.laneRectFor('lane_top').bottom,
+      lessThan(layout.rackRect.top),
+    );
+    expect(layout.laneRectFor('lane_left').height, layout.rackRect.height);
+    expect(layout.laneRectFor('lane_left').width, greaterThanOrEqualTo(44));
+  });
 }
 
 void _expectNoOverlappingCells(BoardLayout layout) {

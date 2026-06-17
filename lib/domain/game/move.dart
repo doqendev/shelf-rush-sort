@@ -17,6 +17,17 @@ enum InvalidMoveReason {
   restrictedByTutorial,
 }
 
+enum MoveQuality {
+  completesTriple,
+  createsPair,
+  revealEnabling,
+  laneSave,
+  reserveSafe,
+  riskyReserve,
+  neutral,
+  badButLegal,
+}
+
 final class MoveAction {
   const MoveAction({required this.source, required this.target});
 

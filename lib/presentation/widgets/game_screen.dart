@@ -7,11 +7,10 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/providers.dart';
 import '../../application/content/content_service.dart';
-import '../../application/economy/economy_service.dart';
 import '../../application/game_session/game_session_controller.dart';
 import '../../application/game_session/game_session_state.dart';
 import '../../application/monetization/monetization_service.dart';
-import '../../application/progression/progression_service.dart';
+import '../../application/progression/level_completion_service.dart';
 import '../../application/progression/reward_service.dart';
 import '../../domain/content/level_def.dart';
 import '../../infrastructure/analytics/analytics_event.dart';
@@ -37,6 +36,8 @@ final class _GameScreenState extends ConsumerState<GameScreen> {
   StreamSubscription<GameSessionState>? _subscription;
   GameSessionState? _session;
   late int _levelNumber;
+  final Set<String> _committedWinAttempts = <String>{};
+  final Set<String> _doubleRewardedAttempts = <String>{};
 
   @override
   void initState() {
@@ -126,12 +127,18 @@ final class _GameScreenState extends ConsumerState<GameScreen> {
     final ShelfRushGame game = ShelfRushGame(
       controller: controller,
       productCatalog: contentService.content.productCatalog,
+      audio: ref.read(audioServiceProvider),
+      haptics: ref.read(hapticsServiceProvider),
+      reduceMotion: ref.read(playerSaveProvider).reduceMotion,
     );
     _subscription = controller.states.listen((GameSessionState state) {
       if (mounted) {
         setState(() {
           _session = state;
         });
+      }
+      if (state.status == GameSessionStatus.won) {
+        unawaited(_commitWinIfNeeded(state));
       }
     });
     setState(() {
@@ -162,8 +169,8 @@ final class _GameScreenState extends ConsumerState<GameScreen> {
     if (session == null) {
       return;
     }
+    await _commitWinIfNeeded(session);
     final AnalyticsService analytics = ref.read(analyticsServiceProvider);
-    var rewardMultiplier = 1;
     if (doubleReward) {
       final MonetizationService monetization = MonetizationService(
         ads: ref.read(adsServiceProvider),
@@ -173,41 +180,37 @@ final class _GameScreenState extends ConsumerState<GameScreen> {
       if (!result.completed) {
         return;
       }
-      rewardMultiplier = 2;
+      if (_doubleRewardedAttempts.add(session.attemptId)) {
+        final PlayerSave before = ref.read(playerSaveProvider);
+        final RewardGrant reward = const RewardService().levelWinReward(
+          session.level.levelNumber,
+        );
+        final PlayerSave rewarded = const LevelCompletionService()
+            .commitDoubleReward(
+              save: before,
+              level: session.level,
+              reward: reward,
+              adTransactionId: session.attemptId,
+            );
+        ref.read(playerSaveProvider.notifier).state = rewarded;
+        unawaited(ref.read(saveRepositoryProvider).save(rewarded));
+        unawaited(
+          analytics.track(
+            AnalyticsEvent(
+              name: 'economy_transaction',
+              parameters: <String, Object?>{
+                'level_id': session.level.id,
+                'type': 'grant',
+                'currency': 'coins',
+                'amount': rewarded.coins - before.coins,
+                'reason': 'level_win_double_reward',
+                'balance': rewarded.coins,
+              },
+            ),
+          ),
+        );
+      }
     }
-    final PlayerSave save = ref.read(playerSaveProvider);
-    final ProgressionService progression = const ProgressionService();
-    final RewardService rewards = const RewardService();
-    final EconomyService economy = const EconomyService();
-    final reward = rewards.levelWinReward(session.level.levelNumber);
-    final int coinsGranted = reward.coins * rewardMultiplier;
-    final PlayerSave updated = progression
-        .onLevelWon(save, session.level)
-        .copyWith(lastSeenAt: DateTime.now().toUtc());
-    final PlayerSave rewarded = economy.grantCoinsToSave(
-      updated,
-      coinsGranted,
-      doubleReward ? 'level_win_double_reward' : reward.reason,
-      sourceId:
-          '${session.level.id}_${doubleReward ? 'double_reward' : 'win_reward'}',
-    );
-    unawaited(
-      analytics.track(
-        AnalyticsEvent(
-          name: 'economy_transaction',
-          parameters: <String, Object?>{
-            'level_id': session.level.id,
-            'type': 'grant',
-            'currency': 'coins',
-            'amount': coinsGranted,
-            'reason': doubleReward ? 'level_win_double_reward' : reward.reason,
-            'balance': rewarded.coins,
-          },
-        ),
-      ),
-    );
-    ref.read(playerSaveProvider.notifier).state = rewarded;
-    unawaited(ref.read(saveRepositoryProvider).save(rewarded));
     final int maxLevel = ref
         .read(contentServiceProvider)
         .content
@@ -216,6 +219,43 @@ final class _GameScreenState extends ConsumerState<GameScreen> {
         .length;
     final int nextLevel = (session.level.levelNumber + 1).clamp(1, maxLevel);
     _loadLevel(nextLevel);
+  }
+
+  Future<void> _commitWinIfNeeded(GameSessionState session) async {
+    if (session.status != GameSessionStatus.won ||
+        !_committedWinAttempts.add(session.attemptId)) {
+      return;
+    }
+    final PlayerSave before = ref.read(playerSaveProvider);
+    final RewardGrant reward = const RewardService().levelWinReward(
+      session.level.levelNumber,
+    );
+    final PlayerSave committed = const LevelCompletionService().commitWin(
+      save: before,
+      level: session.level,
+      session: session,
+      reward: reward,
+    );
+    ref.read(playerSaveProvider.notifier).state = committed;
+    await ref.read(saveRepositoryProvider).save(committed);
+    final int granted = committed.coins - before.coins;
+    if (granted > 0) {
+      await ref
+          .read(analyticsServiceProvider)
+          .track(
+            AnalyticsEvent(
+              name: 'economy_transaction',
+              parameters: <String, Object?>{
+                'level_id': session.level.id,
+                'type': 'grant',
+                'currency': 'coins',
+                'amount': granted,
+                'reason': reward.reason,
+                'balance': committed.coins,
+              },
+            ),
+          );
+    }
   }
 
   Future<void> _reviveWithRewardedAd() async {

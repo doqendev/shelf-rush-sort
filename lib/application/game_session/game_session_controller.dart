@@ -7,6 +7,7 @@ import '../../domain/core/value_objects.dart';
 import '../../domain/game/board_rules.dart';
 import '../../domain/game/board_state.dart';
 import '../../domain/game/fail_reason.dart';
+import '../../domain/game/level_end_evaluator.dart';
 import '../../domain/game/move.dart';
 import '../../domain/game/objective.dart';
 import '../../domain/game/replay.dart';
@@ -24,12 +25,37 @@ final class GameSessionController {
   GameSessionController({
     required LevelDef level,
     required this.analytics,
-    this.boardRules = const BoardRules(),
+    BoardRules? boardRules,
     this.objectiveRules = const ObjectiveRules(),
     this.laneRules = const MovingLaneRules(),
-    this.boosterRules = const BoosterRules(),
+    BoosterRules? boosterRules,
+    this.levelEndEvaluator = const LevelEndEvaluator(),
     this.tutorialController = const TutorialController(),
-  }) : _state = _createInitialState(level, objectiveRules) {
+    String? attemptId,
+  }) : boardRules =
+           boardRules ??
+           BoardRules(
+             allowSameCompartmentMoves: level.rules.allowSameCompartmentMoves,
+           ),
+       boosterRules =
+           boosterRules ??
+           BoosterRules(
+             boardRules:
+                 boardRules ??
+                 BoardRules(
+                   allowSameCompartmentMoves:
+                       level.rules.allowSameCompartmentMoves,
+                 ),
+           ),
+       _state = _createInitialState(
+         level,
+         objectiveRules,
+         boardRules ??
+             BoardRules(
+               allowSameCompartmentMoves: level.rules.allowSameCompartmentMoves,
+             ),
+         attemptId ?? _newAttemptId(level),
+       ) {
     unawaited(
       analytics.track(
         AnalyticsEvent(
@@ -49,6 +75,7 @@ final class GameSessionController {
   final ObjectiveRules objectiveRules;
   final MovingLaneRules laneRules;
   final BoosterRules boosterRules;
+  final LevelEndEvaluator levelEndEvaluator;
   final TutorialController tutorialController;
   final StreamController<GameSessionState> _states =
       StreamController<GameSessionState>.broadcast(sync: true);
@@ -62,8 +89,9 @@ final class GameSessionController {
   static GameSessionState _createInitialState(
     LevelDef level,
     ObjectiveRules objectiveRules,
+    BoardRules boardRules,
+    String attemptId,
   ) {
-    final BoardRules boardRules = const BoardRules();
     final BoardState board = boardRules
         .resolveBoard(level.createBoardState())
         .state;
@@ -79,7 +107,12 @@ final class GameSessionController {
       lanes: level.movingLanes
           .map((lane) => MovingLaneState(def: lane))
           .toList(growable: false),
+      attemptId: attemptId,
     );
+  }
+
+  static String _newAttemptId(LevelDef level) {
+    return '${level.id}_${DateTime.now().toUtc().microsecondsSinceEpoch}';
   }
 
   void dispose() {
@@ -237,6 +270,7 @@ final class GameSessionController {
           ),
         ),
         clearSelectedCell: true,
+        clearSuggestedMove: true,
         events: <SessionEvent>[
           SessionEvent(
             type: SessionEventType.laneGrabbed,
@@ -272,6 +306,7 @@ final class GameSessionController {
     _applyResolution(
       result,
       lanes: lanes,
+      laneDeliveredProduct: held.product,
       replayCommand: ReplayCommand(
         type: ReplayCommandType.placeHeldLaneProduct,
         elapsedMs: _state.timer.elapsed.inMilliseconds,
@@ -288,25 +323,80 @@ final class GameSessionController {
       return;
     }
     final LevelTimer timer = _state.timer.tick(delta);
-    final List<MovingLaneState> lanes = _state.lanes
-        .map((MovingLaneState lane) => laneRules.tickLane(lane, delta))
-        .toList(growable: false);
-    if (timer.expired) {
-      _fail(LevelFailReason.timerExpired, timer: timer, lanes: lanes);
+    final List<MovingLaneState> lanes = <MovingLaneState>[];
+    final List<SessionEvent> events = <SessionEvent>[];
+    for (var index = 0; index < _state.lanes.length; index += 1) {
+      final MovingLaneState previous = _state.lanes[index];
+      final MovingLaneState next = laneRules.tickLane(previous, delta);
+      lanes.add(next);
+      if (next.missedCount > previous.missedCount) {
+        final String? missedSkuId = next.lastMissedSkuId;
+        events.add(
+          SessionEvent(
+            type: SessionEventType.laneMissed,
+            payload: <String, Object?>{
+              'lane_id': next.def.id,
+              'sku_id': ?missedSkuId,
+              'missed_count': next.missedCount,
+            },
+          ),
+        );
+        unawaited(
+          analytics.track(
+            AnalyticsEvent(
+              name: 'lane_miss',
+              parameters: <String, Object?>{
+                'level_id': _state.level.id,
+                'lane_id': next.def.id,
+                'sku_id': ?missedSkuId,
+                'missed_count': next.missedCount,
+              },
+            ),
+          ),
+        );
+      }
+    }
+    final LevelEnd? levelEnd = levelEndEvaluator.evaluate(
+      board: _state.board,
+      objective: _state.objective,
+      timer: timer,
+      lanes: lanes,
+      level: _state.level,
+      boardRules: boardRules,
+      moveCount: _state.moveCount,
+    );
+    if (levelEnd?.isFail ?? false) {
+      _fail(levelEnd!.failReason, timer: timer, lanes: lanes, events: events);
       return;
     }
-    _emit(
-      _state.copyWith(timer: timer, lanes: lanes, events: <SessionEvent>[]),
-    );
+    _emit(_state.copyWith(timer: timer, lanes: lanes, events: events));
   }
 
   void useBooster(BoosterKind booster) {
     if (_state.isEnded) {
       return;
     }
+    final String preStateHash = _sessionHash(_state);
     final BoosterUseResult result = boosterRules.useBooster(
-      _state.board,
+      BoosterContext(
+        board: _state.board,
+        objective: _state.objective,
+        timer: _state.timer,
+        lanes: _state.lanes,
+        selectedCell: _state.selectedCell,
+        seed: _state.level.seed,
+        level: _state.level,
+      ),
       booster,
+    );
+    final String postStateHash = _sessionHash(
+      _state.copyWith(
+        board: result.board,
+        objective: result.objective,
+        timer: result.timer,
+        lanes: result.lanes,
+        suggestedMove: result.suggestedMove,
+      ),
     );
     unawaited(
       analytics.track(
@@ -316,32 +406,106 @@ final class GameSessionController {
             'level_id': _state.level.id,
             'booster': booster.name,
             'used': result.used,
-            if (result.message != null) 'message': result.message,
+            'reason': result.reason,
+            'pre_state_hash': preStateHash,
+            'post_state_hash': postStateHash,
           },
         ),
       ),
     );
+    _applyBoosterResult(booster, result);
+  }
+
+  void _applyBoosterResult(BoosterKind booster, BoosterUseResult result) {
+    final List<SessionEvent> events = <SessionEvent>[
+      SessionEvent(
+        type: SessionEventType.boosterUsed,
+        payload: <String, Object?>{
+          'booster': booster.name,
+          'used': result.used,
+          'reason': result.reason,
+          if (result.suggestedMove != null)
+            'source': result.suggestedMove!.source.key,
+          if (result.suggestedMove != null)
+            'target': result.suggestedMove!.target.key,
+        },
+      ),
+    ];
+    final ResolutionResult? resolution = result.resolution;
+    if (resolution != null) {
+      for (final ClearedTriple triple in resolution.clearedTriples) {
+        events.add(
+          SessionEvent(
+            type: SessionEventType.tripleCleared,
+            payload: <String, Object?>{
+              'sku_id': triple.skuId,
+              'compartment': triple.compartmentIndex,
+              'combo': resolution.comboCount,
+            },
+          ),
+        );
+      }
+      if (resolution.revealedProducts.isNotEmpty) {
+        events.add(
+          SessionEvent(
+            type: SessionEventType.hiddenRevealed,
+            payload: <String, Object?>{
+              'count': resolution.revealedProducts.length,
+            },
+          ),
+        );
+      }
+    }
+    var status = _state.status;
+    var failReason = _state.failReason;
+    final LevelEnd? levelEnd = levelEndEvaluator.evaluate(
+      board: result.board,
+      objective: result.objective,
+      timer: result.timer,
+      lanes: result.lanes,
+      level: _state.level,
+      boardRules: boardRules,
+      moveCount: _state.moveCount,
+    );
+    if (levelEnd?.isWin ?? false) {
+      status = GameSessionStatus.won;
+      events.add(SessionEvent(type: SessionEventType.levelWon));
+    } else if (levelEnd?.isFail ?? false) {
+      status = GameSessionStatus.failed;
+      failReason = levelEnd!.failReason;
+      events.add(
+        SessionEvent(
+          type: SessionEventType.levelFailed,
+          payload: <String, Object?>{'reason': failReason.name},
+        ),
+      );
+    }
     _emit(
       _state.copyWith(
+        board: result.board.copyWith(
+          levelEnded: status != GameSessionStatus.playing,
+        ),
+        objective: result.objective,
+        timer: result.timer,
+        lanes: result.lanes,
+        suggestedMove: result.suggestedMove,
+        clearSuggestedMove: result.suggestedMove == null,
+        status: status,
+        failReason: failReason,
+        clearInvalidReason: result.used,
         replay: result.used
             ? _state.replay.append(
                 ReplayCommand(
                   type: ReplayCommandType.useBooster,
                   elapsedMs: _state.timer.elapsed.inMilliseconds,
-                  payload: <String, Object?>{'booster': booster.name},
+                  payload: <String, Object?>{
+                    'booster': booster.name,
+                    ...result.replayPayload,
+                  },
                 ),
               )
             : _state.replay,
-        events: <SessionEvent>[
-          SessionEvent(
-            type: SessionEventType.boosterUsed,
-            payload: <String, Object?>{
-              'booster': booster.name,
-              'used': result.used,
-              if (result.message != null) 'message': result.message,
-            },
-          ),
-        ],
+        events: events,
       ),
     );
   }
@@ -382,14 +546,20 @@ final class GameSessionController {
   void _applyResolution(
     ResolutionResult result, {
     List<MovingLaneState>? lanes,
+    ProductInstance? laneDeliveredProduct,
     ReplayCommand? replayCommand,
   }) {
-    final ObjectiveState objective = objectiveRules.onResolution(
-      _state.objective,
-      result,
-    );
+    ObjectiveState objective = _state.objective;
+    if (laneDeliveredProduct != null) {
+      objective = objectiveRules.onLaneDelivered(
+        objective,
+        product: laneDeliveredProduct,
+      );
+    }
+    objective = objectiveRules.onResolution(objective, result);
     var status = _state.status;
     var failReason = _state.failReason;
+    final int nextMoveCount = _state.moveCount + (result.moveApplied ? 1 : 0);
     final List<SessionEvent> events = <SessionEvent>[
       SessionEvent(type: SessionEventType.moveApplied),
     ];
@@ -427,7 +597,17 @@ final class GameSessionController {
       );
     }
 
-    if (objective.isComplete(result.state)) {
+    final LevelEnd? levelEnd = levelEndEvaluator.evaluate(
+      board: result.state,
+      objective: objective,
+      timer: _state.timer,
+      lanes: lanes ?? _state.lanes,
+      level: _state.level,
+      boardRules: boardRules,
+      moveCount: nextMoveCount,
+    );
+
+    if (levelEnd?.isWin ?? false) {
       status = GameSessionStatus.won;
       events.add(SessionEvent(type: SessionEventType.levelWon));
       unawaited(
@@ -437,23 +617,20 @@ final class GameSessionController {
             parameters: <String, Object?>{
               'level_id': _state.level.id,
               'duration_sec': _state.timer.elapsed.inSeconds,
-              'moves': _state.moveCount + 1,
+              'moves': nextMoveCount,
             },
           ),
         ),
       );
-    } else {
-      final LevelEnd? levelEnd = boardRules.evaluateLevelEnd(result.state);
-      if (levelEnd?.isFail ?? false) {
-        status = GameSessionStatus.failed;
-        failReason = levelEnd!.failReason;
-        events.add(
-          SessionEvent(
-            type: SessionEventType.levelFailed,
-            payload: <String, Object?>{'reason': failReason.name},
-          ),
-        );
-      }
+    } else if (levelEnd?.isFail ?? false) {
+      status = GameSessionStatus.failed;
+      failReason = levelEnd!.failReason;
+      events.add(
+        SessionEvent(
+          type: SessionEventType.levelFailed,
+          payload: <String, Object?>{'reason': failReason.name},
+        ),
+      );
     }
 
     _emit(
@@ -466,8 +643,9 @@ final class GameSessionController {
         status: status,
         failReason: failReason,
         clearSelectedCell: true,
+        clearSuggestedMove: true,
         clearInvalidReason: true,
-        moveCount: _state.moveCount + (result.moveApplied ? 1 : 0),
+        moveCount: nextMoveCount,
         replay: replayCommand == null
             ? _state.replay
             : _state.replay.append(replayCommand),
@@ -505,6 +683,7 @@ final class GameSessionController {
     LevelFailReason reason, {
     LevelTimer? timer,
     List<MovingLaneState>? lanes,
+    List<SessionEvent> events = const <SessionEvent>[],
   }) {
     unawaited(
       analytics.track(
@@ -526,6 +705,7 @@ final class GameSessionController {
         status: GameSessionStatus.failed,
         failReason: reason,
         events: <SessionEvent>[
+          ...events,
           SessionEvent(
             type: SessionEventType.levelFailed,
             payload: <String, Object?>{'reason': reason.name},
@@ -540,5 +720,16 @@ final class GameSessionController {
     if (!_states.isClosed) {
       _states.add(_state);
     }
+  }
+
+  String _sessionHash(GameSessionState state) {
+    return <Object?>[
+      state.board.stableHash,
+      state.timer.elapsed.inMilliseconds,
+      state.timer.frozenRemaining.inMilliseconds,
+      for (final MovingLaneState lane in state.lanes) lane.stableHash,
+      state.suggestedMove?.source.key,
+      state.suggestedMove?.target.key,
+    ].join('#');
   }
 }

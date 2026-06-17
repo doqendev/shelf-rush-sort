@@ -3,35 +3,177 @@ import '../game/board_state.dart';
 import '../game/objective.dart';
 import '../moving_lanes/moving_lane_def.dart';
 
+enum HiddenPreviewMode { exactDim, silhouette, mysteryBag, hidden }
+
+enum CompartmentRole { standard, reserve, support, decorative }
+
+enum LevelTag { tutorial, normal, hard, superHard, generated, humanReviewed }
+
+final class HiddenLayerDef {
+  HiddenLayerDef({
+    required List<SkuId?> cells,
+    this.previewMode = HiddenPreviewMode.exactDim,
+  }) : assert(cells.length == cellsPerCompartment),
+       cells = List<SkuId?>.unmodifiable(cells);
+
+  factory HiddenLayerDef.fromJson(Map<String, Object?> json) {
+    final List<Object?> cellsJson = json['cells']! as List<Object?>;
+    return HiddenLayerDef(
+      cells: cellsJson.map((Object? item) => item as String?).toList(),
+      previewMode: HiddenPreviewMode.values.byName(
+        json['previewMode'] as String? ?? HiddenPreviewMode.exactDim.name,
+      ),
+    );
+  }
+
+  final List<SkuId?> cells;
+  final HiddenPreviewMode previewMode;
+}
+
+final class LevelRulesDef {
+  const LevelRulesDef({
+    this.allowSameCompartmentMoves = false,
+    this.allowSwap = false,
+    this.allowCategoryClears = false,
+  });
+
+  factory LevelRulesDef.fromJson(Map<String, Object?> json) {
+    return LevelRulesDef(
+      allowSameCompartmentMoves:
+          json['allowSameCompartmentMoves'] as bool? ?? false,
+      allowSwap: json['allowSwap'] as bool? ?? false,
+      allowCategoryClears: json['allowCategoryClears'] as bool? ?? false,
+    );
+  }
+
+  final bool allowSameCompartmentMoves;
+  final bool allowSwap;
+  final bool allowCategoryClears;
+}
+
+final class HumanReviewMetadata {
+  const HumanReviewMetadata({
+    required this.author,
+    required this.intent,
+    required this.curriculumTag,
+    required this.difficultyTarget,
+    required this.humanReviewGrade,
+  });
+
+  factory HumanReviewMetadata.fromJson(Map<String, Object?> json) {
+    return HumanReviewMetadata(
+      author: json['author'] as String? ?? 'unreviewed',
+      intent: json['intent'] as String? ?? '',
+      curriculumTag: json['curriculumTag'] as String? ?? '',
+      difficultyTarget: json['difficultyTarget'] as String? ?? '',
+      humanReviewGrade: json['humanReviewGrade'] as String? ?? 'unreviewed',
+    );
+  }
+
+  final String author;
+  final String intent;
+  final String curriculumTag;
+  final String difficultyTarget;
+  final String humanReviewGrade;
+}
+
+final class ValidationMetrics {
+  const ValidationMetrics({this.values = const <String, Object?>{}});
+
+  factory ValidationMetrics.fromJson(Map<String, Object?> json) {
+    return ValidationMetrics(values: json);
+  }
+
+  final Map<String, Object?> values;
+}
+
+final class LaneFailurePolicy {
+  const LaneFailurePolicy({this.failOnRequiredMiss = true, this.allowedMisses});
+
+  factory LaneFailurePolicy.fromJson(Map<String, Object?> json) {
+    return LaneFailurePolicy(
+      failOnRequiredMiss: json['failOnRequiredMiss'] as bool? ?? true,
+      allowedMisses: json['allowedMisses'] as int?,
+    );
+  }
+
+  final bool failOnRequiredMiss;
+  final int? allowedMisses;
+}
+
 final class CompartmentDef {
   CompartmentDef({
     required this.index,
     required List<SkuId?> cells,
     List<SkuId> hidden = const <SkuId>[],
+    List<HiddenLayerDef>? hiddenLayers,
     this.locked = false,
     this.decorative = false,
+    this.role = CompartmentRole.standard,
   }) : assert(cells.length == cellsPerCompartment),
        cells = List<SkuId?>.unmodifiable(cells),
-       hidden = List<SkuId>.unmodifiable(hidden);
+       hidden = List<SkuId>.unmodifiable(
+         hidden.isEmpty && hiddenLayers != null
+             ? _flattenHiddenLayers(hiddenLayers)
+             : hidden,
+       ),
+       hiddenLayers = List<HiddenLayerDef>.unmodifiable(
+         hiddenLayers ?? _hiddenLayersFromFlat(hidden),
+       );
 
   factory CompartmentDef.fromJson(Map<String, Object?> json) {
     final List<Object?> cellsJson = json['cells']! as List<Object?>;
     final List<Object?> hiddenJson =
         json['hidden'] as List<Object?>? ?? const <Object?>[];
+    final List<Object?> hiddenLayersJson =
+        json['hiddenLayers'] as List<Object?>? ?? const <Object?>[];
+    final List<HiddenLayerDef> parsedHiddenLayers = hiddenLayersJson
+        .map((Object? item) {
+          return HiddenLayerDef.fromJson(item! as Map<String, Object?>);
+        })
+        .toList(growable: false);
     return CompartmentDef(
       index: json['index']! as int,
       cells: cellsJson.map((Object? item) => item as String?).toList(),
       hidden: hiddenJson.cast<String>(),
+      hiddenLayers: parsedHiddenLayers.isEmpty ? null : parsedHiddenLayers,
       locked: json['locked'] as bool? ?? false,
       decorative: json['decorative'] as bool? ?? false,
+      role: CompartmentRole.values.byName(
+        json['role'] as String? ?? CompartmentRole.standard.name,
+      ),
     );
   }
 
   final int index;
   final List<SkuId?> cells;
   final List<SkuId> hidden;
+  final List<HiddenLayerDef> hiddenLayers;
   final bool locked;
   final bool decorative;
+  final CompartmentRole role;
+
+  static List<SkuId> _flattenHiddenLayers(List<HiddenLayerDef> layers) {
+    return layers
+        .expand((HiddenLayerDef layer) => layer.cells)
+        .whereType<SkuId>()
+        .toList(growable: false);
+  }
+
+  static List<HiddenLayerDef> _hiddenLayersFromFlat(List<SkuId> hidden) {
+    if (hidden.isEmpty) {
+      return const <HiddenLayerDef>[];
+    }
+    final List<HiddenLayerDef> layers = <HiddenLayerDef>[];
+    for (var index = 0; index < hidden.length; index += cellsPerCompartment) {
+      final List<SkuId?> cells = <SkuId?>[
+        for (var cell = 0; cell < cellsPerCompartment; cell += 1)
+          index + cell < hidden.length ? hidden[index + cell] : null,
+      ];
+      layers.add(HiddenLayerDef(cells: cells));
+    }
+    return layers;
+  }
 }
 
 final class LevelDef {
@@ -46,8 +188,14 @@ final class LevelDef {
     this.timeLimitSeconds,
     this.moveLimit,
     this.difficulty = 'normal',
+    this.rules = const LevelRulesDef(),
+    List<LevelTag> tags = const <LevelTag>[],
+    this.humanReview,
+    this.validationMetrics = const ValidationMetrics(),
+    this.laneFailurePolicy = const LaneFailurePolicy(),
   }) : compartments = List<CompartmentDef>.unmodifiable(compartments),
-       movingLanes = List<MovingLaneDef>.unmodifiable(movingLanes);
+       movingLanes = List<MovingLaneDef>.unmodifiable(movingLanes),
+       tags = List<LevelTag>.unmodifiable(tags);
 
   factory LevelDef.fromJson(Map<String, Object?> json) {
     final List<Object?> compartmentsJson =
@@ -59,6 +207,14 @@ final class LevelDef {
     final Map<String, Object?> targetCountsJson =
         objectiveJson['targetCounts'] as Map<String, Object?>? ??
         const <String, Object?>{};
+    final Map<String, Object?> categoryTargetsJson =
+        objectiveJson['categoryTargets'] as Map<String, Object?>? ??
+        const <String, Object?>{};
+    final Map<String, Object?> specialTargetsJson =
+        objectiveJson['specialTargets'] as Map<String, Object?>? ??
+        const <String, Object?>{};
+    final List<Object?> tagsJson =
+        json['tags'] as List<Object?>? ?? const <Object?>[];
     return LevelDef(
       id: json['id']! as String,
       levelNumber: json['levelNumber']! as int,
@@ -74,6 +230,18 @@ final class LevelDef {
               in targetCountsJson.entries)
             entry.key: entry.value! as int,
         },
+        categoryTargets: <String, int>{
+          for (final MapEntry<String, Object?> entry
+              in categoryTargetsJson.entries)
+            entry.key: entry.value! as int,
+        },
+        specialTargets: <String, int>{
+          for (final MapEntry<String, Object?> entry
+              in specialTargetsJson.entries)
+            entry.key: entry.value! as int,
+        },
+        comboTarget: objectiveJson['comboTarget'] as int? ?? 0,
+        laneDeliveryTarget: objectiveJson['laneDeliveryTarget'] as int? ?? 0,
       ),
       compartments: compartmentsJson
           .map((Object? item) {
@@ -85,6 +253,25 @@ final class LevelDef {
             return MovingLaneDef.fromJson(item! as Map<String, Object?>);
           })
           .toList(growable: false),
+      rules: LevelRulesDef.fromJson(
+        json['rules'] as Map<String, Object?>? ?? const <String, Object?>{},
+      ),
+      tags: tagsJson
+          .map((Object? item) => LevelTag.values.byName(item! as String))
+          .toList(growable: false),
+      humanReview: json['humanReview'] == null
+          ? null
+          : HumanReviewMetadata.fromJson(
+              json['humanReview']! as Map<String, Object?>,
+            ),
+      validationMetrics: ValidationMetrics.fromJson(
+        json['validationMetrics'] as Map<String, Object?>? ??
+            const <String, Object?>{},
+      ),
+      laneFailurePolicy: LaneFailurePolicy.fromJson(
+        json['laneFailurePolicy'] as Map<String, Object?>? ??
+            const <String, Object?>{},
+      ),
     );
   }
 
@@ -98,6 +285,11 @@ final class LevelDef {
   final int? timeLimitSeconds;
   final int? moveLimit;
   final String difficulty;
+  final LevelRulesDef rules;
+  final List<LevelTag> tags;
+  final HumanReviewMetadata? humanReview;
+  final ValidationMetrics validationMetrics;
+  final LaneFailurePolicy laneFailurePolicy;
 
   BoardState createBoardState() {
     var instanceCounter = 0;
@@ -123,6 +315,10 @@ final class LevelDef {
             hiddenStack: compartment.hidden
                 .map(nextProduct)
                 .toList(growable: false),
+            hiddenPreviewRevealed: compartment.hiddenLayers.any(
+              (HiddenLayerDef layer) =>
+                  layer.previewMode == HiddenPreviewMode.exactDim,
+            ),
           );
         })
         .toList(growable: false);

@@ -3,6 +3,7 @@ final class LevelTimer {
     required this.elapsed,
     required this.limit,
     this.paused = false,
+    this.frozenRemaining = Duration.zero,
   });
 
   factory LevelTimer.fromSeconds(int? seconds) {
@@ -15,6 +16,7 @@ final class LevelTimer {
   final Duration elapsed;
   final Duration? limit;
   final bool paused;
+  final Duration frozenRemaining;
 
   Duration? get remaining {
     final Duration? limit = this.limit;
@@ -33,18 +35,39 @@ final class LevelTimer {
     return limit != null && elapsed >= limit;
   }
 
+  bool get frozen => frozenRemaining > Duration.zero;
+
   LevelTimer tick(Duration delta) {
     if (paused || delta <= Duration.zero) {
       return this;
     }
+    if (frozen) {
+      final Duration remaining = frozenRemaining - delta;
+      return copyWith(
+        frozenRemaining: remaining.isNegative ? Duration.zero : remaining,
+      );
+    }
     return LevelTimer(elapsed: elapsed + delta, limit: limit, paused: paused);
   }
 
-  LevelTimer copyWith({Duration? elapsed, Duration? limit, bool? paused}) {
+  LevelTimer freeze(Duration duration) {
+    if (duration <= Duration.zero) {
+      return this;
+    }
+    return copyWith(frozenRemaining: frozenRemaining + duration);
+  }
+
+  LevelTimer copyWith({
+    Duration? elapsed,
+    Duration? limit,
+    bool? paused,
+    Duration? frozenRemaining,
+  }) {
     return LevelTimer(
       elapsed: elapsed ?? this.elapsed,
       limit: limit ?? this.limit,
       paused: paused ?? this.paused,
+      frozenRemaining: frozenRemaining ?? this.frozenRemaining,
     );
   }
 }

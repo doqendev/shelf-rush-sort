@@ -60,6 +60,7 @@ final class CompartmentState {
     this.locked = false,
     this.decorative = false,
     this.clearedCount = 0,
+    this.hiddenPreviewRevealed = false,
   }) : assert(frontCells.length == cellsPerCompartment),
        frontCells = List<ShelfCell>.unmodifiable(frontCells),
        hiddenStack = List<ProductInstance>.unmodifiable(hiddenStack);
@@ -70,6 +71,7 @@ final class CompartmentState {
   final bool locked;
   final bool decorative;
   final int clearedCount;
+  final bool hiddenPreviewRevealed;
 
   bool get interactable => !locked && !decorative;
   bool get hasHiddenProducts => hiddenStack.isNotEmpty;
@@ -92,6 +94,7 @@ final class CompartmentState {
     bool? locked,
     bool? decorative,
     int? clearedCount,
+    bool? hiddenPreviewRevealed,
   }) {
     return CompartmentState(
       index: index,
@@ -100,6 +103,8 @@ final class CompartmentState {
       locked: locked ?? this.locked,
       decorative: decorative ?? this.decorative,
       clearedCount: clearedCount ?? this.clearedCount,
+      hiddenPreviewRevealed:
+          hiddenPreviewRevealed ?? this.hiddenPreviewRevealed,
     );
   }
 }
@@ -171,6 +176,41 @@ final class BoardState {
 
   int get visibleProductCount => visibleProducts.length;
 
+  String get stableHash {
+    final StringBuffer buffer = StringBuffer(levelId)..write('|');
+    for (final CompartmentState compartment in compartments) {
+      buffer
+        ..write(compartment.index)
+        ..write(':')
+        ..write(compartment.locked ? 'L' : 'U')
+        ..write(compartment.decorative ? 'D' : 'I')
+        ..write(compartment.hiddenPreviewRevealed ? 'R' : 'H')
+        ..write(':');
+      for (final ShelfCell cell in compartment.frontCells) {
+        buffer
+          ..write(cell.blocker.name)
+          ..write('/')
+          ..write(cell.product?.id ?? '-')
+          ..write('/')
+          ..write(cell.product?.skuId ?? '-')
+          ..write('/')
+          ..write(cell.product?.blocker.name ?? '-')
+          ..write(',');
+      }
+      buffer.write(':');
+      for (final ProductInstance product in compartment.hiddenStack) {
+        buffer
+          ..write(product.id)
+          ..write('/')
+          ..write(product.skuId)
+          ..write(',');
+      }
+      buffer.write('|');
+    }
+    buffer.write(levelEnded ? 'ended' : 'open');
+    return _hashString(buffer.toString());
+  }
+
   int get emptyInteractableCellCount {
     var total = 0;
     for (final CompartmentState compartment in compartments) {
@@ -182,5 +222,13 @@ final class BoardState {
       }).length;
     }
     return total;
+  }
+
+  static String _hashString(String value) {
+    var hash = 17;
+    for (final int codeUnit in value.codeUnits) {
+      hash = 37 * hash + codeUnit;
+    }
+    return hash.toUnsigned(32).toRadixString(16);
   }
 }

@@ -87,6 +87,7 @@ void main() {
     final LevelDef level = _level(
       compartments: <CompartmentDef>[
         _compartment(0, <String?>['sku_a', null, null]),
+        _compartment(1, <String?>[null, null, null]),
       ],
     );
     final ReplayLog replay = ReplayLog(levelId: level.id, seed: level.seed)
@@ -96,7 +97,7 @@ void main() {
             elapsedMs: 100,
             move: MoveAction(
               source: CellAddress.fromCompartmentIndex(0, 1),
-              target: CellAddress.fromCompartmentIndex(0, 2),
+              target: CellAddress.fromCompartmentIndex(1, 0),
             ),
           ),
         );

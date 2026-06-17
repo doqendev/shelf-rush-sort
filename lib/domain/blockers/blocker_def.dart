@@ -1,1 +1,1 @@
-enum BlockerKind { none, locked, tape, frozen, cover }
+enum BlockerKind { none, locked, tape, frozen, frost, cover, crate, mysteryBag }

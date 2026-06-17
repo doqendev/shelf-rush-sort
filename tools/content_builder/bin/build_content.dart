@@ -102,7 +102,7 @@ const List<String> _shapes = <String>[
   'produce',
 ];
 
-const String _levelPackId = 'pack_000_soft_launch_candidate';
+const String _levelPackId = 'dev_test_pack_000_generated';
 const int _levelCount = 300;
 
 Future<void> main() async {
@@ -451,7 +451,7 @@ Map<String, Object?> _reviewNotes() {
   return <String, Object?>{
     'schemaVersion': 1,
     'packId': _levelPackId,
-    'reviewStatus': 'engineering_generated_validated',
+    'reviewStatus': 'engineering_generated_dev_test',
     'reviewedAt': '2026-06-17T00:00:00Z',
     'notes': <Map<String, Object?>>[
       <String, Object?>{
@@ -467,7 +467,7 @@ Map<String, Object?> _reviewNotes() {
       <String, Object?>{
         'range': 'level_0031-level_0300',
         'summary':
-            'Scaled conveyor progression reuses validated SKU rotations, capped shelf density, and deterministic lane pressure for the soft-launch pack.',
+            'Scaled conveyor progression reuses validated SKU rotations, capped shelf density, and deterministic lane pressure for the generated dev-test pack.',
       },
     ],
   };

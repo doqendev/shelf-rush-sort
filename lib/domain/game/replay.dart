@@ -7,7 +7,9 @@ import '../moving_lanes/moving_lane_state.dart';
 import 'board_rules.dart';
 import 'board_state.dart';
 import 'move.dart';
+import 'objective.dart';
 import 'resolution.dart';
+import 'timer.dart';
 
 enum ReplayCommandType {
   move,
@@ -163,7 +165,12 @@ final class ReplayPlayer {
 
     for (var index = 0; index < replay.commands.length; index += 1) {
       final ReplayCommand command = replay.commands[index];
-      final _ReplayStepResult result = _applyCommand(board, lanes, command);
+      final _ReplayStepResult result = _applyCommand(
+        level,
+        board,
+        lanes,
+        command,
+      );
       if (!result.isValid) {
         return ReplayPlaybackResult(
           board: board,
@@ -187,6 +194,7 @@ final class ReplayPlayer {
   }
 
   _ReplayStepResult _applyCommand(
+    LevelDef level,
     BoardState board,
     List<MovingLaneState> lanes,
     ReplayCommand command,
@@ -204,6 +212,7 @@ final class ReplayPlayer {
         command,
       ),
       ReplayCommandType.useBooster => _applyBoosterCommand(
+        level,
         board,
         lanes,
         command,
@@ -286,6 +295,7 @@ final class ReplayPlayer {
   }
 
   _ReplayStepResult _applyBoosterCommand(
+    LevelDef level,
     BoardState board,
     List<MovingLaneState> lanes,
     ReplayCommand command,
@@ -295,8 +305,32 @@ final class ReplayPlayer {
       return _ReplayStepResult.invalid(board, lanes, 'missing_booster');
     }
     final BoosterKind booster = BoosterKind.values.byName(boosterName);
-    final BoosterUseResult result = boosterRules.useBooster(board, booster);
-    return _ReplayStepResult.valid(result.board, lanes);
+    final String? selectedKey =
+        command.payload['target'] as String? ??
+        command.payload['source'] as String?;
+    final CellAddress? selected = selectedKey == null
+        ? null
+        : _cellAddressFromKey(selectedKey);
+    final ObjectiveRules objectiveRules = const ObjectiveRules();
+    final BoosterUseResult result = boosterRules.useBooster(
+      BoosterContext(
+        board: board,
+        objective: objectiveRules.initialState(
+          requirement: level.objective,
+          board: board,
+        ),
+        timer: LevelTimer.fromSeconds(level.timeLimitSeconds),
+        lanes: lanes,
+        selectedCell: selected,
+        seed: level.seed,
+        level: level,
+      ),
+      booster,
+    );
+    if (!result.used) {
+      return _ReplayStepResult.invalid(board, lanes, result.reason);
+    }
+    return _ReplayStepResult.valid(result.board, result.lanes);
   }
 }
 

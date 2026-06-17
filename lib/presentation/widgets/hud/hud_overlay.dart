@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../application/game_session/game_session_state.dart';
+import '../../../domain/game/objective.dart';
 import '../../../infrastructure/save/save_repository.dart';
 
 final class HudOverlay extends StatelessWidget {
@@ -43,6 +44,13 @@ final class HudOverlay extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               _StatusPill(icon: Icons.paid, label: '${save.coins}'),
+              const SizedBox(width: 8),
+              Flexible(
+                child: _StatusPill(
+                  icon: Icons.task_alt,
+                  label: _objectiveLabel(),
+                ),
+              ),
               const Spacer(),
               IconButton.filledTonal(
                 tooltip: 'Map',
@@ -120,9 +128,54 @@ final class HudOverlay extends StatelessWidget {
               ),
             ),
           ],
+          if (_laneWarningLabel() != null) ...<Widget>[
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.center,
+              child: _StatusPill(
+                icon: Icons.warning_amber,
+                label: _laneWarningLabel()!,
+              ),
+            ),
+          ],
         ],
       ),
     );
+  }
+
+  String _objectiveLabel() {
+    final objective = session.objective;
+    switch (objective.requirement.type) {
+      case ObjectiveType.clearAll:
+        return 'Clear all';
+      case ObjectiveType.clearSkuTargets:
+        final int remaining = objective.remainingTargets.values.fold<int>(
+          0,
+          (int sum, int count) => sum + count.clamp(0, 999).toInt(),
+        );
+        return 'Order $remaining';
+      case ObjectiveType.clearCategoryTargets:
+        return 'Categories';
+      case ObjectiveType.clearSpecialTargets:
+        return 'Specials';
+      case ObjectiveType.comboTarget:
+        return 'Combo ${objective.maxCombo}/${objective.requirement.comboTarget}';
+      case ObjectiveType.timeChallenge:
+        return 'Time run';
+      case ObjectiveType.laneDeliveryTarget:
+        return 'Lane ${objective.laneDeliveredProducts}/${objective.requirement.laneDeliveryTarget}';
+    }
+  }
+
+  String? _laneWarningLabel() {
+    for (final lane in session.lanes) {
+      if (lane.currentProductDef != null &&
+          !lane.exhausted &&
+          lane.currentProgress >= 0.72) {
+        return 'Lane expiring';
+      }
+    }
+    return null;
   }
 
   double _progressValue() {

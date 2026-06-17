@@ -33,4 +33,53 @@ void main() {
       expect(grab.state.heldProduct!.product.skuId, 'sku_b');
     },
   );
+
+  test('slow conveyor reduces effective lane progress', () {
+    final MovingLaneState state = MovingLaneState(
+      def: MovingLaneDef(
+        id: 'lane',
+        orientation: LaneOrientation.horizontal,
+        behavior: LaneBehavior.finite,
+        speedCellsPerSecond: 1,
+        queue: const <MovingLaneProductDef>[
+          MovingLaneProductDef(skuId: 'sku_a', travelTimeMs: 1000),
+        ],
+      ),
+    );
+    const MovingLaneRules rules = MovingLaneRules();
+
+    final MovingLaneState slowed = rules.applySlowConveyor(state);
+    final MovingLaneState ticked = rules.tickLane(
+      slowed,
+      const Duration(milliseconds: 1000),
+    );
+
+    expect(ticked.queueIndex, 0);
+    expect(ticked.currentProgress, closeTo(0.5, 0.01));
+    expect(ticked.slowConveyorActive, isTrue);
+  });
+
+  test('finite required lane records exhaustion after miss', () {
+    final MovingLaneState state = MovingLaneState(
+      def: MovingLaneDef(
+        id: 'lane',
+        orientation: LaneOrientation.horizontal,
+        behavior: LaneBehavior.finite,
+        speedCellsPerSecond: 1,
+        requiredForObjective: true,
+        queue: const <MovingLaneProductDef>[
+          MovingLaneProductDef(skuId: 'sku_a', travelTimeMs: 1000),
+        ],
+      ),
+    );
+
+    final MovingLaneState ticked = const MovingLaneRules().tickLane(
+      state,
+      const Duration(milliseconds: 1000),
+    );
+
+    expect(ticked.exhausted, isTrue);
+    expect(ticked.missedCount, 1);
+    expect(ticked.lastMissedSkuId, 'sku_a');
+  });
 }

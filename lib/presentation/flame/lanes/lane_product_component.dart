@@ -5,7 +5,8 @@ import 'package:flutter/painting.dart';
 import '../../../domain/content/product_def.dart';
 import '../input/input_router.dart';
 
-final class LaneProductComponent extends PositionComponent with TapCallbacks {
+final class LaneProductComponent extends PositionComponent
+    with TapCallbacks, DragCallbacks {
   LaneProductComponent({
     required this.laneId,
     required this.productDef,
@@ -17,10 +18,34 @@ final class LaneProductComponent extends PositionComponent with TapCallbacks {
   final String laneId;
   final ProductDef productDef;
   final InputRouter inputRouter;
+  Vector2? _lastDragCanvasPosition;
 
   @override
   void onTapDown(TapDownEvent event) {
     inputRouter.onLaneProductTapped(laneId);
+  }
+
+  @override
+  void onDragStart(DragStartEvent event) {
+    super.onDragStart(event);
+    _lastDragCanvasPosition = event.canvasPosition;
+    inputRouter.onLaneProductDragStart(laneId);
+  }
+
+  @override
+  void onDragUpdate(DragUpdateEvent event) {
+    super.onDragUpdate(event);
+    _lastDragCanvasPosition = event.canvasEndPosition;
+  }
+
+  @override
+  void onDragEnd(DragEndEvent event) {
+    super.onDragEnd(event);
+    final Vector2? canvasPosition = _lastDragCanvasPosition;
+    if (canvasPosition != null) {
+      inputRouter.onLaneProductDragEnd(canvasPosition);
+    }
+    _lastDragCanvasPosition = null;
   }
 
   @override

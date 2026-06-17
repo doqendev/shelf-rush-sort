@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../application/progression/reward_service.dart';
 import '../../../application/game_session/game_session_state.dart';
 
 final class WinPanel extends StatelessWidget {
@@ -18,6 +19,9 @@ final class WinPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final RewardGrant reward = const RewardService().levelWinReward(
+      session.level.levelNumber,
+    );
     return Positioned.fill(
       child: ColoredBox(
         color: const Color(0x66000000),
@@ -31,15 +35,45 @@ final class WinPanel extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
+                    Icon(
+                      Icons.celebration,
+                      size: 44,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    const SizedBox(height: 10),
                     Text(
-                      'Level ${session.level.levelNumber} Cleared',
-                      style: Theme.of(context).textTheme.titleLarge,
+                      'Sorted!',
+                      style: Theme.of(context).textTheme.headlineSmall,
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      '${session.moveCount} moves  |  ${session.timer.elapsed.inSeconds}s',
+                      'Level ${session.level.levelNumber} | ${session.moveCount} moves | ${session.timer.elapsed.inSeconds}s',
                       textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: <Widget>[
+                        Chip(
+                          avatar: const Icon(Icons.paid, size: 18),
+                          label: Text('+${reward.coins}'),
+                        ),
+                        Chip(
+                          avatar: const Icon(
+                            Icons.local_fire_department,
+                            size: 18,
+                          ),
+                          label: const Text('Streak +1'),
+                        ),
+                        if (session.level.difficulty == 'hard')
+                          const Chip(
+                            avatar: Icon(Icons.workspace_premium, size: 18),
+                            label: Text('Hard bonus'),
+                          ),
+                      ],
                     ),
                     const SizedBox(height: 16),
                     FilledButton.icon(
@@ -57,7 +91,7 @@ final class WinPanel extends StatelessWidget {
                     OutlinedButton.icon(
                       onPressed: onRetry,
                       icon: const Icon(Icons.refresh),
-                      label: const Text('Retry'),
+                      label: const Text('Replay'),
                     ),
                   ],
                 ),

@@ -37,6 +37,9 @@ final class EconomyService {
     String? sourceId,
   }) {
     final String id = sourceId ?? 'grant_${save.ledger.length}';
+    if (save.ledger.containsKey(id)) {
+      return save;
+    }
     final Map<String, Object?> ledger = Map<String, Object?>.of(save.ledger);
     ledger[id] = <String, Object?>{
       'type': EconomyTransactionType.grant.name,

@@ -7,7 +7,7 @@ import 'move.dart';
 import 'resolution.dart';
 
 final class BoardRules {
-  const BoardRules({this.allowSameCompartmentMoves = true});
+  const BoardRules({this.allowSameCompartmentMoves = false});
 
   final bool allowSameCompartmentMoves;
   static const BlockerRules _blockerRules = BlockerRules();
@@ -208,7 +208,8 @@ final class BoardRules {
         final ShelfCell shelfCell = compartment.cellAt(cell);
         if (shelfCell.product != null &&
             !_blockerRules.blocksSelection(shelfCell.blocker) &&
-            !_blockerRules.blocksSelection(shelfCell.product!.blocker)) {
+            !_blockerRules.blocksSelection(shelfCell.product!.blocker) &&
+            shelfCell.product!.selectable) {
           sources.add(address);
         }
         if (shelfCell.product == null &&
@@ -240,6 +241,58 @@ final class BoardRules {
     return occupied.every((ShelfCell cell) => cell.product!.skuId == skuId);
   }
 
+  MoveQuality classifyMove(BoardState state, MoveAction move) {
+    final MoveValidation validation = validateMove(state, move);
+    if (!validation.isValid) {
+      return MoveQuality.badButLegal;
+    }
+    final ProductInstance product = state.productAt(move.source)!;
+    if (wouldComplete(state, product.skuId, move.target)) {
+      final CompartmentState target = state.compartmentAtAddress(move.target);
+      return target.hasHiddenProducts
+          ? MoveQuality.revealEnabling
+          : MoveQuality.completesTriple;
+    }
+    if (_wouldCreatePair(state, product.skuId, move.target)) {
+      return MoveQuality.createsPair;
+    }
+    final CompartmentState target = state.compartmentAtAddress(move.target);
+    if (target.frontCells.every((ShelfCell cell) => cell.product == null)) {
+      return MoveQuality.reserveSafe;
+    }
+    return MoveQuality.neutral;
+  }
+
+  bool hasUsefulMove(BoardState state) {
+    for (final LegalMove move in generateLegalMoves(state)) {
+      final MoveQuality quality = classifyMove(
+        state,
+        MoveAction(source: move.source, target: move.target),
+      );
+      if (quality == MoveQuality.completesTriple ||
+          quality == MoveQuality.revealEnabling ||
+          quality == MoveQuality.createsPair ||
+          quality == MoveQuality.reserveSafe) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  List<LegalMove> usefulMoves(BoardState state) {
+    return generateLegalMoves(state)
+        .where((LegalMove move) {
+          final MoveQuality quality = classifyMove(
+            state,
+            MoveAction(source: move.source, target: move.target),
+          );
+          return quality != MoveQuality.neutral &&
+              quality != MoveQuality.riskyReserve &&
+              quality != MoveQuality.badButLegal;
+        })
+        .toList(growable: false);
+  }
+
   LevelEnd? evaluateLevelEnd(BoardState state) {
     if (state.visibleProductCount == 0) {
       return const LevelEnd.won();
@@ -266,5 +319,13 @@ final class BoardRules {
     return compartment.frontCells.every(
       (ShelfCell cell) => cell.product!.skuId == skuId,
     );
+  }
+
+  bool _wouldCreatePair(BoardState state, SkuId skuId, CellAddress target) {
+    final CompartmentState compartment = state.compartmentAtAddress(target);
+    final int matching = compartment.frontCells.where((ShelfCell cell) {
+      return cell.product?.skuId == skuId;
+    }).length;
+    return matching == 1;
   }
 }

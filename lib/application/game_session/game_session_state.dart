@@ -22,6 +22,7 @@ enum SessionEventType {
   revived,
   levelWon,
   levelFailed,
+  rewardCommitted,
 }
 
 final class SessionEvent {
@@ -42,8 +43,10 @@ final class GameSessionState {
     required this.timer,
     required this.replay,
     required List<MovingLaneState> lanes,
+    required this.attemptId,
     this.status = GameSessionStatus.playing,
     this.selectedCell,
+    this.suggestedMove,
     this.moveCount = 0,
     this.lastInvalidReason,
     this.failReason = LevelFailReason.none,
@@ -57,8 +60,10 @@ final class GameSessionState {
   final LevelTimer timer;
   final ReplayLog replay;
   final List<MovingLaneState> lanes;
+  final String attemptId;
   final GameSessionStatus status;
   final CellAddress? selectedCell;
+  final LegalMove? suggestedMove;
   final int moveCount;
   final InvalidMoveReason? lastInvalidReason;
   final LevelFailReason failReason;
@@ -93,9 +98,12 @@ final class GameSessionState {
     LevelTimer? timer,
     ReplayLog? replay,
     List<MovingLaneState>? lanes,
+    String? attemptId,
     GameSessionStatus? status,
     CellAddress? selectedCell,
     bool clearSelectedCell = false,
+    LegalMove? suggestedMove,
+    bool clearSuggestedMove = false,
     int? moveCount,
     InvalidMoveReason? lastInvalidReason,
     bool clearInvalidReason = false,
@@ -109,10 +117,14 @@ final class GameSessionState {
       timer: timer ?? this.timer,
       replay: replay ?? this.replay,
       lanes: lanes ?? this.lanes,
+      attemptId: attemptId ?? this.attemptId,
       status: status ?? this.status,
       selectedCell: clearSelectedCell
           ? null
           : selectedCell ?? this.selectedCell,
+      suggestedMove: clearSuggestedMove
+          ? null
+          : suggestedMove ?? this.suggestedMove,
       moveCount: moveCount ?? this.moveCount,
       lastInvalidReason: clearInvalidReason
           ? null

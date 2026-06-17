@@ -9,6 +9,10 @@ const int cellsPerCompartment = 3;
 const int compartmentCount = boardRows * boardColumns;
 const int frontCellCount = compartmentCount * cellsPerCompartment;
 
+// Canonical board geometry for normal gameplay. Do not make this rack shape
+// remote-configurable; level and UI systems should adapt around the 5x3 rack.
+const int minInteractiveTargetPx = 44;
+
 enum ProductShape { bottle, box, can, pouch, jar, carton, toy, produce }
 
 final class CellAddress implements Comparable<CellAddress> {

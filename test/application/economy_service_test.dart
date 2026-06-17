@@ -20,4 +20,28 @@ void main() {
     expect(updated.ledger, contains('txn_test'));
     expect(updated.hasValidChecksum, isTrue);
   });
+
+  test('grantCoinsToSave is idempotent by source id', () {
+    final PlayerSave save = PlayerSave.newPlayer(
+      playerId: 'anon_test',
+      startingCoins: 500,
+    );
+    final EconomyService economy = const EconomyService();
+
+    final PlayerSave first = economy.grantCoinsToSave(
+      save,
+      100,
+      'test_reward',
+      sourceId: 'txn_test',
+    );
+    final PlayerSave second = economy.grantCoinsToSave(
+      first,
+      100,
+      'test_reward',
+      sourceId: 'txn_test',
+    );
+
+    expect(second.coins, 600);
+    expect(second.ledger, hasLength(first.ledger.length));
+  });
 }
