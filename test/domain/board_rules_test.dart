@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shelf_rush_sort/domain/blockers/blocker_def.dart';
 import 'package:shelf_rush_sort/domain/core/value_objects.dart';
 import 'package:shelf_rush_sort/domain/game/board_rules.dart';
 import 'package:shelf_rush_sort/domain/game/board_state.dart';
@@ -45,6 +46,56 @@ void main() {
       );
 
       expect(result.invalidReason, InvalidMoveReason.targetOccupied);
+    });
+
+    test('moving a mystery bag reveals product identity', () {
+      const CellAddress source = CellAddress(row: 0, column: 0, cell: 0);
+      const CellAddress target = CellAddress(row: 0, column: 1, cell: 0);
+      final BoardState board = BoardState(
+        levelId: 'mystery_test',
+        compartments: <CompartmentState>[
+          CompartmentState(
+            index: 0,
+            frontCells: const <ShelfCell>[
+              ShelfCell(
+                product: ProductInstance(
+                  id: 'p_1',
+                  skuId: 'sku_a',
+                  blocker: BlockerKind.mysteryBag,
+                ),
+              ),
+              ShelfCell.empty(),
+              ShelfCell.empty(),
+            ],
+          ),
+          CompartmentState(
+            index: 1,
+            frontCells: const <ShelfCell>[
+              ShelfCell.empty(),
+              ShelfCell.empty(),
+              ShelfCell.empty(),
+            ],
+          ),
+          for (var index = 2; index < compartmentCount; index += 1)
+            CompartmentState(
+              index: index,
+              locked: true,
+              frontCells: const <ShelfCell>[
+                ShelfCell.empty(),
+                ShelfCell.empty(),
+                ShelfCell.empty(),
+              ],
+            ),
+        ],
+      );
+
+      final result = const BoardRules().applyMove(
+        board,
+        const MoveAction(source: source, target: target),
+      );
+
+      expect(result.isValid, isTrue);
+      expect(result.state.cellAt(target)!.product!.blocker, BlockerKind.none);
     });
   });
 }

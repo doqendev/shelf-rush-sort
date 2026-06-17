@@ -219,6 +219,12 @@ Map<String, Object?> _staticChainLevel(int level) {
     compartments.add(<String, Object?>{
       'index': index,
       'cells': cells,
+      if (_cellBlockersForLevel(level, index, active)
+          case final List<String> blockers)
+        'cellBlockers': blockers,
+      if (_hiddenLayersForLevel(level, index, active)
+          case final List<Map<String, Object?>> layers)
+        'hiddenLayers': layers,
       'hidden': <String>[],
       'locked': false,
       'decorative': false,
@@ -255,6 +261,9 @@ Map<String, Object?> _laneLevel(int level) {
     compartments.add(<String, Object?>{
       'index': index,
       'cells': <String?>[skuId, skuId, null],
+      if (_hiddenLayersForLevel(level, index, active)
+          case final List<Map<String, Object?>> layers)
+        'hiddenLayers': layers,
       'hidden': <String>[],
       'locked': false,
       'decorative': false,
@@ -297,6 +306,50 @@ Map<String, Object?> _lockedCompartment(int index) {
     'locked': true,
     'decorative': false,
   };
+}
+
+List<String>? _cellBlockersForLevel(int level, int index, int active) {
+  if (index != active - 1 || level < 2 || level > 8) {
+    return null;
+  }
+  final String blocker = switch (level) {
+    2 => 'locked',
+    3 => 'tape',
+    4 => 'frozen',
+    5 => 'frost',
+    6 => 'cover',
+    7 => 'crate',
+    8 => 'mysteryBag',
+    _ => 'none',
+  };
+  return <String>['none', blocker, 'none'];
+}
+
+List<Map<String, Object?>>? _hiddenLayersForLevel(
+  int level,
+  int index,
+  int active,
+) {
+  if (index != 0) {
+    return null;
+  }
+  final String? mode = switch (level) {
+    4 => 'exactDim',
+    8 => 'silhouette',
+    16 => 'mysteryBag',
+    24 => 'hidden',
+    _ => null,
+  };
+  if (mode == null) {
+    return null;
+  }
+  final String hiddenSku = _sku(level * 3 + active);
+  return <Map<String, Object?>>[
+    <String, Object?>{
+      'previewMode': mode,
+      'cells': <String?>[hiddenSku, hiddenSku, hiddenSku],
+    },
+  ];
 }
 
 Map<String, Object?> _economy() {
@@ -365,7 +418,13 @@ Map<String, Object?> _events() {
       },
       <String, Object?>{
         'name': 'move',
-        'required': <String>['level_id', 'source', 'target', 'valid'],
+        'required': <String>[
+          'level_id',
+          'source',
+          'target',
+          'valid',
+          'move_quality',
+        ],
       },
       <String, Object?>{
         'name': 'triple_clear',

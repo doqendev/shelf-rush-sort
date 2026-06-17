@@ -1,9 +1,11 @@
+import '../blockers/blocker_def.dart';
 import '../core/value_objects.dart';
 import '../game/board_state.dart';
+import '../game/hidden_preview.dart';
 import '../game/objective.dart';
 import '../moving_lanes/moving_lane_def.dart';
 
-enum HiddenPreviewMode { exactDim, silhouette, mysteryBag, hidden }
+export '../game/hidden_preview.dart';
 
 enum CompartmentRole { standard, reserve, support, decorative }
 
@@ -105,13 +107,30 @@ final class CompartmentDef {
   CompartmentDef({
     required this.index,
     required List<SkuId?> cells,
+    List<BlockerKind>? cellBlockers,
+    List<BlockerKind>? productBlockers,
     List<SkuId> hidden = const <SkuId>[],
     List<HiddenLayerDef>? hiddenLayers,
     this.locked = false,
     this.decorative = false,
     this.role = CompartmentRole.standard,
   }) : assert(cells.length == cellsPerCompartment),
+       assert(
+         cellBlockers == null || cellBlockers.length == cellsPerCompartment,
+       ),
+       assert(
+         productBlockers == null ||
+             productBlockers.length == cellsPerCompartment,
+       ),
        cells = List<SkuId?>.unmodifiable(cells),
+       cellBlockers = List<BlockerKind>.unmodifiable(
+         cellBlockers ??
+             List<BlockerKind>.filled(cellsPerCompartment, BlockerKind.none),
+       ),
+       productBlockers = List<BlockerKind>.unmodifiable(
+         productBlockers ??
+             List<BlockerKind>.filled(cellsPerCompartment, BlockerKind.none),
+       ),
        hidden = List<SkuId>.unmodifiable(
          hidden.isEmpty && hiddenLayers != null
              ? _flattenHiddenLayers(hiddenLayers)
@@ -127,6 +146,10 @@ final class CompartmentDef {
         json['hidden'] as List<Object?>? ?? const <Object?>[];
     final List<Object?> hiddenLayersJson =
         json['hiddenLayers'] as List<Object?>? ?? const <Object?>[];
+    final List<Object?> cellBlockersJson =
+        json['cellBlockers'] as List<Object?>? ?? const <Object?>[];
+    final List<Object?> productBlockersJson =
+        json['productBlockers'] as List<Object?>? ?? const <Object?>[];
     final List<HiddenLayerDef> parsedHiddenLayers = hiddenLayersJson
         .map((Object? item) {
           return HiddenLayerDef.fromJson(item! as Map<String, Object?>);
@@ -135,6 +158,8 @@ final class CompartmentDef {
     return CompartmentDef(
       index: json['index']! as int,
       cells: cellsJson.map((Object? item) => item as String?).toList(),
+      cellBlockers: _parseBlockers(cellBlockersJson),
+      productBlockers: _parseBlockers(productBlockersJson),
       hidden: hiddenJson.cast<String>(),
       hiddenLayers: parsedHiddenLayers.isEmpty ? null : parsedHiddenLayers,
       locked: json['locked'] as bool? ?? false,
@@ -147,6 +172,8 @@ final class CompartmentDef {
 
   final int index;
   final List<SkuId?> cells;
+  final List<BlockerKind> cellBlockers;
+  final List<BlockerKind> productBlockers;
   final List<SkuId> hidden;
   final List<HiddenLayerDef> hiddenLayers;
   final bool locked;
@@ -173,6 +200,19 @@ final class CompartmentDef {
       layers.add(HiddenLayerDef(cells: cells));
     }
     return layers;
+  }
+
+  static List<BlockerKind>? _parseBlockers(List<Object?> json) {
+    if (json.isEmpty) {
+      return null;
+    }
+    return json
+        .map((Object? item) {
+          return BlockerKind.values.byName(
+            item as String? ?? BlockerKind.none.name,
+          );
+        })
+        .toList(growable: false);
   }
 }
 
@@ -300,25 +340,50 @@ final class LevelDef {
 
     final List<CompartmentState> states = compartments
         .map((CompartmentDef compartment) {
+          final List<HiddenPreviewLayerState> hiddenPreviewLayers = compartment
+              .hiddenLayers
+              .map((HiddenLayerDef layer) {
+                return HiddenPreviewLayerState(
+                  cells: layer.cells,
+                  previewMode: layer.previewMode,
+                );
+              })
+              .toList(growable: false);
           return CompartmentState(
             index: compartment.index,
             locked: compartment.locked,
             decorative: compartment.decorative,
-            frontCells: compartment.cells
-                .map((SkuId? skuId) {
+            frontCells: <ShelfCell>[
+              for (
+                var cellIndex = 0;
+                cellIndex < cellsPerCompartment;
+                cellIndex += 1
+              )
+                () {
+                  final SkuId? skuId = compartment.cells[cellIndex];
+                  final BlockerKind cellBlocker =
+                      compartment.cellBlockers[cellIndex];
+                  final BlockerKind productBlocker =
+                      compartment.productBlockers[cellIndex];
                   if (skuId == null) {
-                    return const ShelfCell.empty();
+                    return ShelfCell.empty(blocker: cellBlocker);
                   }
-                  return ShelfCell(product: nextProduct(skuId));
-                })
-                .toList(growable: false),
+                  return ShelfCell(
+                    product: nextProduct(
+                      skuId,
+                    ).copyWith(blocker: productBlocker),
+                    blocker: cellBlocker,
+                  );
+                }(),
+            ],
             hiddenStack: compartment.hidden
                 .map(nextProduct)
                 .toList(growable: false),
-            hiddenPreviewRevealed: compartment.hiddenLayers.any(
-              (HiddenLayerDef layer) =>
-                  layer.previewMode == HiddenPreviewMode.exactDim,
-            ),
+            hiddenPreviewLayers: hiddenPreviewLayers,
+            hiddenPreviewRevealed:
+                hiddenPreviewLayers.isNotEmpty &&
+                hiddenPreviewLayers.first.previewMode ==
+                    HiddenPreviewMode.exactDim,
           );
         })
         .toList(growable: false);

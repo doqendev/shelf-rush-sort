@@ -3,6 +3,7 @@ import '../blockers/blocker_rules.dart';
 import '../core/value_objects.dart';
 import 'board_state.dart';
 import 'fail_reason.dart';
+import 'hidden_preview.dart';
 import 'move.dart';
 import 'resolution.dart';
 
@@ -98,7 +99,11 @@ final class BoardRules {
       return ResolutionResult.invalid(state, invalidReason);
     }
 
-    final ProductInstance product = state.productAt(move.source)!;
+    final ProductInstance sourceProduct = state.productAt(move.source)!;
+    final ProductInstance product =
+        sourceProduct.blocker == BlockerKind.mysteryBag
+        ? sourceProduct.copyWith(blocker: BlockerKind.none)
+        : sourceProduct;
     final BoardState updated = state
         .replaceCell(move.source, state.cellAt(move.source)!.withoutProduct())
         .replaceCell(
@@ -159,6 +164,10 @@ final class BoardRules {
         final List<ProductInstance> hidden = List<ProductInstance>.of(
           compartment.hiddenStack,
         );
+        final List<HiddenPreviewLayerState> hiddenPreviewLayers =
+            compartment.hiddenPreviewLayers.length <= 1
+            ? const <HiddenPreviewLayerState>[]
+            : compartment.hiddenPreviewLayers.sublist(1);
         final List<ShelfCell> replacementCells = List<ShelfCell>.generate(
           cellsPerCompartment,
           (int cellIndex) {
@@ -177,6 +186,11 @@ final class BoardRules {
           compartment.copyWith(
             frontCells: replacementCells,
             hiddenStack: hidden,
+            hiddenPreviewLayers: hiddenPreviewLayers,
+            hiddenPreviewRevealed:
+                hiddenPreviewLayers.isNotEmpty &&
+                hiddenPreviewLayers.first.previewMode ==
+                    HiddenPreviewMode.exactDim,
             clearedCount: compartment.clearedCount + 1,
           ),
         );

@@ -1,5 +1,17 @@
 import '../blockers/blocker_def.dart';
 import '../core/value_objects.dart';
+import 'hidden_preview.dart';
+
+final class HiddenPreviewLayerState {
+  HiddenPreviewLayerState({
+    required List<SkuId?> cells,
+    this.previewMode = HiddenPreviewMode.exactDim,
+  }) : assert(cells.length == cellsPerCompartment),
+       cells = List<SkuId?>.unmodifiable(cells);
+
+  final List<SkuId?> cells;
+  final HiddenPreviewMode previewMode;
+}
 
 final class ProductInstance {
   const ProductInstance({
@@ -57,17 +69,23 @@ final class CompartmentState {
     required this.index,
     required List<ShelfCell> frontCells,
     List<ProductInstance> hiddenStack = const <ProductInstance>[],
+    List<HiddenPreviewLayerState> hiddenPreviewLayers =
+        const <HiddenPreviewLayerState>[],
     this.locked = false,
     this.decorative = false,
     this.clearedCount = 0,
     this.hiddenPreviewRevealed = false,
   }) : assert(frontCells.length == cellsPerCompartment),
        frontCells = List<ShelfCell>.unmodifiable(frontCells),
-       hiddenStack = List<ProductInstance>.unmodifiable(hiddenStack);
+       hiddenStack = List<ProductInstance>.unmodifiable(hiddenStack),
+       hiddenPreviewLayers = List<HiddenPreviewLayerState>.unmodifiable(
+         hiddenPreviewLayers,
+       );
 
   final int index;
   final List<ShelfCell> frontCells;
   final List<ProductInstance> hiddenStack;
+  final List<HiddenPreviewLayerState> hiddenPreviewLayers;
   final bool locked;
   final bool decorative;
   final int clearedCount;
@@ -75,6 +93,28 @@ final class CompartmentState {
 
   bool get interactable => !locked && !decorative;
   bool get hasHiddenProducts => hiddenStack.isNotEmpty;
+  HiddenPreviewLayerState? get currentHiddenPreviewLayer =>
+      hiddenPreviewLayers.isEmpty ? null : hiddenPreviewLayers.first;
+  HiddenPreviewMode get hiddenPreviewMode {
+    if (hiddenPreviewRevealed) {
+      return HiddenPreviewMode.exactDim;
+    }
+    return currentHiddenPreviewLayer?.previewMode ?? HiddenPreviewMode.hidden;
+  }
+
+  List<SkuId?> get hiddenPreviewCells {
+    final HiddenPreviewLayerState? layer = currentHiddenPreviewLayer;
+    if (layer != null) {
+      return layer.cells;
+    }
+    if (hiddenStack.isEmpty) {
+      return const <SkuId?>[];
+    }
+    return <SkuId?>[
+      for (var index = 0; index < cellsPerCompartment; index += 1)
+        index < hiddenStack.length ? hiddenStack[index].skuId : null,
+    ];
+  }
 
   CellAddress addressForCell(int cell) {
     return CellAddress.fromCompartmentIndex(index, cell);
@@ -91,6 +131,7 @@ final class CompartmentState {
   CompartmentState copyWith({
     List<ShelfCell>? frontCells,
     List<ProductInstance>? hiddenStack,
+    List<HiddenPreviewLayerState>? hiddenPreviewLayers,
     bool? locked,
     bool? decorative,
     int? clearedCount,
@@ -100,6 +141,7 @@ final class CompartmentState {
       index: index,
       frontCells: frontCells ?? this.frontCells,
       hiddenStack: hiddenStack ?? this.hiddenStack,
+      hiddenPreviewLayers: hiddenPreviewLayers ?? this.hiddenPreviewLayers,
       locked: locked ?? this.locked,
       decorative: decorative ?? this.decorative,
       clearedCount: clearedCount ?? this.clearedCount,
@@ -185,6 +227,7 @@ final class BoardState {
         ..write(compartment.locked ? 'L' : 'U')
         ..write(compartment.decorative ? 'D' : 'I')
         ..write(compartment.hiddenPreviewRevealed ? 'R' : 'H')
+        ..write(compartment.hiddenPreviewMode.name)
         ..write(':');
       for (final ShelfCell cell in compartment.frontCells) {
         buffer
@@ -203,6 +246,12 @@ final class BoardState {
           ..write(product.id)
           ..write('/')
           ..write(product.skuId)
+          ..write(',');
+      }
+      buffer.write(':');
+      for (final SkuId? skuId in compartment.hiddenPreviewCells) {
+        buffer
+          ..write(skuId ?? '-')
           ..write(',');
       }
       buffer.write('|');

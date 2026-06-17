@@ -270,6 +270,11 @@
             null,
             null
           ],
+          "cellBlockers": [
+            "none",
+            "locked",
+            "none"
+          ],
           "hidden": [],
           "locked": false,
           "decorative": false
@@ -451,6 +456,11 @@
             null,
             null
           ],
+          "cellBlockers": [
+            "none",
+            "tape",
+            "none"
+          ],
           "hidden": [],
           "locked": false,
           "decorative": false
@@ -566,6 +576,16 @@
             "sku_006",
             null
           ],
+          "hiddenLayers": [
+            {
+              "previewMode": "exactDim",
+              "cells": [
+                "sku_020",
+                "sku_020",
+                "sku_020"
+              ]
+            }
+          ],
           "hidden": [],
           "locked": false,
           "decorative": false
@@ -642,6 +662,11 @@
             "sku_012",
             null,
             null
+          ],
+          "cellBlockers": [
+            "none",
+            "frozen",
+            "none"
           ],
           "hidden": [],
           "locked": false,
@@ -823,6 +848,11 @@
             "sku_014",
             null,
             null
+          ],
+          "cellBlockers": [
+            "none",
+            "frost",
+            "none"
           ],
           "hidden": [],
           "locked": false,
@@ -1016,6 +1046,11 @@
             null,
             null
           ],
+          "cellBlockers": [
+            "none",
+            "cover",
+            "none"
+          ],
           "hidden": [],
           "locked": false,
           "decorative": false
@@ -1197,6 +1232,11 @@
             null,
             null
           ],
+          "cellBlockers": [
+            "none",
+            "crate",
+            "none"
+          ],
           "hidden": [],
           "locked": false,
           "decorative": false
@@ -1289,6 +1329,16 @@
             "sku_014",
             "sku_014",
             null
+          ],
+          "hiddenLayers": [
+            {
+              "previewMode": "silhouette",
+              "cells": [
+                "sku_034",
+                "sku_034",
+                "sku_034"
+              ]
+            }
           ],
           "hidden": [],
           "locked": false,
@@ -1388,6 +1438,11 @@
             "sku_022",
             null,
             null
+          ],
+          "cellBlockers": [
+            "none",
+            "mysteryBag",
+            "none"
           ],
           "hidden": [],
           "locked": false,
@@ -2778,6 +2833,16 @@
             "sku_022",
             "sku_022",
             null
+          ],
+          "hiddenLayers": [
+            {
+              "previewMode": "mysteryBag",
+              "cells": [
+                "sku_056",
+                "sku_056",
+                "sku_056"
+              ]
+            }
           ],
           "hidden": [],
           "locked": false,
@@ -4618,6 +4683,16 @@
             "sku_038",
             "sku_038",
             null
+          ],
+          "hiddenLayers": [
+            {
+              "previewMode": "hidden",
+              "cells": [
+                "sku_024",
+                "sku_024",
+                "sku_024"
+              ]
+            }
           ],
           "hidden": [],
           "locked": false,

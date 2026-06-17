@@ -198,6 +198,7 @@ final class GameSessionController {
       return;
     }
     final MoveAction move = MoveAction(source: selected, target: target);
+    final MoveQuality moveQuality = boardRules.classifyMove(_state.board, move);
     final ResolutionResult result = boardRules.applyMove(_state.board, move);
     unawaited(
       analytics.track(
@@ -208,6 +209,7 @@ final class GameSessionController {
             'source': selected.key,
             'target': target.key,
             'valid': result.isValid,
+            'move_quality': moveQuality.name,
             if (result.invalidReason != null)
               'invalid_reason': result.invalidReason!.name,
           },

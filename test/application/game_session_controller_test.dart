@@ -65,6 +65,25 @@ void main() {
     expect(controller.state.failReason, LevelFailReason.moveLimitExceeded);
   });
 
+  test('move analytics includes move quality', () {
+    final DebugAnalyticsService analytics = DebugAnalyticsService();
+    final GameSessionController controller = GameSessionController(
+      level: _moveQualityLevel(),
+      analytics: analytics,
+    );
+
+    controller.selectCell(CellAddress.fromCompartmentIndex(1, 0));
+    controller.placeSelectedAt(CellAddress.fromCompartmentIndex(0, 2));
+
+    final moveEvent = analytics.events.firstWhere(
+      (event) => event.name == 'move',
+    );
+    expect(
+      moveEvent.parameters['move_quality'],
+      MoveQuality.completesTriple.name,
+    );
+  });
+
   test('required finite lane miss fails with laneExhausted', () {
     final DebugAnalyticsService analytics = DebugAnalyticsService();
     final GameSessionController controller = GameSessionController(
@@ -169,6 +188,29 @@ LevelDef _requiredLaneLevel() {
           MovingLaneProductDef(skuId: 'sku_000', travelTimeMs: 1000),
         ],
       ),
+    ],
+  );
+}
+
+LevelDef _moveQualityLevel() {
+  return LevelDef(
+    id: 'level_move_quality_test',
+    levelNumber: 10,
+    title: 'Move Quality Test',
+    seed: 10,
+    objective: ObjectiveRequirement(type: ObjectiveType.clearAll),
+    compartments: <CompartmentDef>[
+      CompartmentDef(
+        index: 0,
+        cells: const <String?>['sku_000', 'sku_000', null],
+      ),
+      CompartmentDef(index: 1, cells: const <String?>['sku_000', null, null]),
+      for (var index = 2; index < 15; index += 1)
+        CompartmentDef(
+          index: index,
+          locked: true,
+          cells: const <String?>[null, null, null],
+        ),
     ],
   );
 }

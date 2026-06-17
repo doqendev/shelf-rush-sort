@@ -125,6 +125,13 @@ final class ShelfWorld extends World {
         await add(
           HiddenPreviewComponent(
             count: compartment.hiddenStack.length,
+            mode: compartment.hiddenPreviewMode,
+            revealed: compartment.hiddenPreviewRevealed,
+            previewProducts: compartment.hiddenPreviewCells
+                .map((SkuId? skuId) {
+                  return skuId == null ? null : productCatalog.bySku(skuId);
+                })
+                .toList(growable: false),
             position: Vector2(
               compartmentRect.left + 10,
               compartmentRect.top + 8,
@@ -145,6 +152,7 @@ final class ShelfWorld extends World {
               highlighted:
                   _state.selectedCell != null ||
                   _state.laneHoldingProduct != null,
+              blocker: shelfCell.blocker,
               position: Vector2(cellRect.left, cellRect.top),
               size: Vector2(cellRect.width, cellRect.height),
             ),
@@ -163,6 +171,8 @@ final class ShelfWorld extends World {
             productDef: productDef,
             inputRouter: inputRouter,
             selected: _state.selectedCell == address,
+            cellBlocker: shelfCell.blocker,
+            productBlocker: shelfCell.product!.blocker,
             position: Vector2(cellRect.left, cellRect.top),
             size: Vector2(cellRect.width, cellRect.height),
           ),

@@ -2,6 +2,7 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/painting.dart';
 
+import '../../../domain/blockers/blocker_def.dart';
 import '../../../domain/content/product_def.dart';
 import '../../../domain/core/value_objects.dart';
 import '../input/input_router.dart';
@@ -13,6 +14,8 @@ final class ProductComponent extends PositionComponent
     required this.productDef,
     required this.inputRouter,
     required this.selected,
+    this.cellBlocker = BlockerKind.none,
+    this.productBlocker = BlockerKind.none,
     required super.position,
     required super.size,
   });
@@ -21,6 +24,8 @@ final class ProductComponent extends PositionComponent
   final ProductDef productDef;
   final InputRouter inputRouter;
   final bool selected;
+  final BlockerKind cellBlocker;
+  final BlockerKind productBlocker;
   Vector2? _lastDragCanvasPosition;
 
   @override
@@ -54,7 +59,12 @@ final class ProductComponent extends PositionComponent
   @override
   void render(Canvas canvas) {
     final Rect rect = size.toRect();
-    final Color color = _parseColor(productDef.colorHex);
+    final bool identityHidden =
+        productBlocker == BlockerKind.mysteryBag ||
+        cellBlocker == BlockerKind.mysteryBag;
+    final Color color = identityHidden
+        ? const Color(0xFF7D756D)
+        : _parseColor(productDef.colorHex);
     final Paint shadow = Paint()..color = const Color(0x33000000);
     canvas.drawOval(rect.deflate(4).translate(0, rect.height * 0.16), shadow);
     final Paint body = Paint()
@@ -91,11 +101,13 @@ final class ProductComponent extends PositionComponent
         ..strokeWidth = 3;
       canvas.drawRRect(bodyRect, selectedPaint);
     }
-    final String label = productDef.displayName
-        .split(' ')
-        .map((String part) => part.isEmpty ? '' : part.substring(0, 1))
-        .take(2)
-        .join();
+    final String label = identityHidden
+        ? '?'
+        : productDef.displayName
+              .split(' ')
+              .map((String part) => part.isEmpty ? '' : part.substring(0, 1))
+              .take(2)
+              .join();
     final TextPainter painter = TextPainter(
       text: TextSpan(
         text: label,
@@ -112,6 +124,58 @@ final class ProductComponent extends PositionComponent
       canvas,
       Offset((rect.width - painter.width) / 2, rect.height * 0.36),
     );
+    final BlockerKind visibleBlocker = productBlocker != BlockerKind.none
+        ? productBlocker
+        : cellBlocker;
+    if (visibleBlocker != BlockerKind.none) {
+      _paintBlockerBand(canvas, rect, visibleBlocker);
+    }
+  }
+
+  void _paintBlockerBand(Canvas canvas, Rect rect, BlockerKind blocker) {
+    final Rect band = Rect.fromLTWH(
+      rect.width * 0.11,
+      rect.height * 0.06,
+      rect.width * 0.78,
+      rect.height * 0.22,
+    );
+    final Paint paint = Paint()..color = const Color(0xCC2D211B);
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(band, const Radius.circular(6)),
+      paint,
+    );
+    final TextPainter painter = TextPainter(
+      text: TextSpan(
+        text: _blockerLabel(blocker),
+        style: TextStyle(
+          color: const Color(0xFFFFFFFF),
+          fontSize: (rect.height * 0.12).clamp(8, 11).toDouble(),
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+      textAlign: TextAlign.center,
+      textDirection: TextDirection.ltr,
+    )..layout(maxWidth: band.width - 4);
+    painter.paint(
+      canvas,
+      Offset(
+        band.left + (band.width - painter.width) / 2,
+        band.top + (band.height - painter.height) / 2,
+      ),
+    );
+  }
+
+  String _blockerLabel(BlockerKind blocker) {
+    return switch (blocker) {
+      BlockerKind.none => '',
+      BlockerKind.locked => 'LOCK',
+      BlockerKind.tape => 'TAPE',
+      BlockerKind.frozen => 'ICE',
+      BlockerKind.frost => 'FROST',
+      BlockerKind.cover => 'COVER',
+      BlockerKind.crate => 'CRATE',
+      BlockerKind.mysteryBag => '?',
+    };
   }
 
   double _radiusForShape(ProductShape shape) {

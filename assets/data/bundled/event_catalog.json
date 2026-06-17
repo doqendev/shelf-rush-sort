@@ -15,7 +15,8 @@
         "level_id",
         "source",
         "target",
-        "valid"
+        "valid",
+        "move_quality"
       ]
     },
     {
