@@ -89,19 +89,33 @@ final class BoardLayoutCalculator {
     final bool hasTopLane = lanes.any(
       (MovingLaneDef lane) => lane.anchor == LaneAnchor.top,
     );
+    final bool hasLeftLane = lanes.any(
+      (MovingLaneDef lane) => lane.anchor == LaneAnchor.left,
+    );
+    final bool hasRightLane = lanes.any(
+      (MovingLaneDef lane) => lane.anchor == LaneAnchor.right,
+    );
     final double laneHeight = hasLane ? 66 : 26;
-    final double topInset =
-        math.max(78, gameSize.y * 0.11) + (hasTopLane ? laneHeight + 10 : 0);
-    final double bottomInset = 88 + (hasBottomLane ? laneHeight : 26);
-    final double rackWidth = math.min(safeWidth - 24, 430);
+    final double sideLaneWidth = 58;
+    final double leftReserve = hasLeftLane ? sideLaneWidth : 0;
+    final double rightReserve = hasRightLane ? sideLaneWidth : 0;
+    final double topReserve = hasTopLane ? laneHeight + 10 : 8;
+    final double bottomReserve = hasBottomLane ? laneHeight + 18 : 8;
+    final double playableWidth = math.max(
+      280,
+      safeWidth - leftReserve - rightReserve - 16,
+    );
+    final double rackWidth = math.min(playableWidth, 430);
     final double availableHeight = math.max(
-      420,
-      gameSize.y - topInset - bottomInset,
+      260,
+      gameSize.y - topReserve - bottomReserve - 8,
     );
     final double rackHeight = math.min(availableHeight, rackWidth * 1.22);
-    final double left = (gameSize.x - rackWidth) / 2;
+    final double left =
+        leftReserve +
+        ((gameSize.x - leftReserve - rightReserve - rackWidth) / 2);
     final double top =
-        topInset + ((availableHeight - rackHeight) / 2).clamp(0, 22);
+        topReserve + ((availableHeight - rackHeight) / 2).clamp(0, 18);
     final Rect rackRect = Rect.fromLTWH(left, top, rackWidth, rackHeight);
     final Map<int, Rect> compartmentRects = <int, Rect>{};
     final Map<int, Rect> compartmentHitRects = <int, Rect>{};
@@ -150,7 +164,7 @@ final class BoardLayoutCalculator {
       laneHeight,
     );
     final Rect laneRect = laneRects.isEmpty
-        ? Rect.fromLTWH(rackRect.left, rackRect.bottom + 18, rackRect.width, 26)
+        ? Rect.zero
         : laneRects.values.first;
 
     return BoardLayout(

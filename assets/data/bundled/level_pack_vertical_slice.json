@@ -1,0 +1,3141 @@
+{
+  "schemaVersion": 1,
+  "id": "vertical_slice_pack_000",
+  "version": 1,
+  "levels": [
+    {
+      "id": "vertical_level_0001",
+      "levelNumber": 1,
+      "title": "Full Rack First Clear",
+      "seed": 2001,
+      "difficulty": "tutorial",
+      "timeLimitSeconds": null,
+      "moveLimit": null,
+      "objective": {
+        "type": "clearAll",
+        "targetCounts": {}
+      },
+      "compartments": [
+        {
+          "index": 0,
+          "cells": [
+            "sku_000",
+            "sku_000",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 1,
+          "cells": [
+            "sku_001",
+            "sku_001",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 2,
+          "cells": [
+            "sku_002",
+            "sku_002",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 3,
+          "cells": [
+            "sku_003",
+            "sku_003",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 4,
+          "cells": [
+            "sku_004",
+            "sku_004",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 5,
+          "cells": [
+            "sku_005",
+            "sku_005",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 6,
+          "cells": [
+            "sku_000",
+            "sku_001",
+            "sku_001"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 7,
+          "cells": [
+            "sku_000",
+            "sku_002",
+            "sku_002"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 8,
+          "cells": [
+            "sku_000",
+            "sku_003",
+            "sku_003"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 9,
+          "cells": [
+            "sku_000",
+            "sku_004",
+            "sku_004"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 10,
+          "cells": [
+            "sku_001",
+            "sku_002",
+            "sku_005"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 11,
+          "cells": [
+            "sku_001",
+            "sku_003",
+            "sku_005"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 12,
+          "cells": [
+            "sku_002",
+            "sku_004",
+            "sku_005"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 13,
+          "cells": [
+            "sku_003",
+            "sku_004",
+            "sku_005"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 14,
+          "cells": [
+            null,
+            null,
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        }
+      ],
+      "movingLanes": [],
+      "humanReview": {
+        "author": "engineering_vertical_slice",
+        "intent": "Open with a dense full-rack tutorial and one guaranteed clear.",
+        "curriculumTag": "first_triple",
+        "difficultyTarget": "tutorial",
+        "humanReviewGrade": "engineering_reviewed"
+      }
+    },
+    {
+      "id": "vertical_level_0002",
+      "levelNumber": 2,
+      "title": "Full Rack Sort 2",
+      "seed": 2002,
+      "difficulty": "normal",
+      "timeLimitSeconds": null,
+      "moveLimit": null,
+      "objective": {
+        "type": "clearAll",
+        "targetCounts": {}
+      },
+      "compartments": [
+        {
+          "index": 0,
+          "cells": [
+            "sku_002",
+            "sku_002",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 1,
+          "cells": [
+            "sku_002",
+            "sku_003",
+            "sku_003"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 2,
+          "cells": [
+            "sku_003",
+            "sku_004",
+            "sku_004"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 3,
+          "cells": [
+            "sku_004",
+            "sku_005",
+            "sku_005"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 4,
+          "cells": [
+            "sku_005",
+            "sku_006",
+            "sku_006"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 5,
+          "cells": [
+            "sku_006",
+            "sku_007",
+            "sku_007"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 6,
+          "cells": [
+            "sku_007",
+            "sku_008",
+            "sku_008"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 7,
+          "cells": [
+            "sku_008",
+            "sku_009",
+            "sku_009"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 8,
+          "cells": [
+            "sku_009",
+            "sku_010",
+            "sku_010"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 9,
+          "cells": [
+            "sku_010",
+            "sku_011",
+            "sku_011"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 10,
+          "cells": [
+            "sku_011",
+            "sku_012",
+            "sku_012"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 11,
+          "cells": [
+            "sku_012",
+            "sku_013",
+            "sku_013"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 12,
+          "cells": [
+            "sku_013",
+            "sku_014",
+            "sku_014"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 13,
+          "cells": [
+            "sku_014",
+            "sku_015",
+            "sku_015"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 14,
+          "cells": [
+            "sku_015",
+            null,
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        }
+      ],
+      "movingLanes": [],
+      "humanReview": {
+        "author": "engineering_vertical_slice",
+        "intent": "Maintain full-rack density while increasing SKU planning.",
+        "curriculumTag": "full_rack_opening",
+        "difficultyTarget": "normal",
+        "humanReviewGrade": "engineering_reviewed"
+      }
+    },
+    {
+      "id": "vertical_level_0003",
+      "levelNumber": 3,
+      "title": "Full Rack Sort 3",
+      "seed": 2003,
+      "difficulty": "normal",
+      "timeLimitSeconds": null,
+      "moveLimit": null,
+      "objective": {
+        "type": "clearAll",
+        "targetCounts": {}
+      },
+      "compartments": [
+        {
+          "index": 0,
+          "cells": [
+            "sku_004",
+            "sku_004",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 1,
+          "cells": [
+            "sku_004",
+            "sku_005",
+            "sku_005"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 2,
+          "cells": [
+            "sku_005",
+            "sku_006",
+            "sku_006"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 3,
+          "cells": [
+            "sku_006",
+            "sku_007",
+            "sku_007"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 4,
+          "cells": [
+            "sku_007",
+            "sku_008",
+            "sku_008"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 5,
+          "cells": [
+            "sku_008",
+            "sku_009",
+            "sku_009"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 6,
+          "cells": [
+            "sku_009",
+            "sku_010",
+            "sku_010"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 7,
+          "cells": [
+            "sku_010",
+            "sku_011",
+            "sku_011"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 8,
+          "cells": [
+            "sku_011",
+            "sku_012",
+            "sku_012"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 9,
+          "cells": [
+            "sku_012",
+            "sku_013",
+            "sku_013"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 10,
+          "cells": [
+            "sku_013",
+            "sku_014",
+            "sku_014"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 11,
+          "cells": [
+            "sku_014",
+            "sku_015",
+            "sku_015"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 12,
+          "cells": [
+            "sku_015",
+            "sku_016",
+            "sku_016"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 13,
+          "cells": [
+            "sku_016",
+            "sku_017",
+            "sku_017"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 14,
+          "cells": [
+            "sku_017",
+            null,
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        }
+      ],
+      "movingLanes": [],
+      "humanReview": {
+        "author": "engineering_vertical_slice",
+        "intent": "Maintain full-rack density while increasing SKU planning.",
+        "curriculumTag": "full_rack_opening",
+        "difficultyTarget": "normal",
+        "humanReviewGrade": "engineering_reviewed"
+      }
+    },
+    {
+      "id": "vertical_level_0004",
+      "levelNumber": 4,
+      "title": "Full Rack Sort 4",
+      "seed": 2004,
+      "difficulty": "normal",
+      "timeLimitSeconds": 180,
+      "moveLimit": null,
+      "objective": {
+        "type": "clearAll",
+        "targetCounts": {}
+      },
+      "compartments": [
+        {
+          "index": 0,
+          "cells": [
+            "sku_006",
+            "sku_006",
+            null
+          ],
+          "hiddenLayers": [
+            {
+              "previewMode": "exactDim",
+              "cells": [
+                "sku_027",
+                "sku_027",
+                "sku_027"
+              ]
+            }
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 1,
+          "cells": [
+            "sku_006",
+            "sku_007",
+            "sku_007"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 2,
+          "cells": [
+            "sku_007",
+            "sku_008",
+            "sku_008"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 3,
+          "cells": [
+            "sku_008",
+            "sku_009",
+            "sku_009"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 4,
+          "cells": [
+            "sku_009",
+            "sku_010",
+            "sku_010"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 5,
+          "cells": [
+            "sku_010",
+            "sku_011",
+            "sku_011"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 6,
+          "cells": [
+            "sku_011",
+            "sku_012",
+            "sku_012"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 7,
+          "cells": [
+            "sku_012",
+            "sku_013",
+            "sku_013"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 8,
+          "cells": [
+            "sku_013",
+            "sku_014",
+            "sku_014"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 9,
+          "cells": [
+            "sku_014",
+            "sku_015",
+            "sku_015"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 10,
+          "cells": [
+            "sku_015",
+            "sku_016",
+            "sku_016"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 11,
+          "cells": [
+            "sku_016",
+            "sku_017",
+            "sku_017"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 12,
+          "cells": [
+            "sku_017",
+            "sku_018",
+            "sku_018"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 13,
+          "cells": [
+            "sku_018",
+            "sku_019",
+            "sku_019"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 14,
+          "cells": [
+            "sku_019",
+            null,
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        }
+      ],
+      "movingLanes": [],
+      "humanReview": {
+        "author": "engineering_vertical_slice",
+        "intent": "Introduce exact hidden preview in a full rack.",
+        "curriculumTag": "full_rack_opening",
+        "difficultyTarget": "normal",
+        "humanReviewGrade": "engineering_reviewed"
+      }
+    },
+    {
+      "id": "vertical_level_0005",
+      "levelNumber": 5,
+      "title": "Full Rack Sort 5",
+      "seed": 2005,
+      "difficulty": "normal",
+      "timeLimitSeconds": 180,
+      "moveLimit": null,
+      "objective": {
+        "type": "clearAll",
+        "targetCounts": {}
+      },
+      "compartments": [
+        {
+          "index": 0,
+          "cells": [
+            "sku_008",
+            "sku_008",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 1,
+          "cells": [
+            "sku_008",
+            "sku_009",
+            "sku_009"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 2,
+          "cells": [
+            "sku_009",
+            "sku_010",
+            "sku_010"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 3,
+          "cells": [
+            "sku_010",
+            "sku_011",
+            "sku_011"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 4,
+          "cells": [
+            "sku_011",
+            "sku_012",
+            "sku_012"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 5,
+          "cells": [
+            "sku_012",
+            "sku_013",
+            "sku_013"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 6,
+          "cells": [
+            "sku_013",
+            "sku_014",
+            "sku_014"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 7,
+          "cells": [
+            "sku_014",
+            "sku_015",
+            "sku_015"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 8,
+          "cells": [
+            "sku_015",
+            "sku_016",
+            "sku_016"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 9,
+          "cells": [
+            "sku_016",
+            "sku_017",
+            "sku_017"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 10,
+          "cells": [
+            "sku_017",
+            "sku_018",
+            "sku_018"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 11,
+          "cells": [
+            "sku_018",
+            "sku_019",
+            "sku_019"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 12,
+          "cells": [
+            "sku_019",
+            "sku_020",
+            "sku_020"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 13,
+          "cells": [
+            "sku_020",
+            "sku_021",
+            "sku_021"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 14,
+          "cells": [
+            "sku_021",
+            null,
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        }
+      ],
+      "movingLanes": [],
+      "humanReview": {
+        "author": "engineering_vertical_slice",
+        "intent": "Maintain full-rack density while increasing SKU planning.",
+        "curriculumTag": "full_rack_opening",
+        "difficultyTarget": "normal",
+        "humanReviewGrade": "engineering_reviewed"
+      }
+    },
+    {
+      "id": "vertical_level_0006",
+      "levelNumber": 6,
+      "title": "Full Rack Sort 6",
+      "seed": 2006,
+      "difficulty": "normal",
+      "timeLimitSeconds": 180,
+      "moveLimit": null,
+      "objective": {
+        "type": "clearAll",
+        "targetCounts": {}
+      },
+      "compartments": [
+        {
+          "index": 0,
+          "cells": [
+            "sku_010",
+            "sku_010",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 1,
+          "cells": [
+            "sku_010",
+            "sku_011",
+            "sku_011"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 2,
+          "cells": [
+            "sku_011",
+            "sku_012",
+            "sku_012"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 3,
+          "cells": [
+            "sku_012",
+            "sku_013",
+            "sku_013"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 4,
+          "cells": [
+            "sku_013",
+            "sku_014",
+            "sku_014"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 5,
+          "cells": [
+            "sku_014",
+            "sku_015",
+            "sku_015"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 6,
+          "cells": [
+            "sku_015",
+            "sku_016",
+            "sku_016"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 7,
+          "cells": [
+            "sku_016",
+            "sku_017",
+            "sku_017"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 8,
+          "cells": [
+            "sku_017",
+            "sku_018",
+            "sku_018"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 9,
+          "cells": [
+            "sku_018",
+            "sku_019",
+            "sku_019"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 10,
+          "cells": [
+            "sku_019",
+            "sku_020",
+            "sku_020"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 11,
+          "cells": [
+            "sku_020",
+            "sku_021",
+            "sku_021"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 12,
+          "cells": [
+            "sku_021",
+            "sku_022",
+            "sku_022"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 13,
+          "cells": [
+            "sku_022",
+            "sku_023",
+            "sku_023"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 14,
+          "cells": [
+            "sku_023",
+            null,
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        }
+      ],
+      "movingLanes": [],
+      "humanReview": {
+        "author": "engineering_vertical_slice",
+        "intent": "Maintain full-rack density while increasing SKU planning.",
+        "curriculumTag": "full_rack_opening",
+        "difficultyTarget": "normal",
+        "humanReviewGrade": "engineering_reviewed"
+      }
+    },
+    {
+      "id": "vertical_level_0007",
+      "levelNumber": 7,
+      "title": "Full Rack Sort 7",
+      "seed": 2007,
+      "difficulty": "normal",
+      "timeLimitSeconds": 180,
+      "moveLimit": null,
+      "objective": {
+        "type": "clearAll",
+        "targetCounts": {}
+      },
+      "compartments": [
+        {
+          "index": 0,
+          "cells": [
+            "sku_012",
+            "sku_012",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 1,
+          "cells": [
+            "sku_012",
+            "sku_013",
+            "sku_013"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 2,
+          "cells": [
+            "sku_013",
+            "sku_014",
+            "sku_014"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 3,
+          "cells": [
+            "sku_014",
+            "sku_015",
+            "sku_015"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 4,
+          "cells": [
+            "sku_015",
+            "sku_016",
+            "sku_016"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 5,
+          "cells": [
+            "sku_016",
+            "sku_017",
+            "sku_017"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 6,
+          "cells": [
+            "sku_017",
+            "sku_018",
+            "sku_018"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 7,
+          "cells": [
+            "sku_018",
+            "sku_019",
+            "sku_019"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 8,
+          "cells": [
+            "sku_019",
+            "sku_020",
+            "sku_020"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 9,
+          "cells": [
+            "sku_020",
+            "sku_021",
+            "sku_021"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 10,
+          "cells": [
+            "sku_021",
+            "sku_022",
+            "sku_022"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 11,
+          "cells": [
+            "sku_022",
+            "sku_023",
+            "sku_023"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 12,
+          "cells": [
+            "sku_023",
+            "sku_024",
+            "sku_024"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 13,
+          "cells": [
+            "sku_024",
+            "sku_025",
+            "sku_025"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 14,
+          "cells": [
+            "sku_025",
+            null,
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        }
+      ],
+      "movingLanes": [],
+      "humanReview": {
+        "author": "engineering_vertical_slice",
+        "intent": "Maintain full-rack density while increasing SKU planning.",
+        "curriculumTag": "full_rack_opening",
+        "difficultyTarget": "normal",
+        "humanReviewGrade": "engineering_reviewed"
+      }
+    },
+    {
+      "id": "vertical_level_0008",
+      "levelNumber": 8,
+      "title": "Full Rack Sort 8",
+      "seed": 2008,
+      "difficulty": "hard",
+      "timeLimitSeconds": 180,
+      "moveLimit": null,
+      "objective": {
+        "type": "clearAll",
+        "targetCounts": {}
+      },
+      "compartments": [
+        {
+          "index": 0,
+          "cells": [
+            "sku_014",
+            "sku_014",
+            null
+          ],
+          "hiddenLayers": [
+            {
+              "previewMode": "silhouette",
+              "cells": [
+                "sku_039",
+                "sku_039",
+                "sku_039"
+              ]
+            }
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 1,
+          "cells": [
+            "sku_014",
+            "sku_015",
+            "sku_015"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 2,
+          "cells": [
+            "sku_015",
+            "sku_016",
+            "sku_016"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 3,
+          "cells": [
+            "sku_016",
+            "sku_017",
+            "sku_017"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 4,
+          "cells": [
+            "sku_017",
+            "sku_018",
+            "sku_018"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 5,
+          "cells": [
+            "sku_018",
+            "sku_019",
+            "sku_019"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 6,
+          "cells": [
+            "sku_019",
+            "sku_020",
+            "sku_020"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 7,
+          "cells": [
+            "sku_020",
+            "sku_021",
+            "sku_021"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 8,
+          "cells": [
+            "sku_021",
+            "sku_022",
+            "sku_022"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 9,
+          "cells": [
+            "sku_022",
+            "sku_023",
+            "sku_023"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 10,
+          "cells": [
+            "sku_023",
+            "sku_024",
+            "sku_024"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 11,
+          "cells": [
+            "sku_024",
+            "sku_025",
+            "sku_025"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 12,
+          "cells": [
+            "sku_025",
+            "sku_026",
+            "sku_026"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 13,
+          "cells": [
+            "sku_026",
+            "sku_027",
+            "sku_027"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 14,
+          "cells": [
+            "sku_027",
+            null,
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        }
+      ],
+      "movingLanes": [],
+      "humanReview": {
+        "author": "engineering_vertical_slice",
+        "intent": "Maintain full-rack density while increasing SKU planning.",
+        "curriculumTag": "full_rack_opening",
+        "difficultyTarget": "normal",
+        "humanReviewGrade": "engineering_reviewed"
+      }
+    },
+    {
+      "id": "vertical_level_0009",
+      "levelNumber": 9,
+      "title": "Full Rack Sort 9",
+      "seed": 2009,
+      "difficulty": "hard",
+      "timeLimitSeconds": 180,
+      "moveLimit": null,
+      "objective": {
+        "type": "clearAll",
+        "targetCounts": {}
+      },
+      "compartments": [
+        {
+          "index": 0,
+          "cells": [
+            "sku_016",
+            "sku_016",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 1,
+          "cells": [
+            "sku_016",
+            "sku_017",
+            "sku_017"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 2,
+          "cells": [
+            "sku_017",
+            "sku_018",
+            "sku_018"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 3,
+          "cells": [
+            "sku_018",
+            "sku_019",
+            "sku_019"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 4,
+          "cells": [
+            "sku_019",
+            "sku_020",
+            "sku_020"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 5,
+          "cells": [
+            "sku_020",
+            "sku_021",
+            "sku_021"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 6,
+          "cells": [
+            "sku_021",
+            "sku_022",
+            "sku_022"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 7,
+          "cells": [
+            "sku_022",
+            "sku_023",
+            "sku_023"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 8,
+          "cells": [
+            "sku_023",
+            "sku_024",
+            "sku_024"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 9,
+          "cells": [
+            "sku_024",
+            "sku_025",
+            "sku_025"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 10,
+          "cells": [
+            "sku_025",
+            "sku_026",
+            "sku_026"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 11,
+          "cells": [
+            "sku_026",
+            "sku_027",
+            "sku_027"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 12,
+          "cells": [
+            "sku_027",
+            "sku_028",
+            "sku_028"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 13,
+          "cells": [
+            "sku_028",
+            "sku_029",
+            "sku_029"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 14,
+          "cells": [
+            "sku_029",
+            null,
+            null
+          ],
+          "cellBlockers": [
+            "none",
+            "mysteryBag",
+            "none"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        }
+      ],
+      "movingLanes": [],
+      "humanReview": {
+        "author": "engineering_vertical_slice",
+        "intent": "Maintain full-rack density while increasing SKU planning.",
+        "curriculumTag": "full_rack_opening",
+        "difficultyTarget": "normal",
+        "humanReviewGrade": "engineering_reviewed"
+      }
+    },
+    {
+      "id": "vertical_level_0010",
+      "levelNumber": 10,
+      "title": "Full Rack Sort 10",
+      "seed": 2010,
+      "difficulty": "hard",
+      "timeLimitSeconds": 180,
+      "moveLimit": null,
+      "objective": {
+        "type": "clearAll",
+        "targetCounts": {}
+      },
+      "compartments": [
+        {
+          "index": 0,
+          "cells": [
+            "sku_018",
+            "sku_018",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 1,
+          "cells": [
+            "sku_018",
+            "sku_019",
+            "sku_019"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 2,
+          "cells": [
+            "sku_019",
+            "sku_020",
+            "sku_020"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 3,
+          "cells": [
+            "sku_020",
+            "sku_021",
+            "sku_021"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 4,
+          "cells": [
+            "sku_021",
+            "sku_022",
+            "sku_022"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 5,
+          "cells": [
+            "sku_022",
+            "sku_023",
+            "sku_023"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 6,
+          "cells": [
+            "sku_023",
+            "sku_024",
+            "sku_024"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 7,
+          "cells": [
+            "sku_024",
+            "sku_025",
+            "sku_025"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 8,
+          "cells": [
+            "sku_025",
+            "sku_026",
+            "sku_026"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 9,
+          "cells": [
+            "sku_026",
+            "sku_027",
+            "sku_027"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 10,
+          "cells": [
+            "sku_027",
+            "sku_028",
+            "sku_028"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 11,
+          "cells": [
+            "sku_028",
+            "sku_029",
+            "sku_029"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 12,
+          "cells": [
+            "sku_029",
+            "sku_030",
+            "sku_030"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 13,
+          "cells": [
+            "sku_030",
+            "sku_031",
+            "sku_031"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 14,
+          "cells": [
+            "sku_031",
+            null,
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        }
+      ],
+      "movingLanes": [],
+      "humanReview": {
+        "author": "engineering_vertical_slice",
+        "intent": "Maintain full-rack density while increasing SKU planning.",
+        "curriculumTag": "full_rack_opening",
+        "difficultyTarget": "hard",
+        "humanReviewGrade": "engineering_reviewed"
+      }
+    },
+    {
+      "id": "vertical_level_0011",
+      "levelNumber": 11,
+      "title": "Full Rack Sort 11",
+      "seed": 2011,
+      "difficulty": "hard",
+      "timeLimitSeconds": 180,
+      "moveLimit": null,
+      "objective": {
+        "type": "clearAll",
+        "targetCounts": {}
+      },
+      "compartments": [
+        {
+          "index": 0,
+          "cells": [
+            "sku_020",
+            "sku_020",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 1,
+          "cells": [
+            "sku_020",
+            "sku_021",
+            "sku_021"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 2,
+          "cells": [
+            "sku_021",
+            "sku_022",
+            "sku_022"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 3,
+          "cells": [
+            "sku_022",
+            "sku_023",
+            "sku_023"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 4,
+          "cells": [
+            "sku_023",
+            "sku_024",
+            "sku_024"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 5,
+          "cells": [
+            "sku_024",
+            "sku_025",
+            "sku_025"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 6,
+          "cells": [
+            "sku_025",
+            "sku_026",
+            "sku_026"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 7,
+          "cells": [
+            "sku_026",
+            "sku_027",
+            "sku_027"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 8,
+          "cells": [
+            "sku_027",
+            "sku_028",
+            "sku_028"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 9,
+          "cells": [
+            "sku_028",
+            "sku_029",
+            "sku_029"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 10,
+          "cells": [
+            "sku_029",
+            "sku_030",
+            "sku_030"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 11,
+          "cells": [
+            "sku_030",
+            "sku_031",
+            "sku_031"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 12,
+          "cells": [
+            "sku_031",
+            "sku_032",
+            "sku_032"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 13,
+          "cells": [
+            "sku_032",
+            "sku_033",
+            "sku_033"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 14,
+          "cells": [
+            "sku_033",
+            null,
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        }
+      ],
+      "movingLanes": [],
+      "humanReview": {
+        "author": "engineering_vertical_slice",
+        "intent": "Maintain full-rack density while increasing SKU planning.",
+        "curriculumTag": "full_rack_opening",
+        "difficultyTarget": "hard",
+        "humanReviewGrade": "engineering_reviewed"
+      }
+    },
+    {
+      "id": "vertical_level_0012",
+      "levelNumber": 12,
+      "title": "Full Rack Conveyor 1",
+      "seed": 2012,
+      "difficulty": "hard",
+      "timeLimitSeconds": 180,
+      "moveLimit": null,
+      "objective": {
+        "type": "clearAll",
+        "targetCounts": {}
+      },
+      "compartments": [
+        {
+          "index": 0,
+          "cells": [
+            "sku_020",
+            "sku_020",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 1,
+          "cells": [
+            "sku_021",
+            "sku_021",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 2,
+          "cells": [
+            "sku_022",
+            "sku_022",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 3,
+          "cells": [
+            "sku_023",
+            "sku_023",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 4,
+          "cells": [
+            "sku_024",
+            "sku_024",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 5,
+          "cells": [
+            "sku_025",
+            "sku_025",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 6,
+          "cells": [
+            "sku_026",
+            "sku_026",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 7,
+          "cells": [
+            "sku_027",
+            "sku_027",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 8,
+          "cells": [
+            "sku_028",
+            "sku_028",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 9,
+          "cells": [
+            "sku_029",
+            "sku_029",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 10,
+          "cells": [
+            "sku_030",
+            "sku_030",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 11,
+          "cells": [
+            "sku_031",
+            "sku_031",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 12,
+          "cells": [
+            "sku_032",
+            "sku_032",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 13,
+          "cells": [
+            "sku_033",
+            "sku_033",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 14,
+          "cells": [
+            "sku_034",
+            "sku_034",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        }
+      ],
+      "movingLanes": [
+        {
+          "id": "lane_main",
+          "orientation": "vertical",
+          "behavior": "finite",
+          "speedCellsPerSecond": 1.0,
+          "queue": [
+            {
+              "skuId": "sku_020",
+              "travelTimeMs": 5200
+            },
+            {
+              "skuId": "sku_021",
+              "travelTimeMs": 5200
+            },
+            {
+              "skuId": "sku_022",
+              "travelTimeMs": 5200
+            },
+            {
+              "skuId": "sku_023",
+              "travelTimeMs": 5200
+            },
+            {
+              "skuId": "sku_024",
+              "travelTimeMs": 5200
+            },
+            {
+              "skuId": "sku_025",
+              "travelTimeMs": 5200
+            },
+            {
+              "skuId": "sku_026",
+              "travelTimeMs": 5200
+            },
+            {
+              "skuId": "sku_027",
+              "travelTimeMs": 5200
+            },
+            {
+              "skuId": "sku_028",
+              "travelTimeMs": 5200
+            },
+            {
+              "skuId": "sku_029",
+              "travelTimeMs": 5200
+            },
+            {
+              "skuId": "sku_030",
+              "travelTimeMs": 5200
+            },
+            {
+              "skuId": "sku_031",
+              "travelTimeMs": 5200
+            },
+            {
+              "skuId": "sku_032",
+              "travelTimeMs": 5200
+            },
+            {
+              "skuId": "sku_033",
+              "travelTimeMs": 5200
+            },
+            {
+              "skuId": "sku_034",
+              "travelTimeMs": 5200
+            }
+          ]
+        }
+      ],
+      "humanReview": {
+        "author": "engineering_vertical_slice",
+        "intent": "Introduce conveyor pressure without reducing rack density.",
+        "curriculumTag": "lane_intro",
+        "difficultyTarget": "hard",
+        "humanReviewGrade": "engineering_reviewed"
+      }
+    },
+    {
+      "id": "vertical_level_0013",
+      "levelNumber": 13,
+      "title": "Full Rack Conveyor 2",
+      "seed": 2013,
+      "difficulty": "hard",
+      "timeLimitSeconds": 180,
+      "moveLimit": null,
+      "objective": {
+        "type": "clearAll",
+        "targetCounts": {}
+      },
+      "compartments": [
+        {
+          "index": 0,
+          "cells": [
+            "sku_022",
+            "sku_022",
+            null
+          ],
+          "hiddenLayers": [
+            {
+              "previewMode": "mysteryBag",
+              "cells": [
+                "sku_003",
+                "sku_003",
+                "sku_003"
+              ]
+            }
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 1,
+          "cells": [
+            "sku_023",
+            "sku_023",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 2,
+          "cells": [
+            "sku_024",
+            "sku_024",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 3,
+          "cells": [
+            "sku_025",
+            "sku_025",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 4,
+          "cells": [
+            "sku_026",
+            "sku_026",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 5,
+          "cells": [
+            "sku_027",
+            "sku_027",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 6,
+          "cells": [
+            "sku_028",
+            "sku_028",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 7,
+          "cells": [
+            "sku_029",
+            "sku_029",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 8,
+          "cells": [
+            "sku_030",
+            "sku_030",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 9,
+          "cells": [
+            "sku_031",
+            "sku_031",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 10,
+          "cells": [
+            "sku_032",
+            "sku_032",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 11,
+          "cells": [
+            "sku_033",
+            "sku_033",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 12,
+          "cells": [
+            "sku_034",
+            "sku_034",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 13,
+          "cells": [
+            "sku_035",
+            "sku_035",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 14,
+          "cells": [
+            null,
+            null,
+            null
+          ],
+          "cellBlockers": [
+            "none",
+            "cover",
+            "none"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        }
+      ],
+      "movingLanes": [
+        {
+          "id": "lane_main",
+          "orientation": "horizontal",
+          "behavior": "finite",
+          "speedCellsPerSecond": 1.03,
+          "queue": [
+            {
+              "skuId": "sku_022",
+              "travelTimeMs": 5120
+            },
+            {
+              "skuId": "sku_023",
+              "travelTimeMs": 5120
+            },
+            {
+              "skuId": "sku_024",
+              "travelTimeMs": 5120
+            },
+            {
+              "skuId": "sku_025",
+              "travelTimeMs": 5120
+            },
+            {
+              "skuId": "sku_026",
+              "travelTimeMs": 5120
+            },
+            {
+              "skuId": "sku_027",
+              "travelTimeMs": 5120
+            },
+            {
+              "skuId": "sku_028",
+              "travelTimeMs": 5120
+            },
+            {
+              "skuId": "sku_029",
+              "travelTimeMs": 5120
+            },
+            {
+              "skuId": "sku_030",
+              "travelTimeMs": 5120
+            },
+            {
+              "skuId": "sku_031",
+              "travelTimeMs": 5120
+            },
+            {
+              "skuId": "sku_032",
+              "travelTimeMs": 5120
+            },
+            {
+              "skuId": "sku_033",
+              "travelTimeMs": 5120
+            },
+            {
+              "skuId": "sku_034",
+              "travelTimeMs": 5120
+            },
+            {
+              "skuId": "sku_035",
+              "travelTimeMs": 5120
+            }
+          ]
+        }
+      ],
+      "humanReview": {
+        "author": "engineering_vertical_slice",
+        "intent": "Introduce conveyor pressure without reducing rack density.",
+        "curriculumTag": "lane_intro",
+        "difficultyTarget": "hard",
+        "humanReviewGrade": "engineering_reviewed"
+      }
+    },
+    {
+      "id": "vertical_level_0014",
+      "levelNumber": 14,
+      "title": "Full Rack Conveyor 3",
+      "seed": 2014,
+      "difficulty": "hard",
+      "timeLimitSeconds": 180,
+      "moveLimit": null,
+      "objective": {
+        "type": "clearAll",
+        "targetCounts": {}
+      },
+      "compartments": [
+        {
+          "index": 0,
+          "cells": [
+            "sku_024",
+            "sku_024",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 1,
+          "cells": [
+            "sku_025",
+            "sku_025",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 2,
+          "cells": [
+            "sku_026",
+            "sku_026",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 3,
+          "cells": [
+            "sku_027",
+            "sku_027",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 4,
+          "cells": [
+            "sku_028",
+            "sku_028",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 5,
+          "cells": [
+            "sku_029",
+            "sku_029",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 6,
+          "cells": [
+            "sku_030",
+            "sku_030",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 7,
+          "cells": [
+            "sku_031",
+            "sku_031",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 8,
+          "cells": [
+            "sku_032",
+            "sku_032",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 9,
+          "cells": [
+            "sku_033",
+            "sku_033",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 10,
+          "cells": [
+            "sku_034",
+            "sku_034",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 11,
+          "cells": [
+            "sku_035",
+            "sku_035",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 12,
+          "cells": [
+            "sku_036",
+            "sku_036",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 13,
+          "cells": [
+            "sku_037",
+            "sku_037",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 14,
+          "cells": [
+            null,
+            null,
+            null
+          ],
+          "cellBlockers": [
+            "none",
+            "locked",
+            "none"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        }
+      ],
+      "movingLanes": [
+        {
+          "id": "lane_main",
+          "orientation": "horizontal",
+          "behavior": "finite",
+          "speedCellsPerSecond": 1.06,
+          "queue": [
+            {
+              "skuId": "sku_024",
+              "travelTimeMs": 5040
+            },
+            {
+              "skuId": "sku_025",
+              "travelTimeMs": 5040
+            },
+            {
+              "skuId": "sku_026",
+              "travelTimeMs": 5040
+            },
+            {
+              "skuId": "sku_027",
+              "travelTimeMs": 5040
+            },
+            {
+              "skuId": "sku_028",
+              "travelTimeMs": 5040
+            },
+            {
+              "skuId": "sku_029",
+              "travelTimeMs": 5040
+            },
+            {
+              "skuId": "sku_030",
+              "travelTimeMs": 5040
+            },
+            {
+              "skuId": "sku_031",
+              "travelTimeMs": 5040
+            },
+            {
+              "skuId": "sku_032",
+              "travelTimeMs": 5040
+            },
+            {
+              "skuId": "sku_033",
+              "travelTimeMs": 5040
+            },
+            {
+              "skuId": "sku_034",
+              "travelTimeMs": 5040
+            },
+            {
+              "skuId": "sku_035",
+              "travelTimeMs": 5040
+            },
+            {
+              "skuId": "sku_036",
+              "travelTimeMs": 5040
+            },
+            {
+              "skuId": "sku_037",
+              "travelTimeMs": 5040
+            }
+          ]
+        }
+      ],
+      "humanReview": {
+        "author": "engineering_vertical_slice",
+        "intent": "Introduce conveyor pressure without reducing rack density.",
+        "curriculumTag": "lane_intro",
+        "difficultyTarget": "hard",
+        "humanReviewGrade": "engineering_reviewed"
+      }
+    },
+    {
+      "id": "vertical_level_0015",
+      "levelNumber": 15,
+      "title": "Full Rack Conveyor 4",
+      "seed": 2015,
+      "difficulty": "hard",
+      "timeLimitSeconds": 180,
+      "moveLimit": null,
+      "objective": {
+        "type": "clearAll",
+        "targetCounts": {}
+      },
+      "compartments": [
+        {
+          "index": 0,
+          "cells": [
+            "sku_026",
+            "sku_026",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 1,
+          "cells": [
+            "sku_027",
+            "sku_027",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 2,
+          "cells": [
+            "sku_028",
+            "sku_028",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 3,
+          "cells": [
+            "sku_029",
+            "sku_029",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 4,
+          "cells": [
+            "sku_030",
+            "sku_030",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 5,
+          "cells": [
+            "sku_031",
+            "sku_031",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 6,
+          "cells": [
+            "sku_032",
+            "sku_032",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 7,
+          "cells": [
+            "sku_033",
+            "sku_033",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 8,
+          "cells": [
+            "sku_034",
+            "sku_034",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 9,
+          "cells": [
+            "sku_035",
+            "sku_035",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 10,
+          "cells": [
+            "sku_036",
+            "sku_036",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 11,
+          "cells": [
+            "sku_037",
+            "sku_037",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 12,
+          "cells": [
+            "sku_038",
+            "sku_038",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 13,
+          "cells": [
+            "sku_039",
+            "sku_039",
+            null
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        },
+        {
+          "index": 14,
+          "cells": [
+            null,
+            null,
+            null
+          ],
+          "cellBlockers": [
+            "none",
+            "tape",
+            "none"
+          ],
+          "hidden": [],
+          "locked": false,
+          "decorative": false
+        }
+      ],
+      "movingLanes": [
+        {
+          "id": "lane_main",
+          "orientation": "horizontal",
+          "behavior": "finite",
+          "speedCellsPerSecond": 1.09,
+          "queue": [
+            {
+              "skuId": "sku_026",
+              "travelTimeMs": 4960
+            },
+            {
+              "skuId": "sku_027",
+              "travelTimeMs": 4960
+            },
+            {
+              "skuId": "sku_028",
+              "travelTimeMs": 4960
+            },
+            {
+              "skuId": "sku_029",
+              "travelTimeMs": 4960
+            },
+            {
+              "skuId": "sku_030",
+              "travelTimeMs": 4960
+            },
+            {
+              "skuId": "sku_031",
+              "travelTimeMs": 4960
+            },
+            {
+              "skuId": "sku_032",
+              "travelTimeMs": 4960
+            },
+            {
+              "skuId": "sku_033",
+              "travelTimeMs": 4960
+            },
+            {
+              "skuId": "sku_034",
+              "travelTimeMs": 4960
+            },
+            {
+              "skuId": "sku_035",
+              "travelTimeMs": 4960
+            },
+            {
+              "skuId": "sku_036",
+              "travelTimeMs": 4960
+            },
+            {
+              "skuId": "sku_037",
+              "travelTimeMs": 4960
+            },
+            {
+              "skuId": "sku_038",
+              "travelTimeMs": 4960
+            },
+            {
+              "skuId": "sku_039",
+              "travelTimeMs": 4960
+            }
+          ]
+        }
+      ],
+      "humanReview": {
+        "author": "engineering_vertical_slice",
+        "intent": "Introduce conveyor pressure without reducing rack density.",
+        "curriculumTag": "lane_intro",
+        "difficultyTarget": "hard",
+        "humanReviewGrade": "engineering_reviewed"
+      }
+    }
+  ]
+}

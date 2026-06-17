@@ -16,6 +16,10 @@ const Map<String, _Budget> _fileBudgets = <String, _Budget>{
     label: 'bundled level pack',
     maxBytes: 2 * _mib,
   ),
+  'assets/data/bundled/level_pack_vertical_slice.json': _Budget(
+    label: 'vertical slice level pack',
+    maxBytes: 512 * 1024,
+  ),
   'assets/data/bundled/asset_manifest.json': _Budget(
     label: 'product visual manifest',
     maxBytes: 256 * 1024,

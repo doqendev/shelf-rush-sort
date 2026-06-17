@@ -14,7 +14,9 @@ void main() {
       productCatalogJson: await _readJson(
         'assets/data/bundled/product_catalog.json',
       ),
-      levelPackJson: await _readJson('assets/data/bundled/level_pack_000.json'),
+      levelPackJson: await _readJson(
+        'assets/data/bundled/level_pack_vertical_slice.json',
+      ),
       economyJson: await _readJson('assets/data/bundled/economy_config.json'),
       remoteConfigJson: await _readJson(
         'assets/data/bundled/remote_defaults.json',

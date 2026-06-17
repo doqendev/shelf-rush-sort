@@ -29,8 +29,13 @@ void main() {
         expect(layout.rackRect.left, greaterThanOrEqualTo(0));
         expect(layout.rackRect.right, lessThanOrEqualTo(viewport.value.x));
         expect(layout.rackRect.top, greaterThanOrEqualTo(0));
-        expect(layout.rackRect.bottom, lessThan(layout.laneRect.top));
-        expect(layout.laneRect.bottom, lessThanOrEqualTo(viewport.value.y));
+        expect(layout.rackRect.bottom, lessThanOrEqualTo(viewport.value.y));
+        if (hasLane) {
+          expect(layout.rackRect.bottom, lessThan(layout.laneRect.top));
+          expect(layout.laneRect.bottom, lessThanOrEqualTo(viewport.value.y));
+        } else {
+          expect(layout.laneRect, Rect.zero);
+        }
 
         for (final MapEntry<CellAddress, Rect> entry
             in layout.cellRects.entries) {

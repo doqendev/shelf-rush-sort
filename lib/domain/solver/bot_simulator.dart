@@ -20,6 +20,9 @@ final class BotSimulator {
     final BoardRules effectiveBoardRules = BoardRules(
       allowSameCompartmentMoves: level.rules.allowSameCompartmentMoves,
     );
+    final BoardState initialBoard = effectiveBoardRules
+        .resolveBoard(level.createBoardState())
+        .state;
     final SolverResult exact = _solveExact(
       level,
       effectiveBoardRules,
@@ -28,9 +31,7 @@ final class BotSimulator {
     if (exact.solved) {
       return exact;
     }
-    var board = effectiveBoardRules
-        .resolveBoard(level.createBoardState())
-        .state;
+    var board = initialBoard;
     final List<MovingLaneState> lanes = level.movingLanes
         .map((lane) => MovingLaneState(def: lane))
         .toList(growable: false);
@@ -84,10 +85,22 @@ final class BotSimulator {
       moves += 1;
     }
 
+    if (board.visibleProductCount == 0) {
+      return SolverResult(solved: true, moves: moves);
+    }
+    final SolverResult search = _solveUsefulSearch(
+      initialBoard,
+      effectiveBoardRules,
+      maxDepth: maxMoves,
+      nodeBudget: 16000,
+    );
+    if (search.solved) {
+      return search;
+    }
     return SolverResult(
-      solved: board.visibleProductCount == 0,
+      solved: false,
       moves: moves,
-      reason: board.visibleProductCount == 0 ? null : 'move_budget_exhausted',
+      reason: search.reason ?? 'move_budget_exhausted',
     );
   }
 
@@ -155,6 +168,66 @@ final class BotSimulator {
       solved: false,
       moves: 0,
       reason: 'exact_solver_depth_exhausted',
+    );
+  }
+
+  SolverResult _solveUsefulSearch(
+    BoardState initial,
+    BoardRules rules, {
+    required int maxDepth,
+    required int nodeBudget,
+  }) {
+    var visitedNodes = 0;
+    final Map<String, int> bestDepthByState = <String, int>{};
+
+    int? visit(BoardState board, int depth) {
+      if (board.visibleProductCount == 0) {
+        return 0;
+      }
+      if (depth >= maxDepth || visitedNodes >= nodeBudget) {
+        return null;
+      }
+      visitedNodes += 1;
+      final String hash = board.stableHash;
+      final int? previousDepth = bestDepthByState[hash];
+      if (previousDepth != null && previousDepth <= depth) {
+        return null;
+      }
+      bestDepthByState[hash] = depth;
+
+      final List<_ScoredMove> scoredMoves =
+          rules
+              .generateLegalMoves(board)
+              .map((_LegalMoveScorer(board: board, rules: rules).score))
+              .toList(growable: false)
+            ..sort((_ScoredMove left, _ScoredMove right) {
+              return right.score.compareTo(left.score);
+            });
+      final Iterable<_ScoredMove> candidates =
+          scoredMoves.where((_ScoredMove move) => move.score >= 40).isEmpty
+          ? scoredMoves.take(12)
+          : scoredMoves.where((_ScoredMove move) => move.score >= 40).take(48);
+      for (final _ScoredMove scored in candidates) {
+        final result = rules.applyMove(
+          board,
+          MoveAction(source: scored.move.source, target: scored.move.target),
+        );
+        if (!result.isValid || result.state.stableHash == hash) {
+          continue;
+        }
+        final int? childMoves = visit(result.state, depth + 1);
+        if (childMoves != null) {
+          return childMoves + 1;
+        }
+      }
+      return null;
+    }
+
+    final int? moves = visit(initial, 0);
+    return SolverResult(
+      solved: moves != null,
+      moves: moves ?? 0,
+      reason: moves == null ? 'bounded_search_exhausted' : null,
     );
   }
 
@@ -233,6 +306,41 @@ final class BotSimulator {
       MoveQuality.badButLegal => 0,
     };
   }
+}
+
+final class _LegalMoveScorer {
+  const _LegalMoveScorer({required this.board, required this.rules});
+
+  final BoardState board;
+  final BoardRules rules;
+
+  _ScoredMove score(LegalMove move) {
+    final MoveQuality quality = rules.classifyMove(
+      board,
+      MoveAction(source: move.source, target: move.target),
+    );
+    return _ScoredMove(move: move, score: _qualityScore(quality));
+  }
+
+  int _qualityScore(MoveQuality quality) {
+    return switch (quality) {
+      MoveQuality.completesTriple => 100,
+      MoveQuality.revealEnabling => 90,
+      MoveQuality.createsPair => 70,
+      MoveQuality.reserveSafe => 45,
+      MoveQuality.laneSave => 35,
+      MoveQuality.neutral => 10,
+      MoveQuality.riskyReserve => 4,
+      MoveQuality.badButLegal => 0,
+    };
+  }
+}
+
+final class _ScoredMove {
+  const _ScoredMove({required this.move, required this.score});
+
+  final LegalMove move;
+  final int score;
 }
 
 final class _SearchNode {

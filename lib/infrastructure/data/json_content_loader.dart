@@ -16,19 +16,22 @@ final class JsonContentLoader {
   JsonContentLoader({
     AssetBundle? bundle,
     SchemaValidator validator = const SchemaValidator(),
+    this.levelPackAssetPath =
+        'assets/data/bundled/level_pack_vertical_slice.json',
+    this.validateLevelSolvabilityOnLoad = false,
   }) : _bundle = bundle ?? rootBundle,
        _validator = validator;
 
   final AssetBundle _bundle;
   final SchemaValidator _validator;
+  final String levelPackAssetPath;
+  final bool validateLevelSolvabilityOnLoad;
 
   Future<ContentService> load() async {
     final productCatalogJson = await _loadJson(
       'assets/data/bundled/product_catalog.json',
     );
-    final levelPackJson = await _loadJson(
-      'assets/data/bundled/level_pack_000.json',
-    );
+    final levelPackJson = await _loadJson(levelPackAssetPath);
     final economyJson = await _loadJson(
       'assets/data/bundled/economy_config.json',
     );
@@ -62,6 +65,7 @@ final class JsonContentLoader {
         productCatalog: productCatalog,
         levelPack: levelPack,
         productVisualManifest: productVisualManifest,
+        validateLevels: validateLevelSolvabilityOnLoad,
       ),
     );
     final List<Object?> themesJson = themeJson['themes']! as List<Object?>;

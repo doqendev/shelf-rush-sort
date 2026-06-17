@@ -41,6 +41,7 @@ final class SchemaValidator {
     required ProductCatalog productCatalog,
     required LevelPack levelPack,
     required ProductVisualManifest productVisualManifest,
+    bool validateLevels = true,
   }) {
     final List<ValidationIssue> issues = <ValidationIssue>[];
     final Set<String> seenSkus = <String>{};
@@ -65,7 +66,9 @@ final class SchemaValidator {
     issues.addAll(
       _validateProductVisualCoverage(productCatalog, productVisualManifest),
     );
-    issues.addAll(validateLevelPack(levelPack, productCatalog).issues);
+    if (validateLevels) {
+      issues.addAll(validateLevelPack(levelPack, productCatalog).issues);
+    }
     return ValidationReport(issues: issues);
   }
 

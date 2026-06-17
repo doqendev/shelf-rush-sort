@@ -14,9 +14,9 @@ import '../../infrastructure/platform/audio_service.dart';
 import '../../infrastructure/platform/haptics_service.dart';
 import 'board/board_layout_calculator.dart';
 import 'board/cell_target_component.dart';
-import 'board/compartment_component.dart';
 import 'board/hidden_preview_component.dart';
 import 'board/product_component.dart';
+import 'board/rack_backdrop_component.dart';
 import 'fx/fx_director.dart';
 import 'input/input_router.dart';
 import 'lanes/moving_lane_component.dart';
@@ -112,16 +112,14 @@ final class ShelfWorld extends World {
   }
 
   Future<void> _addBoard() async {
+    await add(
+      RackBackdropComponent(
+        position: Vector2(_layout.rackRect.left, _layout.rackRect.top),
+        size: Vector2(_layout.rackRect.width, _layout.rackRect.height),
+      ),
+    );
     for (final CompartmentState compartment in _state.board.compartments) {
       final Rect compartmentRect = _layout.compartmentRect(compartment.index);
-      await add(
-        CompartmentComponent(
-          locked: compartment.locked,
-          decorative: compartment.decorative,
-          position: Vector2(compartmentRect.left, compartmentRect.top),
-          size: Vector2(compartmentRect.width, compartmentRect.height),
-        ),
-      );
       if (compartment.hasHiddenProducts) {
         await add(
           HiddenPreviewComponent(

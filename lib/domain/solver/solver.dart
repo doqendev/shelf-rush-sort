@@ -60,6 +60,7 @@ final class LevelValidator {
     final Map<SkuId, int> skuCounts = <SkuId, int>{};
     var visibleSlots = 0;
     var lockedCompartments = 0;
+    var decorativeCompartments = 0;
     var laneQueueSlots = 0;
     for (final CompartmentDef compartment in level.compartments) {
       if (!seenIndexes.add(compartment.index)) {
@@ -80,8 +81,11 @@ final class LevelValidator {
           ),
         );
       }
-      if (compartment.locked || compartment.decorative) {
+      if (compartment.locked) {
         lockedCompartments += 1;
+      }
+      if (compartment.decorative) {
+        decorativeCompartments += 1;
       }
       for (final SkuId? skuId in compartment.cells) {
         if (skuId == null) {
@@ -131,12 +135,53 @@ final class LevelValidator {
     final int effectiveVisibleSlots =
         visibleSlots + (level.movingLanes.isEmpty ? 0 : laneQueueSlots);
     final int emptyVisibleSlots = frontCellCount - effectiveVisibleSlots;
-    if (emptyVisibleSlots > 20 && lockedCompartments < 6) {
+    if (emptyVisibleSlots > 20) {
       issues.add(
         ValidationIssue(
           code: 'low_visual_density',
           levelId: level.id,
           message: 'Level opens with too many empty visible slots.',
+        ),
+      );
+    }
+    final int activeCompartmentCount =
+        level.compartments.length - lockedCompartments - decorativeCompartments;
+    if (level.levelNumber <= 15) {
+      if (activeCompartmentCount != compartmentCount) {
+        issues.add(
+          ValidationIssue(
+            code: 'opening_levels_require_full_rack',
+            levelId: level.id,
+            message: 'Opening levels must keep all 15 compartments playable.',
+          ),
+        );
+      }
+      if (lockedCompartments != 0) {
+        issues.add(
+          ValidationIssue(
+            code: 'opening_levels_forbid_locks',
+            levelId: level.id,
+            message: 'Opening levels must not use generic locked shelves.',
+          ),
+        );
+      }
+      if (decorativeCompartments != 0) {
+        issues.add(
+          ValidationIssue(
+            code: 'opening_levels_forbid_decorative_slots',
+            levelId: level.id,
+            message:
+                'Opening levels must not replace gameplay shelves with decorative slots.',
+          ),
+        );
+      }
+    } else if (productionPack && activeCompartmentCount < compartmentCount) {
+      issues.add(
+        ValidationIssue(
+          code: 'inactive_compartments_require_explicit_mechanic',
+          levelId: level.id,
+          message:
+              'Inactive production compartments require an authored lock mechanic.',
         ),
       );
     }

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -17,7 +16,9 @@ import '../../infrastructure/analytics/analytics_event.dart';
 import '../../infrastructure/analytics/analytics_service.dart';
 import '../../infrastructure/save/save_repository.dart';
 import '../flame/shelf_rush_game.dart';
-import 'hud/hud_overlay.dart';
+import 'gameplay/game_scaffold.dart';
+import 'gameplay/game_viewport.dart';
+import 'gameplay/pause_sheet.dart';
 import 'overlays/loss_panel.dart';
 import 'overlays/win_panel.dart';
 
@@ -66,7 +67,6 @@ final class _GameScreenState extends ConsumerState<GameScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final PlayerSave save = ref.watch(playerSaveProvider);
     final GameSessionState? session = _session;
     final ShelfRushGame? game = _game;
     if (session == null || game == null) {
@@ -76,18 +76,11 @@ final class _GameScreenState extends ConsumerState<GameScreen> {
     return Scaffold(
       body: Stack(
         children: <Widget>[
-          Positioned.fill(child: GameWidget(game: game)),
-          SafeArea(
-            child: HudOverlay(
+          Positioned.fill(
+            child: GameScaffold(
               session: session,
-              save: save,
-              onMap: () => context.push('/map'),
-              onShop: () => context.push('/shop'),
-              onSettings: () => context.push('/settings'),
-              onRetry: () => _loadLevel(_levelNumber),
-              onDebug: ref.watch(environmentProvider).debugToolsEnabled
-                  ? () => context.push('/debug/analytics')
-                  : null,
+              viewport: GameViewport(game: game),
+              onPause: _showPauseSheet,
             ),
           ),
           if (session.status == GameSessionStatus.won)
@@ -105,6 +98,29 @@ final class _GameScreenState extends ConsumerState<GameScreen> {
             ),
         ],
       ),
+    );
+  }
+
+  void _showPauseSheet() {
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (BuildContext sheetContext) {
+        void closeThen(VoidCallback action) {
+          Navigator.of(sheetContext).pop();
+          action();
+        }
+
+        return PauseSheet(
+          onResume: () => Navigator.of(sheetContext).pop(),
+          onRestart: () => closeThen(() => _loadLevel(_levelNumber)),
+          onSettings: () => closeThen(() => context.push('/settings')),
+          onExitToMap: () => closeThen(() => context.push('/map')),
+          onDebug: ref.watch(environmentProvider).debugToolsEnabled
+              ? () => closeThen(() => context.push('/debug/analytics'))
+              : null,
+        );
+      },
     );
   }
 

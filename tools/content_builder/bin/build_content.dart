@@ -112,6 +112,10 @@ Future<void> main() async {
   await _writeJson('assets/data/bundled/product_catalog.json', _products());
   await _writeJson('assets/data/bundled/asset_manifest.json', _assetManifest());
   await _writeJson('assets/data/bundled/level_pack_000.json', _levelPack());
+  await _writeJson(
+    'assets/data/bundled/level_pack_vertical_slice.json',
+    _verticalSlicePack(),
+  );
   await _writeJson('assets/data/bundled/economy_config.json', _economy());
   await _writeJson(
     'assets/data/bundled/remote_defaults.json',
@@ -195,8 +199,111 @@ Map<String, Object?> _levelPack() {
   };
 }
 
+Map<String, Object?> _verticalSlicePack() {
+  return <String, Object?>{
+    'schemaVersion': 1,
+    'id': 'vertical_slice_pack_000',
+    'version': 1,
+    'levels': <Map<String, Object?>>[
+      for (var level = 1; level <= 15; level += 1)
+        level == 1 ? _verticalSliceLevelOne() : _denseOpeningLevel(level),
+    ],
+  };
+}
+
+Map<String, Object?> _verticalSliceLevelOne() {
+  final List<List<String?>> cells = <List<String?>>[
+    <String?>[_sku(0), _sku(0), null],
+    <String?>[_sku(1), _sku(1), null],
+    <String?>[_sku(2), _sku(2), null],
+    <String?>[_sku(3), _sku(3), null],
+    <String?>[_sku(4), _sku(4), null],
+    <String?>[_sku(5), _sku(5), null],
+    <String?>[_sku(0), _sku(1), _sku(1)],
+    <String?>[_sku(0), _sku(2), _sku(2)],
+    <String?>[_sku(0), _sku(3), _sku(3)],
+    <String?>[_sku(0), _sku(4), _sku(4)],
+    <String?>[_sku(1), _sku(2), _sku(5)],
+    <String?>[_sku(1), _sku(3), _sku(5)],
+    <String?>[_sku(2), _sku(4), _sku(5)],
+    <String?>[_sku(3), _sku(4), _sku(5)],
+    <String?>[null, null, null],
+  ];
+  return _levelFromCells(
+    level: 1,
+    title: 'Full Rack First Clear',
+    seed: 2001,
+    difficulty: 'tutorial',
+    cells: cells,
+    movingLanes: const <Map<String, Object?>>[],
+  );
+}
+
+Map<String, Object?> _denseOpeningLevel(int level) {
+  final Map<String, Object?> generated = level < 12
+      ? _staticChainLevel(level)
+      : _laneLevel(level + 3);
+  return <String, Object?>{
+    ...generated,
+    'id': 'vertical_level_${level.toString().padLeft(4, '0')}',
+    'levelNumber': level,
+    'title': level < 12
+        ? 'Full Rack Sort $level'
+        : 'Full Rack Conveyor ${level - 11}',
+    'seed': 2000 + level,
+    'humanReview': _humanReview(
+      intent: level == 4
+          ? 'Introduce exact hidden preview in a full rack.'
+          : level >= 12
+          ? 'Introduce conveyor pressure without reducing rack density.'
+          : 'Maintain full-rack density while increasing SKU planning.',
+      curriculumTag: level >= 12 ? 'lane_intro' : 'full_rack_opening',
+      difficultyTarget: level < 10 ? 'normal' : 'hard',
+    ),
+  };
+}
+
+Map<String, Object?> _levelFromCells({
+  required int level,
+  required String title,
+  required int seed,
+  required String difficulty,
+  required List<List<String?>> cells,
+  required List<Map<String, Object?>> movingLanes,
+}) {
+  return <String, Object?>{
+    'id': 'vertical_level_${level.toString().padLeft(4, '0')}',
+    'levelNumber': level,
+    'title': title,
+    'seed': seed,
+    'difficulty': difficulty,
+    'timeLimitSeconds': null,
+    'moveLimit': null,
+    'objective': <String, Object?>{
+      'type': 'clearAll',
+      'targetCounts': <String, int>{},
+    },
+    'compartments': <Map<String, Object?>>[
+      for (var index = 0; index < 15; index += 1)
+        <String, Object?>{
+          'index': index,
+          'cells': cells[index],
+          'hidden': <String>[],
+          'locked': false,
+          'decorative': false,
+        },
+    ],
+    'movingLanes': movingLanes,
+    'humanReview': _humanReview(
+      intent: 'Open with a dense full-rack tutorial and one guaranteed clear.',
+      curriculumTag: 'first_triple',
+      difficultyTarget: 'tutorial',
+    ),
+  };
+}
+
 Map<String, Object?> _staticChainLevel(int level) {
-  final int active = (6 + (level ~/ 2)).clamp(6, 15);
+  final int active = 15;
   final int skuOffset = (level - 1) * 2;
   final List<Map<String, Object?>> compartments = <Map<String, Object?>>[];
   for (var index = 0; index < 15; index += 1) {
@@ -248,13 +355,29 @@ Map<String, Object?> _staticChainLevel(int level) {
 }
 
 Map<String, Object?> _laneLevel(int level) {
-  final int active = (8 + ((level - 15) ~/ 2)).clamp(8, 15);
+  final int active = 15;
   final int skuOffset = 20 + ((level - 15) * 2);
   final List<Map<String, Object?>> compartments = <Map<String, Object?>>[];
   final List<Map<String, Object?>> queue = <Map<String, Object?>>[];
   for (var index = 0; index < 15; index += 1) {
     if (index >= active) {
       compartments.add(_lockedCompartment(index));
+      continue;
+    }
+    final List<String>? cellBlockers = _cellBlockersForLevel(
+      level,
+      index,
+      active,
+    );
+    if (cellBlockers != null) {
+      compartments.add(<String, Object?>{
+        'index': index,
+        'cells': <String?>[null, null, null],
+        'cellBlockers': cellBlockers,
+        'hidden': <String>[],
+        'locked': false,
+        'decorative': false,
+      });
       continue;
     }
     final String skuId = _sku(skuOffset + index);
@@ -309,19 +432,22 @@ Map<String, Object?> _lockedCompartment(int index) {
 }
 
 List<String>? _cellBlockersForLevel(int level, int index, int active) {
-  if (index != active - 1 || level < 2 || level > 8) {
+  if (index != active - 1) {
     return null;
   }
   final String blocker = switch (level) {
-    2 => 'locked',
-    3 => 'tape',
-    4 => 'frozen',
-    5 => 'frost',
-    6 => 'cover',
-    7 => 'crate',
-    8 => 'mysteryBag',
+    9 => 'mysteryBag',
+    16 => 'cover',
+    17 => 'locked',
+    18 => 'tape',
+    19 => 'frozen',
+    20 => 'frost',
+    21 => 'crate',
     _ => 'none',
   };
+  if (blocker == 'none') {
+    return null;
+  }
   return <String>['none', blocker, 'none'];
 }
 
@@ -365,6 +491,20 @@ Map<String, Object?> _economy() {
       'revealHidden': 120,
       'slowConveyor': 140,
     },
+  };
+}
+
+Map<String, Object?> _humanReview({
+  required String intent,
+  required String curriculumTag,
+  required String difficultyTarget,
+}) {
+  return <String, Object?>{
+    'author': 'engineering_vertical_slice',
+    'intent': intent,
+    'curriculumTag': curriculumTag,
+    'difficultyTarget': difficultyTarget,
+    'humanReviewGrade': 'engineering_reviewed',
   };
 }
 

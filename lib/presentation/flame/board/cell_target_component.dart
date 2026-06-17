@@ -30,6 +30,14 @@ final class CellTargetComponent extends PositionComponent with TapCallbacks {
   void render(Canvas canvas) {
     final Rect rect = size.toRect();
     final bool hasBlocker = blocker != BlockerKind.none;
+    if (!highlighted && !hasBlocker) {
+      final Paint resting = Paint()..color = const Color(0x08FFFFFF);
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(rect, const Radius.circular(7)),
+        resting,
+      );
+      return;
+    }
     final Paint paint = Paint()
       ..color = hasBlocker
           ? const Color(0x66B76A4E)

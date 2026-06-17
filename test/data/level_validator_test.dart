@@ -33,4 +33,34 @@ void main() {
     expect(pack.levels, hasLength(300));
     expect(report.metricsByLevel, hasLength(300));
   });
+
+  test(
+    'vertical-slice levels pass production validation and solver checks',
+    () async {
+      final ProductCatalog catalog = ProductCatalog.fromJson(
+        jsonDecode(
+              await File(
+                'assets/data/bundled/product_catalog.json',
+              ).readAsString(),
+            )
+            as Map<String, Object?>,
+      );
+      final LevelPack pack = LevelPack.fromJson(
+        jsonDecode(
+              await File(
+                'assets/data/bundled/level_pack_vertical_slice.json',
+              ).readAsString(),
+            )
+            as Map<String, Object?>,
+      );
+
+      const LevelValidator validator = LevelValidator();
+      final report = validator.validatePack(pack, catalog);
+
+      expect(report.issues, isEmpty);
+      expect(pack.id, 'vertical_slice_pack_000');
+      expect(pack.levels, hasLength(15));
+      expect(report.metricsByLevel, hasLength(15));
+    },
+  );
 }
