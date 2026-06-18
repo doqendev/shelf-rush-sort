@@ -11,10 +11,17 @@ final class InputRouter {
     required this.controller,
     required BoardLayout layout,
     this.magnetTargeting = const MagnetTargeting(),
+    this.onProductDragStarted,
+    this.onProductDragUpdated,
+    this.onProductDragFinished,
   }) : _layout = layout;
 
   final GameSessionController controller;
   final MagnetTargeting magnetTargeting;
+  void Function(CellAddress address, Vector2 canvasPosition)?
+  onProductDragStarted;
+  void Function(Vector2 canvasPosition)? onProductDragUpdated;
+  void Function()? onProductDragFinished;
   BoardLayout _layout;
 
   set layout(BoardLayout layout) {
@@ -29,8 +36,13 @@ final class InputRouter {
     controller.placeSelectedAt(address);
   }
 
-  void onProductDragStart(CellAddress address) {
+  void onProductDragStart(CellAddress address, Vector2 canvasPosition) {
+    onProductDragStarted?.call(address, canvasPosition);
     controller.selectCell(address);
+  }
+
+  void onProductDragUpdate(Vector2 canvasPosition) {
+    onProductDragUpdated?.call(canvasPosition);
   }
 
   void onProductDragEnd(Vector2 canvasPosition) {
@@ -47,6 +59,7 @@ final class InputRouter {
     if (target != null) {
       controller.placeSelectedAt(target);
     }
+    onProductDragFinished?.call();
   }
 
   void onLaneProductTapped(String laneId) {

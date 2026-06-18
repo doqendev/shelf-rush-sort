@@ -5,6 +5,7 @@ import 'package:flame/components.dart';
 
 import '../../application/game_session/game_session_controller.dart';
 import '../../application/game_session/game_session_state.dart';
+import '../../domain/blockers/blocker_def.dart';
 import '../../domain/content/product_def.dart';
 import '../../domain/core/value_objects.dart';
 import '../../domain/game/board_state.dart';
@@ -14,6 +15,7 @@ import '../../infrastructure/platform/audio_service.dart';
 import '../../infrastructure/platform/haptics_service.dart';
 import 'board/board_layout_calculator.dart';
 import 'board/cell_target_component.dart';
+import 'board/dragged_product_component.dart';
 import 'board/hidden_preview_component.dart';
 import 'board/product_component.dart';
 import 'board/rack_backdrop_component.dart';
@@ -33,7 +35,12 @@ final class ShelfWorld extends World {
     this.fxDirector = const FxDirector(),
   }) : inputRouter = InputRouter(controller: controller, layout: initialLayout),
        _layout = initialLayout,
-       _state = controller.state;
+       _state = controller.state {
+    inputRouter
+      ..onProductDragStarted = _startProductDragVisual
+      ..onProductDragUpdated = _updateProductDragVisual
+      ..onProductDragFinished = _finishProductDragVisual;
+  }
 
   final GameSessionController controller;
   final ProductCatalog productCatalog;
@@ -49,6 +56,8 @@ final class ShelfWorld extends World {
   bool _rebuilding = false;
   bool _pendingRebuild = false;
   String _boardSyncHash = '';
+  _ProductDragVisual? _productDragVisual;
+  DraggedProductComponent? _productDragComponent;
   final Map<String, MovingLaneComponent> _laneComponents =
       <String, MovingLaneComponent>{};
 
@@ -102,10 +111,15 @@ final class ShelfWorld extends World {
     _rebuilding = true;
     do {
       _pendingRebuild = false;
-      removeAll(children.toList());
+      removeAll(
+        children
+            .where((Component child) => child != _productDragComponent)
+            .toList(),
+      );
       _laneComponents.clear();
       await _addBoard();
       await _addLanes();
+      await _syncProductDragComponent();
       _boardSyncHash = _currentBoardSyncHash();
     } while (_pendingRebuild);
     _rebuilding = false;
@@ -162,6 +176,9 @@ final class ShelfWorld extends World {
         if (productDef == null) {
           continue;
         }
+        if (_productDragVisual?.source == address) {
+          continue;
+        }
         await add(
           ProductComponent(
             address: address,
@@ -207,6 +224,76 @@ final class ShelfWorld extends World {
     }
   }
 
+  void _startProductDragVisual(CellAddress address, Vector2 canvasPosition) {
+    final ProductInstance? product = _state.board.productAt(address);
+    if (product == null) {
+      return;
+    }
+    final ProductDef? productDef = productCatalog.bySku(product.skuId);
+    if (productDef == null) {
+      return;
+    }
+    final Rect cellRect = _layout.cellRect(address);
+    final ShelfCell shelfCell = _state.board.cellAt(address)!;
+    final Vector2 origin = Vector2(cellRect.left, cellRect.top);
+    _productDragVisual = _ProductDragVisual(
+      source: address,
+      productDef: productDef,
+      cellBlocker: shelfCell.blocker,
+      productBlocker: product.blocker,
+      size: Vector2(cellRect.width, cellRect.height),
+      grabOffset: canvasPosition - origin,
+      position: origin,
+    );
+    unawaited(_syncProductDragComponent());
+  }
+
+  void _updateProductDragVisual(Vector2 canvasPosition) {
+    final _ProductDragVisual? visual = _productDragVisual;
+    if (visual == null) {
+      return;
+    }
+    final Vector2 nextPosition = canvasPosition - visual.grabOffset;
+    _productDragVisual = visual.copyWith(position: nextPosition);
+    final DraggedProductComponent? component = _productDragComponent;
+    if (component != null && component.isMounted) {
+      component.position = nextPosition;
+    } else {
+      unawaited(_syncProductDragComponent());
+    }
+  }
+
+  void _finishProductDragVisual() {
+    _productDragVisual = null;
+    final DraggedProductComponent? component = _productDragComponent;
+    _productDragComponent = null;
+    if (component != null) {
+      component.removeFromParent();
+    }
+    unawaited(rebuild());
+  }
+
+  Future<void> _syncProductDragComponent() async {
+    final _ProductDragVisual? visual = _productDragVisual;
+    if (visual == null) {
+      return;
+    }
+    final DraggedProductComponent? current = _productDragComponent;
+    if (current != null && current.isMounted) {
+      current.position = visual.position;
+      return;
+    }
+    final DraggedProductComponent component = DraggedProductComponent(
+      productDef: visual.productDef,
+      cellBlocker: visual.cellBlocker,
+      productBlocker: visual.productBlocker,
+      position: visual.position,
+      size: visual.size,
+    );
+    _productDragComponent = component;
+    await add(component);
+  }
+
   bool _isLegalTarget(CellAddress target) {
     final CellAddress? selected = _state.selectedCell;
     if (selected != null) {
@@ -234,5 +321,37 @@ final class ShelfWorld extends World {
       _state.laneHoldingProduct?.heldProduct?.product.id,
       _state.status.name,
     ].join('|');
+  }
+}
+
+final class _ProductDragVisual {
+  const _ProductDragVisual({
+    required this.source,
+    required this.productDef,
+    required this.cellBlocker,
+    required this.productBlocker,
+    required this.size,
+    required this.grabOffset,
+    required this.position,
+  });
+
+  final CellAddress source;
+  final ProductDef productDef;
+  final BlockerKind cellBlocker;
+  final BlockerKind productBlocker;
+  final Vector2 size;
+  final Vector2 grabOffset;
+  final Vector2 position;
+
+  _ProductDragVisual copyWith({required Vector2 position}) {
+    return _ProductDragVisual(
+      source: source,
+      productDef: productDef,
+      cellBlocker: cellBlocker,
+      productBlocker: productBlocker,
+      size: size,
+      grabOffset: grabOffset,
+      position: position,
+    );
   }
 }
