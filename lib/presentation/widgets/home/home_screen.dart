@@ -66,7 +66,7 @@ final class HomeScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 20),
                   const CozyTitle(
-                    'SELF\nRUSH',
+                    'SHELF\nRUSH',
                     fontSize: 60,
                     strokeWidth: 6,
                     height: 0.86,

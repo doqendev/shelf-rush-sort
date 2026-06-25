@@ -81,10 +81,22 @@ final class GameSessionController {
       StreamController<GameSessionState>.broadcast(sync: true);
 
   GameSessionState _state;
+  bool _paused = false;
 
   GameSessionState get state => _state;
 
   Stream<GameSessionState> get states => _states.stream;
+
+  /// Whether the deterministic simulation is paused. While paused, [tick] is a
+  /// no-op, so the level timer and moving lanes do not advance.
+  bool get isPaused => _paused;
+
+  /// Pauses or resumes the simulation. The Flame engine should be paused and
+  /// resumed alongside this (see the GameScreen pause flow) so rendering and
+  /// simulation stay in lockstep.
+  void setPaused(bool paused) {
+    _paused = paused;
+  }
 
   static GameSessionState _createInitialState(
     LevelDef level,
@@ -318,7 +330,7 @@ final class GameSessionController {
   }
 
   void tick(Duration delta) {
-    if (_state.isEnded) {
+    if (_paused || _state.isEnded) {
       return;
     }
     if (_state.timer.limit == null && _state.lanes.isEmpty) {

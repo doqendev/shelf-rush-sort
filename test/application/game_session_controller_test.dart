@@ -124,6 +124,33 @@ void main() {
       CellAddress.fromCompartmentIndex(1, 0),
     );
   });
+
+  test('paused controller does not advance the timer (P0.3)', () {
+    final GameSessionController controller = GameSessionController(
+      level: _pauseTestLevel(),
+      analytics: DebugAnalyticsService(),
+    );
+
+    controller.tick(const Duration(seconds: 1));
+    final Duration elapsedAtPause = controller.state.timer.elapsed;
+    expect(controller.state.status, GameSessionStatus.playing);
+
+    controller.setPaused(true);
+    // Simulate five real seconds of engine ticks while the pause sheet is open.
+    for (var i = 0; i < 50; i += 1) {
+      controller.tick(const Duration(milliseconds: 100));
+    }
+
+    expect(controller.isPaused, isTrue);
+    expect(controller.state.timer.elapsed, elapsedAtPause);
+    expect(controller.state.status, GameSessionStatus.playing);
+
+    controller.setPaused(false);
+    controller.tick(const Duration(seconds: 1));
+    expect(controller.state.timer.elapsed, greaterThan(elapsedAtPause));
+
+    controller.dispose();
+  });
 }
 
 LevelDef _moveLimitLevel() {
@@ -275,6 +302,32 @@ LevelDef _tutorialLevel() {
         index: 1,
         cells: const <String?>['sku_000', 'sku_001', null],
       ),
+      for (var index = 2; index < 15; index += 1)
+        CompartmentDef(
+          index: index,
+          locked: true,
+          cells: const <String?>[null, null, null],
+        ),
+    ],
+  );
+}
+
+LevelDef _pauseTestLevel() {
+  return LevelDef(
+    id: 'level_pause_test',
+    levelNumber: 4,
+    title: 'Pause Test',
+    seed: 4,
+    timeLimitSeconds: 60,
+    objective: ObjectiveRequirement(type: ObjectiveType.clearAll),
+    compartments: <CompartmentDef>[
+      // A completable triple (3x sku_000) keeps the board playable — no jam,
+      // no auto-clear — so the level stays in progress across ticks.
+      CompartmentDef(
+        index: 0,
+        cells: const <String?>['sku_000', 'sku_000', null],
+      ),
+      CompartmentDef(index: 1, cells: const <String?>['sku_000', null, null]),
       for (var index = 2; index < 15; index += 1)
         CompartmentDef(
           index: index,

@@ -33,6 +33,10 @@ class CozySpriteCache {
   final Map<String, ui.Image> _images = <String, ui.Image>{};
   bool _loaded = false;
 
+  /// Per-level SKU -> sprite assignment ensuring distinct match identities in
+  /// the active level never share a sprite. Empty outside an active level.
+  Map<String, String> _levelAssignment = const <String, String>{};
+
   /// Preloads every cozy product sprite into memory. Safe to call repeatedly.
   Future<void> ensureLoaded(Images images) async {
     if (_loaded) {
@@ -46,12 +50,58 @@ class CozySpriteCache {
 
   ui.Image? imageForName(String name) => _images[name];
 
-  /// Stable mapping from a SKU id to one of the cozy sprite names.
+  /// Number of visually distinct cozy product identities available.
+  static int get visualBudget => productNames.length;
+
+  /// Resolves the sprite for [skuId]. Prefers the active level's collision-free
+  /// assignment (see [assignLevel]); falls back to a global stable mapping when
+  /// no level is active.
   String spriteNameForSku(String skuId) {
+    final String? assigned = _levelAssignment[skuId];
+    if (assigned != null) {
+      return assigned;
+    }
     return productNames[_skuIndex(skuId) % productNames.length];
   }
 
   ui.Image? imageForSku(String skuId) => _images[spriteNameForSku(skuId)];
+
+  /// Assigns every distinct SKU in the active level a unique sprite so two
+  /// different match identities never share artwork ("artwork is the truth").
+  /// SKUs are sorted for deterministic, stable assignment; any beyond
+  /// [visualBudget] wrap and collide — a content failure that [visualCollisions]
+  /// reports.
+  void assignLevel(Iterable<String> skuIds) {
+    final List<String> sorted = skuIds.toSet().toList()..sort();
+    final Map<String, String> assignment = <String, String>{};
+    for (var index = 0; index < sorted.length; index += 1) {
+      assignment[sorted[index]] = productNames[index % productNames.length];
+    }
+    _levelAssignment = Map<String, String>.unmodifiable(assignment);
+  }
+
+  /// Reverts to the global fallback mapping (no active level).
+  void clearLevelAssignment() {
+    _levelAssignment = const <String, String>{};
+  }
+
+  /// Groups of distinct SKUs that would share a sprite under [assignLevel] for
+  /// [skuIds]. Empty when every SKU is visually unique; any non-empty entry is
+  /// a different-SKU/same-sprite collision that must fail content validation.
+  static Map<String, List<String>> visualCollisions(Iterable<String> skuIds) {
+    final List<String> sorted = skuIds.toSet().toList()..sort();
+    final Map<String, List<String>> byVisual = <String, List<String>>{};
+    for (var index = 0; index < sorted.length; index += 1) {
+      byVisual
+          .putIfAbsent(
+            productNames[index % productNames.length],
+            () => <String>[],
+          )
+          .add(sorted[index]);
+    }
+    byVisual.removeWhere((_, List<String> skus) => skus.length < 2);
+    return byVisual;
+  }
 
   int _skuIndex(String skuId) {
     final Match? match = RegExp(r'(\d+)$').firstMatch(skuId);

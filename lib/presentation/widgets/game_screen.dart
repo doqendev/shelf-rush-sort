@@ -34,7 +34,8 @@ final class GameScreen extends ConsumerStatefulWidget {
   ConsumerState<GameScreen> createState() => _GameScreenState();
 }
 
-final class _GameScreenState extends ConsumerState<GameScreen> {
+final class _GameScreenState extends ConsumerState<GameScreen>
+    with WidgetsBindingObserver {
   GameSessionController? _controller;
   ShelfRushGame? _game;
   StreamSubscription<GameSessionState>? _subscription;
@@ -46,6 +47,7 @@ final class _GameScreenState extends ConsumerState<GameScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _levelNumber = widget.initialLevel;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadLevel(_levelNumber);
@@ -63,9 +65,31 @@ final class _GameScreenState extends ConsumerState<GameScreen> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     unawaited(_subscription?.cancel());
     _controller?.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    final GameSessionController? controller = _controller;
+    final ShelfRushGame? game = _game;
+    if (controller == null || game == null) {
+      return;
+    }
+    if (state == AppLifecycleState.resumed) {
+      // Only auto-resume when the game screen is the visible, top-most route
+      // (not behind a pause sheet, settings page, ad, or ended overlay).
+      final bool onTop = ModalRoute.of(context)?.isCurrent ?? false;
+      if (mounted && onTop && !controller.state.isEnded) {
+        controller.setPaused(false);
+        game.resumeEngine();
+      }
+    } else {
+      controller.setPaused(true);
+      game.pauseEngine();
+    }
   }
 
   @override
@@ -106,6 +130,32 @@ final class _GameScreenState extends ConsumerState<GameScreen> {
   }
 
   void _showPauseSheet() {
+    // Pause both the simulation (timer + lanes) and the Flame engine while the
+    // sheet is open, then resume on close — unless the session was replaced
+    // (Restart), the player left (Home), or the level already ended.
+    final ShelfRushGame? pausedGame = _game;
+    final GameSessionController? pausedController = _controller;
+    pausedController?.setPaused(true);
+    pausedGame?.pauseEngine();
+
+    bool resumeHandled = false;
+    void resumeIfSafe() {
+      if (resumeHandled) {
+        return;
+      }
+      resumeHandled = true;
+      final bool sameSession =
+          identical(pausedGame, _game) &&
+          identical(pausedController, _controller);
+      if (mounted &&
+          sameSession &&
+          pausedController != null &&
+          !pausedController.state.isEnded) {
+        pausedController.setPaused(false);
+        pausedGame?.resumeEngine();
+      }
+    }
+
     showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
@@ -121,15 +171,21 @@ final class _GameScreenState extends ConsumerState<GameScreen> {
 
         return PauseSheet(
           onResume: () => Navigator.of(sheetContext).pop(),
-          onRestart: () => closeThen(() => _loadLevel(_levelNumber)),
+          onRestart: () => closeThen(() {
+            resumeHandled = true; // a fresh session starts unpaused
+            _loadLevel(_levelNumber);
+          }),
           onSettings: () => closeThen(() => context.push('/settings')),
-          onExitToMap: () => closeThen(() => context.go('/home')),
+          onExitToMap: () => closeThen(() {
+            resumeHandled = true; // leaving the game screen entirely
+            context.go('/home');
+          }),
           onDebug: ref.watch(environmentProvider).debugToolsEnabled
               ? () => closeThen(() => context.push('/debug/analytics'))
               : null,
         );
       },
-    );
+    ).whenComplete(resumeIfSafe);
   }
 
   void _loadLevel(int requestedLevel) {
@@ -312,7 +368,7 @@ class _CozyLoading extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             const CozyTitle(
-              'SELF\nRUSH',
+              'SHELF\nRUSH',
               fontSize: 56,
               strokeWidth: 6,
               height: 0.86,
