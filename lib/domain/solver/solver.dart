@@ -135,7 +135,12 @@ final class LevelValidator {
     final int effectiveVisibleSlots =
         visibleSlots + (level.movingLanes.isEmpty ? 0 : laneQueueSlots);
     final int emptyVisibleSlots = frontCellCount - effectiveVisibleSlots;
-    if (emptyVisibleSlots > 20) {
+    // Tutorial levels are intentionally sparse, guided and partly locked down
+    // (a gentle first success), so they are exempt from the dense full-rack
+    // opening-quality gates. See the studio-quality upgrade plan, sections 14
+    // and 22.
+    final bool isTutorial = level.difficulty == 'tutorial';
+    if (emptyVisibleSlots > 20 && !isTutorial) {
       issues.add(
         ValidationIssue(
           code: 'low_visual_density',
@@ -146,7 +151,7 @@ final class LevelValidator {
     }
     final int activeCompartmentCount =
         level.compartments.length - lockedCompartments - decorativeCompartments;
-    if (level.levelNumber <= 15) {
+    if (level.levelNumber <= 15 && !isTutorial) {
       if (activeCompartmentCount != compartmentCount) {
         issues.add(
           ValidationIssue(
@@ -175,7 +180,9 @@ final class LevelValidator {
           ),
         );
       }
-    } else if (productionPack && activeCompartmentCount < compartmentCount) {
+    } else if (productionPack &&
+        activeCompartmentCount < compartmentCount &&
+        !isTutorial) {
       issues.add(
         ValidationIssue(
           code: 'inactive_compartments_require_explicit_mechanic',
@@ -195,7 +202,7 @@ final class LevelValidator {
         ),
       );
     }
-    if (productionPack && metrics.duplicatePatternRatio > 0.24) {
+    if (productionPack && metrics.duplicatePatternRatio > 0.24 && !isTutorial) {
       issues.add(
         ValidationIssue(
           code: 'duplicate_shelf_pattern',

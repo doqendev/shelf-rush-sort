@@ -9,23 +9,23 @@ import 'package:shelf_rush_sort/domain/game/board_rules.dart';
 import 'package:shelf_rush_sort/domain/game/move.dart';
 
 void main() {
-  test('level 1 uses the full dense tutorial rack', () async {
+  test('level 1 is a gentle, collision-free teaching board', () async {
     final LevelPack pack = await _verticalSlicePack();
     final LevelDef level = pack.levelByNumber(1);
 
+    // The board shape is intact, but the opening level is now a small guided
+    // teaching board (studio-quality upgrade plan, sections 14 and 22): few
+    // products, unique-visual SKUs within the 11-sprite budget (so it is
+    // collision-free), inactive shelves dimmed via locks, and no time pressure,
+    // hidden layers, lanes or blockers.
+    expect(level.difficulty, 'tutorial');
     expect(level.compartments, hasLength(compartmentCount));
+    expect(_visibleProductCount(level), lessThanOrEqualTo(12));
+    expect(_skuCounts(level), hasLength(lessThanOrEqualTo(11)));
     expect(
       level.compartments.where((compartment) => compartment.locked),
-      isEmpty,
+      isNotEmpty,
     );
-    expect(
-      level.compartments.where((compartment) => compartment.decorative),
-      isEmpty,
-    );
-    expect(_visibleProductCount(level), 36);
-    expect(_emptyCellCount(level), 9);
-    expect(_skuCounts(level).values, everyElement(6));
-    expect(_skuCounts(level), hasLength(6));
     expect(level.timeLimitSeconds, isNull);
     expect(level.moveLimit, isNull);
     expect(level.movingLanes, isEmpty);
@@ -39,13 +39,16 @@ void main() {
     );
   });
 
-  test('level 1 first hinted move completes a triple', () async {
+  test('level 1 guided hint move completes a triple', () async {
     final LevelDef level = (await _verticalSlicePack()).levelByNumber(1);
     const BoardRules rules = BoardRules();
+    // The TutorialController's level-1 hint (compartment 1 cell 0 -> the empty
+    // slot of compartment 0) must actually complete a triple on the curated
+    // board — fixes the review's "incorrect hard-coded hint" finding (P0.5).
     final result = rules.applyMove(
       level.createBoardState(),
       MoveAction(
-        source: CellAddress.fromCompartmentIndex(6, 0),
+        source: CellAddress.fromCompartmentIndex(1, 0),
         target: CellAddress.fromCompartmentIndex(0, 2),
       ),
     );
@@ -55,9 +58,11 @@ void main() {
     expect(result.clearedTriples.single.skuId, 'sku_000');
   });
 
-  test('levels 1-15 keep every rack compartment playable', () async {
+  test('levels 2-15 keep every rack compartment playable', () async {
     final LevelPack pack = await _verticalSlicePack();
-    for (var levelNumber = 1; levelNumber <= 15; levelNumber += 1) {
+    // Level 1 is the gentle guided tutorial (partly locked); the remaining
+    // opening levels still use the full rack until they are curated too.
+    for (var levelNumber = 2; levelNumber <= 15; levelNumber += 1) {
       final LevelDef level = pack.levelByNumber(levelNumber);
       expect(
         level.compartments.where((compartment) {
@@ -94,10 +99,6 @@ int _visibleProductCount(LevelDef level) {
   ) {
     return count + compartment.cells.whereType<String>().length;
   });
-}
-
-int _emptyCellCount(LevelDef level) {
-  return frontCellCount - _visibleProductCount(level);
 }
 
 Map<String, int> _skuCounts(LevelDef level) {
