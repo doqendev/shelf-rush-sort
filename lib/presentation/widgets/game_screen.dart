@@ -40,6 +40,10 @@ final class _GameScreenState extends ConsumerState<GameScreen>
   ShelfRushGame? _game;
   StreamSubscription<GameSessionState>? _subscription;
   GameSessionState? _session;
+  // Presentation settle: the win/loss overlay is held back until the final
+  // clear has been seen (review P1.4 / section 16.2), keyed per attempt.
+  bool _endOverlayVisible = false;
+  String? _endOverlayAttempt;
   late int _levelNumber;
   final Set<String> _committedWinAttempts = <String>{};
   final Set<String> _doubleRewardedAttempts = <String>{};
@@ -111,14 +115,14 @@ final class _GameScreenState extends ConsumerState<GameScreen>
               onUseBooster: (BoosterKind kind) => _controller?.useBooster(kind),
             ),
           ),
-          if (session.status == GameSessionStatus.won)
+          if (session.status == GameSessionStatus.won && _endOverlayVisible)
             WinPanel(
               session: session,
               onNext: () => _completeAndNext(doubleReward: false),
               onDoubleReward: () => _completeAndNext(doubleReward: true),
               onRetry: () => _loadLevel(_levelNumber),
             ),
-          if (session.status == GameSessionStatus.failed)
+          if (session.status == GameSessionStatus.failed && _endOverlayVisible)
             LossPanel(
               session: session,
               onRetry: () => _loadLevel(_levelNumber),
@@ -127,6 +131,30 @@ final class _GameScreenState extends ConsumerState<GameScreen>
         ],
       ),
     );
+  }
+
+  void _scheduleEndOverlay(GameSessionState state) {
+    final bool ended =
+        state.status == GameSessionStatus.won ||
+        state.status == GameSessionStatus.failed;
+    if (!ended || _endOverlayAttempt == state.attemptId) {
+      return;
+    }
+    // Hold the cleared board and let the final celebration play before the
+    // win/loss panel arrives (review P1.4 — don't interrupt the final moment).
+    _endOverlayAttempt = state.attemptId;
+    Future<void>.delayed(const Duration(milliseconds: 480), () {
+      if (!mounted) {
+        return;
+      }
+      final GameSessionState? current = _controller?.state;
+      if (current != null &&
+          current.attemptId == state.attemptId &&
+          (current.status == GameSessionStatus.won ||
+              current.status == GameSessionStatus.failed)) {
+        setState(() => _endOverlayVisible = true);
+      }
+    });
   }
 
   void _showPauseSheet() {
@@ -221,12 +249,15 @@ final class _GameScreenState extends ConsumerState<GameScreen>
       if (state.status == GameSessionStatus.won) {
         unawaited(_commitWinIfNeeded(state));
       }
+      _scheduleEndOverlay(state);
     });
     setState(() {
       _levelNumber = levelNumber;
       _controller = controller;
       _game = game;
       _session = controller.state;
+      _endOverlayVisible = false;
+      _endOverlayAttempt = null;
     });
     loadTimer.stop();
     unawaited(
