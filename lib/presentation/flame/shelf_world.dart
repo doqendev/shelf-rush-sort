@@ -271,14 +271,32 @@ final class ShelfWorld extends World {
     }
   }
 
-  void _finishProductDragVisual() {
+  void _finishProductDragVisual(bool placed) {
+    final _ProductDragVisual? visual = _productDragVisual;
     _productDragVisual = null;
     final DraggedProductComponent? component = _productDragComponent;
-    _productDragComponent = null;
-    if (component != null) {
-      component.removeFromParent();
+    if (component == null) {
+      unawaited(rebuild());
+      return;
     }
-    unawaited(rebuild());
+    if (placed || visual == null || reduceMotion) {
+      _productDragComponent = null;
+      component.removeFromParent();
+      unawaited(rebuild());
+      return;
+    }
+    // Invalid drop: spring the lifted product back to its source shelf, then
+    // settle the board (P1.2 — a cancelled drag should animate home, not snap
+    // back instantly).
+    final Rect source = _layout.cellRect(visual.source);
+    component.animateReturnTo(
+      Vector2(source.left, source.top),
+      onComplete: () {
+        _productDragComponent = null;
+        component.removeFromParent();
+        unawaited(rebuild());
+      },
+    );
   }
 
   Future<void> _syncProductDragComponent() async {
@@ -297,6 +315,7 @@ final class ShelfWorld extends World {
       productBlocker: visual.productBlocker,
       position: visual.position,
       size: visual.size,
+      reduceMotion: reduceMotion,
     );
     _productDragComponent = component;
     await add(component);

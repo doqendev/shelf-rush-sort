@@ -30,7 +30,7 @@ void main() {
         startedPosition = canvasPosition;
       },
       onProductDragUpdated: updates.add,
-      onProductDragFinished: () {
+      onProductDragFinished: (bool placed) {
         finishedCount += 1;
       },
     );

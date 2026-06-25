@@ -21,7 +21,7 @@ final class InputRouter {
   void Function(CellAddress address, Vector2 canvasPosition)?
   onProductDragStarted;
   void Function(Vector2 canvasPosition)? onProductDragUpdated;
-  void Function()? onProductDragFinished;
+  void Function(bool placed)? onProductDragFinished;
   BoardLayout _layout;
 
   set layout(BoardLayout layout) {
@@ -59,7 +59,7 @@ final class InputRouter {
     if (target != null) {
       controller.placeSelectedAt(target);
     }
-    onProductDragFinished?.call();
+    onProductDragFinished?.call(target != null);
   }
 
   void onLaneProductTapped(String laneId) {
