@@ -76,9 +76,7 @@ final class GameSurfaces {
   static BoxDecoration dock() {
     return BoxDecoration(
       color: GameColors.surface.withValues(alpha: 0.92),
-      border: const Border(
-        top: BorderSide(color: GameColors.border, width: 3),
-      ),
+      border: const Border(top: BorderSide(color: GameColors.border, width: 3)),
     );
   }
 }

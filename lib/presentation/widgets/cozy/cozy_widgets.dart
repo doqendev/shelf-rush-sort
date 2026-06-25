@@ -101,7 +101,11 @@ class StrokedText extends StatelessWidget {
                 : null,
           ),
         ),
-        Text(text, textAlign: textAlign, style: base.copyWith(color: fillColor)),
+        Text(
+          text,
+          textAlign: textAlign,
+          style: base.copyWith(color: fillColor),
+        ),
       ],
     );
   }

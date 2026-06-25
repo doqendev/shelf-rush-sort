@@ -91,9 +91,9 @@ final class _Header extends StatelessWidget {
                 cozyAsset('icon/coin.png'),
                 width: 26,
                 height: 26,
-                errorBuilder: (BuildContext context, Object error,
-                        StackTrace? stack) =>
-                    const SizedBox(width: 26, height: 26),
+                errorBuilder:
+                    (BuildContext context, Object error, StackTrace? stack) =>
+                        const SizedBox(width: 26, height: 26),
               ),
               const SizedBox(width: 6),
               Text('$coins', style: GameTypography.compactLabel),
@@ -187,9 +187,12 @@ final class _BoosterCard extends StatelessWidget {
                           cozyAsset(iconAsset),
                           width: 36,
                           height: 36,
-                          errorBuilder: (BuildContext context, Object error,
-                                  StackTrace? stack) =>
-                              const SizedBox(width: 36, height: 36),
+                          errorBuilder:
+                              (
+                                BuildContext context,
+                                Object error,
+                                StackTrace? stack,
+                              ) => const SizedBox(width: 36, height: 36),
                         ),
                       ),
                     ),
@@ -206,8 +209,10 @@ final class _BoosterCard extends StatelessWidget {
                 const SizedBox(height: 8),
                 CozyPill(
                   color: GameColors.sunny,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -216,9 +221,12 @@ final class _BoosterCard extends StatelessWidget {
                         cozyAsset('icon/coin.png'),
                         width: 16,
                         height: 16,
-                        errorBuilder: (BuildContext context, Object error,
-                                StackTrace? stack) =>
-                            const SizedBox(width: 16, height: 16),
+                        errorBuilder:
+                            (
+                              BuildContext context,
+                              Object error,
+                              StackTrace? stack,
+                            ) => const SizedBox(width: 16, height: 16),
                       ),
                       const SizedBox(width: 4),
                       Text('$price', style: GameTypography.compactLabel),
@@ -233,8 +241,7 @@ final class _BoosterCard extends StatelessWidget {
               right: -6,
               child: CozyPill(
                 color: GameColors.blossom,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 child: Text('x3', style: GameTypography.compactLabel),
               ),
             ),
@@ -272,9 +279,9 @@ final class _CoinPackRow extends StatelessWidget {
               cozyAsset(rewardAsset),
               width: 52,
               height: 52,
-              errorBuilder: (BuildContext context, Object error,
-                      StackTrace? stack) =>
-                  const SizedBox(width: 52, height: 52),
+              errorBuilder:
+                  (BuildContext context, Object error, StackTrace? stack) =>
+                      const SizedBox(width: 52, height: 52),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -292,13 +299,13 @@ final class _CoinPackRow extends StatelessWidget {
               child: DecoratedBox(
                 decoration: GameSurfaces.button(color: GameColors.leaf),
                 child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
                   child: Text(
                     price,
-                    style: GameTypography.body.copyWith(
-                      color: GameColors.ink,
-                    ),
+                    style: GameTypography.body.copyWith(color: GameColors.ink),
                   ),
                 ),
               ),
@@ -329,9 +336,9 @@ final class _RemoveAdsRow extends StatelessWidget {
               cozyAsset('icon/star.png'),
               width: 48,
               height: 48,
-              errorBuilder: (BuildContext context, Object error,
-                      StackTrace? stack) =>
-                  const SizedBox(width: 48, height: 48),
+              errorBuilder:
+                  (BuildContext context, Object error, StackTrace? stack) =>
+                      const SizedBox(width: 48, height: 48),
             ),
             const SizedBox(width: 12),
             Expanded(

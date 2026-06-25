@@ -60,13 +60,12 @@ final class MapScreen extends ConsumerWidget {
               Expanded(
                 child: GridView.builder(
                   padding: const EdgeInsets.only(bottom: 12),
-                  gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 5,
-                        mainAxisSpacing: 10,
-                        crossAxisSpacing: 10,
-                        childAspectRatio: 0.92,
-                      ),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 5,
+                    mainAxisSpacing: 10,
+                    crossAxisSpacing: 10,
+                    childAspectRatio: 0.92,
+                  ),
                   itemCount: levels.length,
                   itemBuilder: (BuildContext context, int index) {
                     final LevelDef level = levels[index];

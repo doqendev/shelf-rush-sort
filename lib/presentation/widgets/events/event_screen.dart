@@ -53,7 +53,10 @@ final class EventScreen extends ConsumerWidget {
             // Scrollable content
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 children: <Widget>[
                   // Daily reward card
                   _DailyRewardCard(
@@ -127,9 +130,9 @@ class _DailyRewardCard extends StatelessWidget {
               width: 50,
               height: 50,
               fit: BoxFit.contain,
-              errorBuilder: (BuildContext context, Object error,
-                      StackTrace? stack) =>
-                  const SizedBox(width: 50, height: 50),
+              errorBuilder:
+                  (BuildContext context, Object error, StackTrace? stack) =>
+                      const SizedBox(width: 50, height: 50),
             ),
             const SizedBox(width: 12),
             // Title + subtitle
@@ -160,7 +163,9 @@ class _DailyRewardCard extends StatelessWidget {
                   decoration: GameSurfaces.button(color: GameColors.leaf),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 8),
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     child: Text(
                       daily.canClaim ? 'Claim' : 'Claimed',
                       style: GameTypography.body.copyWith(
@@ -206,23 +211,19 @@ class _EventTaskCard extends StatelessWidget {
                 child: Image.asset(
                   cozyAsset(event.enabled ? 'icon/star.png' : 'icon/ray.png'),
                   fit: BoxFit.contain,
-                  errorBuilder: (BuildContext context, Object error,
-                          StackTrace? stack) =>
-                      const SizedBox(width: 36, height: 36),
+                  errorBuilder:
+                      (BuildContext context, Object error, StackTrace? stack) =>
+                          const SizedBox(width: 36, height: 36),
                 ),
               ),
             ),
             const SizedBox(width: 12),
             // Event title
-            Expanded(
-              child: Text(event.title, style: GameTypography.body),
-            ),
+            Expanded(child: Text(event.title, style: GameTypography.body)),
             const SizedBox(width: 10),
             // Status pill
             CozyPill(
-              color: event.enabled
-                  ? GameColors.leaf
-                  : GameColors.surfaceInset,
+              color: event.enabled ? GameColors.leaf : GameColors.surfaceInset,
               child: Text(
                 event.enabled ? 'Enabled' : 'Disabled',
                 style: GameTypography.compactLabel,

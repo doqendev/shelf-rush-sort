@@ -323,7 +323,8 @@ class _CozyLoading extends StatelessWidget {
               width: 120,
               height: 120,
               fit: BoxFit.contain,
-              errorBuilder: (_, _, _) => const SizedBox(width: 120, height: 120),
+              errorBuilder: (_, _, _) =>
+                  const SizedBox(width: 120, height: 120),
             ),
             const SizedBox(height: 28),
             const SizedBox(

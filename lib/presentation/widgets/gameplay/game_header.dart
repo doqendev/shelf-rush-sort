@@ -101,7 +101,11 @@ final class _RightStatus extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            const Icon(Icons.swap_horiz_rounded, size: 16, color: GameColors.ink),
+            const Icon(
+              Icons.swap_horiz_rounded,
+              size: 16,
+              color: GameColors.ink,
+            ),
             const SizedBox(width: 4),
             Text(
               '${session.moveCount}/${session.level.moveLimit}',

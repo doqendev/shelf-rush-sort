@@ -63,7 +63,10 @@ final class CollectionScreen extends ConsumerWidget {
             ),
             Expanded(
               child: GridView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 4,
                   crossAxisSpacing: 10,
@@ -72,8 +75,9 @@ final class CollectionScreen extends ConsumerWidget {
                 itemCount: total,
                 itemBuilder: (BuildContext context, int index) {
                   final product = products[index];
-                  final bool discovered =
-                      save.collections.containsKey(product.skuId);
+                  final bool discovered = save.collections.containsKey(
+                    product.skuId,
+                  );
                   return DecoratedBox(
                     decoration: GameSurfaces.panel(radius: 16),
                     child: Padding(
@@ -92,12 +96,12 @@ final class CollectionScreen extends ConsumerWidget {
                                       'object-no/${_spriteFor(index)}.png',
                                     ),
                                     fit: BoxFit.contain,
-                                    errorBuilder: (
-                                      BuildContext context,
-                                      Object error,
-                                      StackTrace? stack,
-                                    ) =>
-                                        const SizedBox.shrink(),
+                                    errorBuilder:
+                                        (
+                                          BuildContext context,
+                                          Object error,
+                                          StackTrace? stack,
+                                        ) => const SizedBox.shrink(),
                                   ),
                                 ),
                                 if (!discovered)

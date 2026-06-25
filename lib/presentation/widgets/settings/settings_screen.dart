@@ -155,9 +155,7 @@ class _CozyToggleRow extends StatelessWidget {
                       const SizedBox(width: 26, height: 26),
             ),
             const SizedBox(width: 12),
-            Expanded(
-              child: Text(label, style: GameTypography.body),
-            ),
+            Expanded(child: Text(label, style: GameTypography.body)),
             _CozyToggle(value: value, onChanged: onChanged),
           ],
         ),
@@ -167,10 +165,7 @@ class _CozyToggleRow extends StatelessWidget {
 }
 
 class _CozyToggle extends StatelessWidget {
-  const _CozyToggle({
-    required this.value,
-    required this.onChanged,
-  });
+  const _CozyToggle({required this.value, required this.onChanged});
 
   final bool value;
   final ValueChanged<bool> onChanged;
@@ -210,8 +205,7 @@ class _CozyToggle extends StatelessWidget {
           child: Stack(
             children: <Widget>[
               AnimatedAlign(
-                alignment:
-                    value ? Alignment.centerRight : Alignment.centerLeft,
+                alignment: value ? Alignment.centerRight : Alignment.centerLeft,
                 duration: const Duration(milliseconds: 160),
                 curve: Curves.easeInOut,
                 child: Padding(

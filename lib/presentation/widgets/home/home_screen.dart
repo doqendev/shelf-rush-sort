@@ -24,7 +24,10 @@ final class HomeScreen extends ConsumerWidget {
         .levels;
     final PlayerSave save = ref.watch(playerSaveProvider);
     final int maxLevel = levels.isEmpty ? 1 : levels.length;
-    final int currentLevel = (save.highestLevelCompleted + 1).clamp(1, maxLevel);
+    final int currentLevel = (save.highestLevelCompleted + 1).clamp(
+      1,
+      maxLevel,
+    );
     final double progress = maxLevel == 0
         ? 0
         : (save.highestLevelCompleted / maxLevel).clamp(0, 1).toDouble();
@@ -72,7 +75,10 @@ final class HomeScreen extends ConsumerWidget {
                   DecoratedBox(
                     decoration: GameSurfaces.pill(color: GameColors.blossom),
                     child: const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 18, vertical: 5),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 5,
+                      ),
                       child: Text(
                         'SHORT  ·  SHELF SORT',
                         style: TextStyle(

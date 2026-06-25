@@ -59,9 +59,21 @@ final class WinPanel extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: <Widget>[
-                          Image.asset(cozyAsset('icon/star.png'), width: 50, height: 50),
-                          Image.asset(cozyAsset('icon/star.png'), width: 66, height: 66),
-                          Image.asset(cozyAsset('icon/star.png'), width: 50, height: 50),
+                          Image.asset(
+                            cozyAsset('icon/star.png'),
+                            width: 50,
+                            height: 50,
+                          ),
+                          Image.asset(
+                            cozyAsset('icon/star.png'),
+                            width: 66,
+                            height: 66,
+                          ),
+                          Image.asset(
+                            cozyAsset('icon/star.png'),
+                            width: 50,
+                            height: 50,
+                          ),
                         ],
                       ),
                       const SizedBox(height: 12),
@@ -83,7 +95,11 @@ final class WinPanel extends StatelessWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
-                              Image.asset(cozyAsset('icon/coin.png'), width: 38, height: 38),
+                              Image.asset(
+                                cozyAsset('icon/coin.png'),
+                                width: 38,
+                                height: 38,
+                              ),
                               const SizedBox(width: 8),
                               Text(
                                 '+${reward.coins}',

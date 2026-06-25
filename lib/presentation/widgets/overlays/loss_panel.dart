@@ -50,7 +50,11 @@ final class LossPanel extends StatelessWidget {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
-                            CozyTitle(copy.title, fontSize: 34, color: titleColor),
+                            CozyTitle(
+                              copy.title,
+                              fontSize: 34,
+                              color: titleColor,
+                            ),
                             const SizedBox(height: 10),
                             Text(
                               copy.body,
@@ -60,7 +64,11 @@ final class LossPanel extends StatelessWidget {
                             const SizedBox(height: 18),
                             _WatchRow(label: copy.rescueLabel, onTap: onRevive),
                             const SizedBox(height: 14),
-                            CozyButton(label: 'RETRY', onTap: onRetry, fontSize: 24),
+                            CozyButton(
+                              label: 'RETRY',
+                              onTap: onRetry,
+                              fontSize: 24,
+                            ),
                           ],
                         ),
                       ),
@@ -145,7 +153,11 @@ class _WatchRow extends StatelessWidget {
           padding: const EdgeInsets.all(11),
           child: Row(
             children: <Widget>[
-              Image.asset(cozyAsset('reward/claquete.png'), width: 42, height: 42),
+              Image.asset(
+                cozyAsset('reward/claquete.png'),
+                width: 42,
+                height: 42,
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -153,13 +165,19 @@ class _WatchRow extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     Text(label, style: GameTypography.compactLabel),
-                    Text('Watch a short video', style: GameTypography.secondary),
+                    Text(
+                      'Watch a short video',
+                      style: GameTypography.secondary,
+                    ),
                   ],
                 ),
               ),
               const SizedBox(width: 8),
               DecoratedBox(
-                decoration: GameSurfaces.button(color: GameColors.leaf, radius: 13),
+                decoration: GameSurfaces.button(
+                  color: GameColors.leaf,
+                  radius: 13,
+                ),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 14,
