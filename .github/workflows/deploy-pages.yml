@@ -1,0 +1,55 @@
+name: Deploy Web (GitHub Pages)
+
+# Builds the Flutter web app in the cloud and publishes it to GitHub Pages so
+# anyone can play the latest `main` in a browser — no local Flutter toolchain.
+#
+# ONE-TIME SETUP: repo Settings -> Pages -> "Build and deployment" ->
+# Source: "GitHub Actions". After that, every push to main redeploys.
+# Live URL: https://doqendev.github.io/shelf-rush-sort/
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment; newer pushes supersede in-flight ones.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Build web (base-href for project Pages)
+        run: >-
+          flutter build web --release
+          --dart-define=SHELF_RUSH_ENV=qa
+          --base-href "/shelf-rush-sort/"
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
