@@ -126,10 +126,18 @@ final class ShelfWorld extends World {
   }
 
   Future<void> _addBoard() async {
+    final Rect rackRect = _layout.rackRect;
+    final List<Rect> slotRects = <Rect>[
+      for (int index = 0; index < compartmentCount; index += 1)
+        _layout
+            .compartmentRect(index)
+            .shift(Offset(-rackRect.left, -rackRect.top)),
+    ];
     await add(
       RackBackdropComponent(
-        position: Vector2(_layout.rackRect.left, _layout.rackRect.top),
-        size: Vector2(_layout.rackRect.width, _layout.rackRect.height),
+        slotRects: slotRects,
+        position: Vector2(rackRect.left, rackRect.top),
+        size: Vector2(rackRect.width, rackRect.height),
       ),
     );
     for (final CompartmentState compartment in _state.board.compartments) {

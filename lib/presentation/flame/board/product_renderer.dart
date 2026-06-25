@@ -1,9 +1,20 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/painting.dart';
 
 import '../../../domain/blockers/blocker_def.dart';
 import '../../../domain/content/product_def.dart';
 import '../../../domain/core/value_objects.dart';
+import '../../design/game_colors.dart';
+import '../../design/game_typography.dart';
+import 'cozy_sprite_cache.dart';
 
+/// Draws a single product in the cozy v2 style: a bottom-anchored sprite from
+/// the cozy art set resting on the shelf, with a soft contact shadow.
+///
+/// When a sprite is unavailable (mystery products, or assets not yet loaded) it
+/// falls back to a rounded "blob" tinted with the SKU colour so the board stays
+/// legible no matter what.
 final class ProductRenderer {
   const ProductRenderer._();
 
@@ -19,115 +30,194 @@ final class ProductRenderer {
     final bool identityHidden =
         productBlocker == BlockerKind.mysteryBag ||
         cellBlocker == BlockerKind.mysteryBag;
-    final Color color = identityHidden
-        ? const Color(0xFF7D756D)
-        : _parseColor(productDef.colorHex);
-    final bool usesOpacityLayer = opacity < 1;
-    if (usesOpacityLayer) {
+    final ui.Image? image = identityHidden
+        ? null
+        : CozySpriteCache.instance.imageForSku(productDef.skuId);
+
+    final bool usesLayer = opacity < 1;
+    if (usesLayer) {
       canvas.saveLayer(
-        rect,
+        rect.inflate(rect.height),
         Paint()..color = Color.fromRGBO(255, 255, 255, opacity),
       );
     }
-    final Paint shadow = Paint()..color = const Color(0x33000000);
-    canvas.drawOval(rect.deflate(4).translate(0, rect.height * 0.16), shadow);
-    final Paint body = Paint()
-      ..shader = LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: <Color>[
-          Color.lerp(color, const Color(0xFFFFFFFF), 0.34)!,
-          color,
-        ],
-      ).createShader(rect);
-    final RRect bodyRect = RRect.fromRectAndRadius(
-      rect.deflate(selected ? 2 : 5),
-      Radius.circular(_radiusForShape(productDef.shape)),
-    );
-    canvas.drawRRect(bodyRect, body);
-    final Paint shine = Paint()..color = const Color(0x55FFFFFF);
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTWH(
-          rect.width * 0.22,
-          rect.height * 0.14,
-          rect.width * 0.22,
-          rect.height * 0.18,
-        ),
-        const Radius.circular(8),
-      ),
-      shine,
-    );
-    if (selected) {
-      final Paint selectedPaint = Paint()
-        ..color = const Color(0xFF1D7F5A)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 3;
-      canvas.drawRRect(bodyRect, selectedPaint);
+
+    if (image != null) {
+      _drawSprite(canvas, rect, image, selected: selected);
+    } else {
+      _drawBlob(
+        canvas,
+        rect,
+        productDef,
+        identityHidden: identityHidden,
+        selected: selected,
+      );
     }
-    final String label = identityHidden
-        ? '?'
-        : productDef.displayName
-              .split(' ')
-              .map((String part) => part.isEmpty ? '' : part.substring(0, 1))
-              .take(2)
-              .join();
-    final TextPainter painter = TextPainter(
-      text: TextSpan(
-        text: label,
-        style: TextStyle(
-          color: _contrastingTextColor(color),
-          fontSize: rect.height * 0.26,
-          fontWeight: FontWeight.w800,
-        ),
-      ),
-      textAlign: TextAlign.center,
-      textDirection: TextDirection.ltr,
-    )..layout(maxWidth: rect.width);
-    painter.paint(
-      canvas,
-      Offset((rect.width - painter.width) / 2, rect.height * 0.36),
-    );
+
     final BlockerKind visibleBlocker = productBlocker != BlockerKind.none
         ? productBlocker
         : cellBlocker;
-    if (visibleBlocker != BlockerKind.none) {
+    if (visibleBlocker != BlockerKind.none &&
+        visibleBlocker != BlockerKind.mysteryBag) {
       _paintBlockerBand(canvas, rect, visibleBlocker);
     }
-    if (usesOpacityLayer) {
+
+    if (usesLayer) {
       canvas.restore();
     }
   }
 
+  static void _drawSprite(
+    Canvas canvas,
+    Rect cell,
+    ui.Image image, {
+    required bool selected,
+  }) {
+    final double aspect = image.width / image.height;
+    double h = cell.height * (selected ? 1.1 : 1.04);
+    double w = h * aspect;
+    final double maxW = cell.width * (selected ? 1.36 : 1.28);
+    if (w > maxW) {
+      w = maxW;
+      h = w / aspect;
+    }
+    final double cx = cell.center.dx;
+    final double baseY = cell.bottom + 2;
+    final Rect dst = Rect.fromLTWH(cx - w / 2, baseY - h, w, h);
+
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(cx, baseY - h * 0.05),
+        width: w * 0.72,
+        height: cell.height * 0.16,
+      ),
+      Paint()
+        ..color = GameColors.shadow(0.34)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
+    );
+
+    if (selected) {
+      canvas.drawCircle(
+        Offset(cx, dst.center.dy),
+        w * 0.6,
+        Paint()
+          ..color = GameColors.sunny.withValues(alpha: 0.5)
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10),
+      );
+    }
+
+    canvas.drawImageRect(
+      image,
+      Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()),
+      dst,
+      Paint()
+        ..filterQuality = FilterQuality.medium
+        ..isAntiAlias = true,
+    );
+  }
+
+  static void _drawBlob(
+    Canvas canvas,
+    Rect cell,
+    ProductDef productDef, {
+    required bool identityHidden,
+    required bool selected,
+  }) {
+    final Color color = identityHidden
+        ? GameColors.mutedInk
+        : _parseColor(productDef.colorHex);
+    final double w = cell.width * 0.86;
+    final double h = cell.height * 0.92;
+    final double cx = cell.center.dx;
+    final double baseY = cell.bottom;
+    final Rect body = Rect.fromLTWH(cx - w / 2, baseY - h, w, h);
+
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(cx, baseY - 1),
+        width: w * 0.8,
+        height: cell.height * 0.16,
+      ),
+      Paint()
+        ..color = GameColors.shadow(0.3)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
+    );
+
+    if (selected) {
+      canvas.drawCircle(
+        body.center,
+        w * 0.66,
+        Paint()
+          ..color = GameColors.sunny.withValues(alpha: 0.5)
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10),
+      );
+    }
+
+    final RRect bodyRect = RRect.fromRectAndRadius(
+      body,
+      Radius.circular(_radiusForShape(productDef.shape)),
+    );
+    canvas.drawRRect(
+      bodyRect,
+      Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: <Color>[
+            Color.lerp(color, const Color(0xFFFFFFFF), 0.34)!,
+            color,
+          ],
+        ).createShader(body),
+    );
+    canvas.drawRRect(
+      bodyRect,
+      Paint()
+        ..color = GameColors.ink
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.5,
+    );
+
+    _paintLabel(
+      canvas,
+      body,
+      identityHidden ? '?' : _initials(productDef),
+      identityHidden ? const Color(0xFFFFFFFF) : _contrast(color),
+    );
+  }
+
   static void _paintBlockerBand(Canvas canvas, Rect rect, BlockerKind blocker) {
     final Rect band = Rect.fromLTWH(
-      rect.width * 0.11,
-      rect.height * 0.06,
-      rect.width * 0.78,
-      rect.height * 0.22,
+      rect.left + rect.width * 0.08,
+      rect.top + rect.height * 0.04,
+      rect.width * 0.84,
+      (rect.height * 0.22).clamp(14, 22),
     );
-    final Paint paint = Paint()..color = const Color(0xCC2D211B);
     canvas.drawRRect(
-      RRect.fromRectAndRadius(band, const Radius.circular(6)),
-      paint,
+      RRect.fromRectAndRadius(band, const Radius.circular(7)),
+      Paint()..color = GameColors.ink.withValues(alpha: 0.86),
     );
+    _paintLabel(canvas, band, _blockerLabel(blocker), const Color(0xFFFFFFFF));
+  }
+
+  static void _paintLabel(Canvas canvas, Rect area, String label, Color color) {
     final TextPainter painter = TextPainter(
       text: TextSpan(
-        text: _blockerLabel(blocker),
+        text: label,
         style: TextStyle(
-          color: const Color(0xFFFFFFFF),
-          fontSize: (rect.height * 0.12).clamp(8, 11).toDouble(),
-          fontWeight: FontWeight.w800,
+          fontFamily: GameTypography.fontFamily,
+          color: color,
+          fontSize: (area.height * 0.42).clamp(9, 16).toDouble(),
+          fontWeight: FontWeight.w700,
         ),
       ),
       textAlign: TextAlign.center,
       textDirection: TextDirection.ltr,
-    )..layout(maxWidth: band.width - 4);
+    )..layout(maxWidth: area.width);
     painter.paint(
       canvas,
       Offset(
-        band.left + (band.width - painter.width) / 2,
-        band.top + (band.height - painter.height) / 2,
+        area.left + (area.width - painter.width) / 2,
+        area.top + (area.height - painter.height) / 2,
       ),
     );
   }
@@ -157,7 +247,7 @@ final class ProductRenderer {
       case ProductShape.box:
       case ProductShape.carton:
       case ProductShape.toy:
-        return 8;
+        return 10;
     }
   }
 
@@ -166,9 +256,17 @@ final class ProductRenderer {
     return Color(int.parse('FF$normalized', radix: 16));
   }
 
-  static Color _contrastingTextColor(Color color) {
+  static Color _contrast(Color color) {
     return color.computeLuminance() > 0.52
-        ? const Color(0xFF35261E)
+        ? GameColors.ink
         : const Color(0xFFFFFFFF);
+  }
+
+  static String _initials(ProductDef product) {
+    return product.displayName
+        .split(' ')
+        .map((String part) => part.isEmpty ? '' : part.substring(0, 1))
+        .take(2)
+        .join();
   }
 }

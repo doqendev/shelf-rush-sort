@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 
 import '../presentation/widgets/game_screen.dart';
 import '../presentation/widgets/collections/collection_screen.dart';
+import '../presentation/widgets/home/home_screen.dart';
 import '../presentation/widgets/debug/debug_analytics_screen.dart';
 import '../presentation/widgets/events/event_screen.dart';
 import '../presentation/widgets/map/map_screen.dart';
@@ -24,6 +25,7 @@ GoRouter createRouter({
           return GameScreen(initialLevel: level);
         },
       ),
+      GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
       GoRoute(path: '/map', builder: (context, state) => const MapScreen()),
       GoRoute(
         path: '/collections',

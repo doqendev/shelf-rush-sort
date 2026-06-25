@@ -10,7 +10,9 @@ import '../../infrastructure/analytics/analytics_event.dart';
 import '../../infrastructure/analytics/analytics_service.dart';
 import '../../infrastructure/platform/audio_service.dart';
 import '../../infrastructure/platform/haptics_service.dart';
+import '../design/game_colors.dart';
 import 'board/board_layout_calculator.dart';
+import 'board/cozy_sprite_cache.dart';
 import 'shelf_world.dart';
 
 final class ShelfRushGame extends FlameGame<ShelfWorld> {
@@ -73,10 +75,11 @@ final class ShelfRushGame extends FlameGame<ShelfWorld> {
   int _lastLaneTickMs = 0;
 
   @override
-  Color backgroundColor() => const Color(0xFFF7F3E8);
+  Color backgroundColor() => GameColors.bgYellow;
 
   @override
   Future<void> onLoad() async {
+    await CozySpriteCache.instance.ensureLoaded(images);
     camera.viewfinder.anchor = Anchor.topLeft;
     camera.viewfinder.position = Vector2.zero();
     _shelfWorld.resize(size);

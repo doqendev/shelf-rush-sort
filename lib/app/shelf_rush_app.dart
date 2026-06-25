@@ -6,7 +6,7 @@ import 'providers.dart';
 import 'routes.dart';
 
 final class ShelfRushApp extends ConsumerWidget {
-  const ShelfRushApp({super.key, this.initialLocation = '/'});
+  const ShelfRushApp({super.key, this.initialLocation = '/home'});
 
   final String initialLocation;
 

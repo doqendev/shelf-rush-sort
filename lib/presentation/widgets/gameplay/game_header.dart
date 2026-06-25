@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../../../application/game_session/game_session_state.dart';
 import '../../../presentation/design/game_colors.dart';
-import '../../../presentation/design/game_surfaces.dart';
 import '../../../presentation/design/game_typography.dart';
 import '../../../presentation/design/layout_tokens.dart';
+import '../cozy/cozy_widgets.dart';
 
 final class GameHeader extends StatelessWidget {
   const GameHeader({super.key, required this.session, required this.onPause});
@@ -26,45 +26,35 @@ final class GameHeader extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
             child: Row(
               children: <Widget>[
-                SizedBox.square(
-                  dimension: GameLayoutTokens.minHitTarget,
-                  child: IconButton(
-                    tooltip: 'Pause',
-                    onPressed: onPause,
-                    icon: const Icon(Icons.pause_rounded),
+                CozyPill(
+                  child: Text(
+                    'Level ${session.level.levelNumber}',
+                    style: GameTypography.compactLabel,
                   ),
                 ),
-                Expanded(
-                  child: Center(
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          Text(
-                            'Level ${session.level.levelNumber}',
-                            style: GameTypography.levelLabel,
-                          ),
-                          if (session.level.difficulty == 'hard' ||
-                              session.level.difficulty == 'superHard') ...[
-                            const SizedBox(width: 8),
-                            _HeaderBadge(
-                              label: session.level.difficulty == 'superHard'
-                                  ? 'Super Hard'
-                                  : 'Hard',
-                            ),
-                          ],
-                        ],
+                if (session.level.difficulty == 'hard' ||
+                    session.level.difficulty == 'superHard') ...<Widget>[
+                  const SizedBox(width: 8),
+                  CozyPill(
+                    color: GameColors.blossom,
+                    child: Text(
+                      session.level.difficulty == 'superHard'
+                          ? 'Super Hard'
+                          : 'Hard',
+                      style: GameTypography.compactLabel.copyWith(
+                        color: const Color(0xFFFFFFFF),
                       ),
                     ),
                   ),
-                ),
-                SizedBox(
-                  width: 96,
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: _RightStatus(session: session),
-                  ),
+                ],
+                const Spacer(),
+                _RightStatus(session: session),
+                const SizedBox(width: 8),
+                CozyIconButton(
+                  asset: 'btn/clear-pause.png',
+                  onTap: onPause,
+                  size: 44,
+                  tooltip: 'Pause',
                 ),
               ],
             ),
@@ -84,44 +74,43 @@ final class _RightStatus extends StatelessWidget {
   Widget build(BuildContext context) {
     final Duration? remaining = session.timer.remaining;
     if (remaining != null) {
-      return _HeaderBadge(
-        icon: Icons.timer_outlined,
-        label: '${remaining.inSeconds}s',
-      );
-    }
-    if (session.level.moveLimit != null) {
-      return _HeaderBadge(
-        icon: Icons.swap_horiz,
-        label: '${session.moveCount}/${session.level.moveLimit}',
-      );
-    }
-    return const SizedBox(width: GameLayoutTokens.minHitTarget);
-  }
-}
-
-final class _HeaderBadge extends StatelessWidget {
-  const _HeaderBadge({required this.label, this.icon});
-
-  final String label;
-  final IconData? icon;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: GameSurfaces.panel(color: GameColors.surfaceStrong),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      final int seconds = remaining.inSeconds;
+      final String minutes = (seconds ~/ 60).toString().padLeft(2, '0');
+      final String secs = (seconds % 60).toString().padLeft(2, '0');
+      return CozyPill(
+        color: GameColors.sunny,
+        padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 5),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            if (icon != null) ...<Widget>[
-              Icon(icon, size: 15, color: GameColors.ink),
-              const SizedBox(width: 4),
-            ],
-            Text(label, style: GameTypography.compactLabel),
+            Text(
+              'TIME',
+              style: GameTypography.secondary.copyWith(
+                color: GameColors.ink,
+                letterSpacing: 1,
+              ),
+            ),
+            const SizedBox(width: 7),
+            Text('$minutes:$secs', style: GameTypography.levelLabel),
           ],
         ),
-      ),
-    );
+      );
+    }
+    if (session.level.moveLimit != null) {
+      return CozyPill(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            const Icon(Icons.swap_horiz_rounded, size: 16, color: GameColors.ink),
+            const SizedBox(width: 4),
+            Text(
+              '${session.moveCount}/${session.level.moveLimit}',
+              style: GameTypography.compactLabel,
+            ),
+          ],
+        ),
+      );
+    }
+    return const SizedBox.shrink();
   }
 }

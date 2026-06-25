@@ -6,6 +6,7 @@ import '../../../presentation/design/game_colors.dart';
 import '../../../presentation/design/game_surfaces.dart';
 import '../../../presentation/design/game_typography.dart';
 import '../../../presentation/design/layout_tokens.dart';
+import '../cozy/cozy_widgets.dart';
 
 final class ObjectiveStrip extends StatelessWidget {
   const ObjectiveStrip({super.key, required this.session});
@@ -24,7 +25,7 @@ final class ObjectiveStrip extends StatelessWidget {
               horizontal: GameLayoutTokens.horizontalPaddingFor(width),
             ),
             child: DecoratedBox(
-              decoration: GameSurfaces.panel(),
+              decoration: GameSurfaces.panel(radius: 14, shadowDy: 3),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: Row(
@@ -32,7 +33,7 @@ final class ObjectiveStrip extends StatelessWidget {
                     const Icon(
                       Icons.task_alt_rounded,
                       size: 18,
-                      color: GameColors.accent,
+                      color: GameColors.leaf,
                     ),
                     const SizedBox(width: 8),
                     Expanded(
@@ -40,11 +41,11 @@ final class ObjectiveStrip extends StatelessWidget {
                         _objectiveText(),
                         style: GameTypography.objective,
                         maxLines: width < 340 ? 2 : 1,
-                        overflow: TextOverflow.visible,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     const SizedBox(width: 8),
-                    Text(_progressText(), style: GameTypography.secondary),
+                    _ComboPill(combo: session.objective.maxCombo),
                   ],
                 ),
               ),
@@ -67,27 +68,38 @@ final class ObjectiveStrip extends StatelessWidget {
       ObjectiveType.laneDeliveryTarget => 'Deliver lane products',
     };
   }
+}
 
-  String _progressText() {
-    final ObjectiveState objective = session.objective;
-    switch (objective.requirement.type) {
-      case ObjectiveType.clearAll:
-      case ObjectiveType.timeChallenge:
-        return '${session.board.visibleProductCount} left';
-      case ObjectiveType.clearSkuTargets:
-        final int remaining = objective.remainingTargets.values.fold<int>(
-          0,
-          (int sum, int count) => sum + count.clamp(0, 999).toInt(),
-        );
-        return '$remaining left';
-      case ObjectiveType.clearCategoryTargets:
-        return '${objective.remainingCategoryTargets.length} groups';
-      case ObjectiveType.clearSpecialTargets:
-        return '${objective.remainingSpecialTargets.length} goals';
-      case ObjectiveType.comboTarget:
-        return '${objective.maxCombo}/${objective.requirement.comboTarget}';
-      case ObjectiveType.laneDeliveryTarget:
-        return '${objective.laneDeliveredProducts}/${objective.requirement.laneDeliveryTarget}';
-    }
+class _ComboPill extends StatelessWidget {
+  const _ComboPill({required this.combo});
+
+  final int combo;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: GameSurfaces.pill(color: GameColors.blossom, shadowDy: 2),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Image.asset(
+              cozyAsset('icon/ray.png'),
+              width: 15,
+              height: 15,
+              errorBuilder: (_, _, _) => const SizedBox(width: 15, height: 15),
+            ),
+            const SizedBox(width: 4),
+            Text(
+              'x$combo',
+              style: GameTypography.compactLabel.copyWith(
+                color: const Color(0xFFFFFFFF),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

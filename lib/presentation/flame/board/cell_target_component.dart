@@ -4,8 +4,12 @@ import 'package:flutter/painting.dart';
 
 import '../../../domain/blockers/blocker_def.dart';
 import '../../../domain/core/value_objects.dart';
+import '../../design/game_colors.dart';
+import '../../design/game_typography.dart';
 import '../input/input_router.dart';
 
+/// An empty shelf cell. The slot background is drawn by the rack, so this only
+/// adds the legal-target highlight and any blocker badge, and handles taps.
 final class CellTargetComponent extends PositionComponent with TapCallbacks {
   CellTargetComponent({
     required this.address,
@@ -30,37 +34,24 @@ final class CellTargetComponent extends PositionComponent with TapCallbacks {
   void render(Canvas canvas) {
     final Rect rect = size.toRect();
     final bool hasBlocker = blocker != BlockerKind.none;
-    if (!highlighted && !hasBlocker) {
-      final Paint resting = Paint()..color = const Color(0x08FFFFFF);
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(rect, const Radius.circular(7)),
-        resting,
+
+    if (highlighted) {
+      final RRect r = RRect.fromRectAndRadius(
+        rect.deflate(1),
+        const Radius.circular(8),
       );
-      return;
+      canvas.drawRRect(
+        r,
+        Paint()..color = GameColors.leaf.withValues(alpha: 0.34),
+      );
+      canvas.drawRRect(
+        r,
+        Paint()
+          ..color = GameColors.leaf
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 3,
+      );
     }
-    final Paint paint = Paint()
-      ..color = hasBlocker
-          ? const Color(0x66B76A4E)
-          : highlighted
-          ? const Color(0x6676C893)
-          : const Color(0x22FFFFFF)
-      ..style = PaintingStyle.fill;
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(rect, const Radius.circular(9)),
-      paint,
-    );
-    final Paint border = Paint()
-      ..color = hasBlocker
-          ? const Color(0xFFD98255)
-          : highlighted
-          ? const Color(0xFF2F9D64)
-          : const Color(0x55A8754D)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = highlighted || hasBlocker ? 2.4 : 1.2;
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(rect, const Radius.circular(9)),
-      border,
-    );
     if (hasBlocker) {
       _paintBlockerBadge(canvas, rect, blocker);
     }
@@ -69,21 +60,21 @@ final class CellTargetComponent extends PositionComponent with TapCallbacks {
   void _paintBlockerBadge(Canvas canvas, Rect rect, BlockerKind blocker) {
     final Rect badge = Rect.fromCenter(
       center: Offset(rect.width / 2, rect.height / 2),
-      width: rect.width * 0.72,
-      height: rect.height * 0.34,
+      width: rect.width * 0.82,
+      height: (rect.height * 0.4).clamp(16, 26).toDouble(),
     );
-    final Paint badgePaint = Paint()..color = const Color(0xCC3D2A22);
     canvas.drawRRect(
-      RRect.fromRectAndRadius(badge, const Radius.circular(6)),
-      badgePaint,
+      RRect.fromRectAndRadius(badge, const Radius.circular(8)),
+      Paint()..color = GameColors.ink.withValues(alpha: 0.86),
     );
     final TextPainter painter = TextPainter(
       text: TextSpan(
         text: _labelFor(blocker),
         style: TextStyle(
+          fontFamily: GameTypography.fontFamily,
           color: const Color(0xFFFFFFFF),
-          fontSize: (rect.height * 0.15).clamp(8, 12).toDouble(),
-          fontWeight: FontWeight.w800,
+          fontSize: (rect.height * 0.16).clamp(9, 13).toDouble(),
+          fontWeight: FontWeight.w700,
         ),
       ),
       textAlign: TextAlign.center,

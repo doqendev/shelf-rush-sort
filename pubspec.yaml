@@ -66,6 +66,22 @@ flutter:
   assets:
     - assets/data/bundled/
     - assets/data/schemas/
+    - assets/images/cozy/bar/
+    - assets/images/cozy/bg/
+    - assets/images/cozy/btn/
+    - assets/images/cozy/deco/
+    - assets/images/cozy/dock/
+    - assets/images/cozy/gem/
+    - assets/images/cozy/icon/
+    - assets/images/cozy/object/
+    - assets/images/cozy/object-no/
+    - assets/images/cozy/reward/
+    - assets/images/cozy/ui/
+
+  fonts:
+    - family: Fredoka
+      fonts:
+        - asset: assets/fonts/Fredoka-Variable.ttf
 
   # To add assets to your application, add an assets section, like this:
   # assets:

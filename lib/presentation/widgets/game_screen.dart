@@ -11,11 +11,14 @@ import '../../application/game_session/game_session_state.dart';
 import '../../application/monetization/monetization_service.dart';
 import '../../application/progression/level_completion_service.dart';
 import '../../application/progression/reward_service.dart';
+import '../../domain/boosters/booster_def.dart';
 import '../../domain/content/level_def.dart';
 import '../../infrastructure/analytics/analytics_event.dart';
 import '../../infrastructure/analytics/analytics_service.dart';
 import '../../infrastructure/save/save_repository.dart';
+import '../design/game_colors.dart';
 import '../flame/shelf_rush_game.dart';
+import 'cozy/cozy_widgets.dart';
 import 'gameplay/game_scaffold.dart';
 import 'gameplay/game_viewport.dart';
 import 'gameplay/pause_sheet.dart';
@@ -70,7 +73,7 @@ final class _GameScreenState extends ConsumerState<GameScreen> {
     final GameSessionState? session = _session;
     final ShelfRushGame? game = _game;
     if (session == null || game == null) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const _CozyLoading();
     }
 
     return Scaffold(
@@ -81,6 +84,7 @@ final class _GameScreenState extends ConsumerState<GameScreen> {
               session: session,
               viewport: GameViewport(game: game),
               onPause: _showPauseSheet,
+              onUseBooster: (BoosterKind kind) => _controller?.useBooster(kind),
             ),
           ),
           if (session.status == GameSessionStatus.won)
@@ -105,6 +109,10 @@ final class _GameScreenState extends ConsumerState<GameScreen> {
     showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
+      backgroundColor: GameColors.bgGreen,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
       builder: (BuildContext sheetContext) {
         void closeThen(VoidCallback action) {
           Navigator.of(sheetContext).pop();
@@ -115,7 +123,7 @@ final class _GameScreenState extends ConsumerState<GameScreen> {
           onResume: () => Navigator.of(sheetContext).pop(),
           onRestart: () => closeThen(() => _loadLevel(_levelNumber)),
           onSettings: () => closeThen(() => context.push('/settings')),
-          onExitToMap: () => closeThen(() => context.push('/map')),
+          onExitToMap: () => closeThen(() => context.go('/home')),
           onDebug: ref.watch(environmentProvider).debugToolsEnabled
               ? () => closeThen(() => context.push('/debug/analytics'))
               : null,
@@ -289,5 +297,46 @@ final class _GameScreenState extends ConsumerState<GameScreen> {
     if (result.completed) {
       controller.revive();
     }
+  }
+}
+
+class _CozyLoading extends StatelessWidget {
+  const _CozyLoading();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: GameColors.bgMint,
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            const CozyTitle(
+              'SELF\nRUSH',
+              fontSize: 56,
+              strokeWidth: 6,
+              height: 0.86,
+            ),
+            const SizedBox(height: 24),
+            Image.asset(
+              cozyAsset('reward/flower-vase.png'),
+              width: 120,
+              height: 120,
+              fit: BoxFit.contain,
+              errorBuilder: (_, _, _) => const SizedBox(width: 120, height: 120),
+            ),
+            const SizedBox(height: 28),
+            const SizedBox(
+              width: 36,
+              height: 36,
+              child: CircularProgressIndicator(
+                strokeWidth: 4,
+                color: GameColors.ink,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

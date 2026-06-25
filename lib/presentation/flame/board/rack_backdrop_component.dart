@@ -1,62 +1,98 @@
 import 'package:flame/components.dart';
 import 'package:flutter/painting.dart';
 
-import '../../../domain/core/value_objects.dart';
+import '../../design/game_colors.dart';
 
+/// The cozy v2 shelf rack: a thick-outlined, rounded board with a chunky drop
+/// "lip", holding a 3×5 grid of gradient shelf slots that each carry their own
+/// little shelf lip.
 final class RackBackdropComponent extends PositionComponent {
-  RackBackdropComponent({required super.position, required super.size});
+  RackBackdropComponent({
+    required this.slotRects,
+    this.bodyColor = GameColors.shelf,
+    this.lipColor = GameColors.shelfLip,
+    required super.position,
+    required super.size,
+  });
+
+  /// Local-space rects (relative to this component) of the 15 shelf slots.
+  final List<Rect> slotRects;
+  final Color bodyColor;
+  final Color lipColor;
+
+  static const Radius _bodyRadius = Radius.circular(20);
+  static const Radius _slotRadius = Radius.circular(6);
 
   @override
   void render(Canvas canvas) {
     final Rect rect = size.toRect();
-    final RRect outer = RRect.fromRectAndRadius(
-      rect,
-      const Radius.circular(14),
+    final RRect body = RRect.fromRectAndRadius(rect, _bodyRadius);
+
+    // Ambient soft shadow + chunky lip offset (the "0 7px 0 lip" sticker drop).
+    canvas.drawRRect(
+      body.shift(const Offset(0, 12)),
+      Paint()
+        ..color = GameColors.shadow(0.22)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 9),
     );
-    final Paint shadow = Paint()..color = const Color(0x33000000);
-    canvas.drawRRect(outer.shift(const Offset(0, 5)), shadow);
+    canvas.drawRRect(body.shift(const Offset(0, 7)), Paint()..color = lipColor);
 
-    final Paint backing = Paint()
-      ..shader = const LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: <Color>[Color(0xFFFFE9BE), Color(0xFFF4C987)],
-      ).createShader(rect);
-    canvas.drawRRect(outer, backing);
+    // Rack body.
+    canvas.drawRRect(body, Paint()..color = bodyColor);
 
-    final Paint frame = Paint()
-      ..color = const Color(0xFFA9653C)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 7;
-    canvas.drawRRect(outer.deflate(3.5), frame);
+    // Inner top highlight.
+    canvas.save();
+    canvas.clipRRect(body);
+    canvas.drawRect(
+      Rect.fromLTWH(0, 0, rect.width, 5),
+      Paint()..color = const Color(0x3DFFFFFF),
+    );
+    canvas.restore();
 
-    final double rowHeight = rect.height / boardRows;
-    final double columnWidth = rect.width / boardColumns;
-    final Paint shelfBoard = Paint()..color = const Color(0xFF7A452C);
-    final Paint divider = Paint()..color = const Color(0xFF9B603A);
-    for (var row = 1; row < boardRows; row += 1) {
-      final double y = row * rowHeight;
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(
-          Rect.fromLTWH(6, y - 3, rect.width - 12, 6),
-          const Radius.circular(3),
-        ),
-        shelfBoard,
-      );
+    // 4px ink frame.
+    canvas.drawRRect(
+      body.deflate(2),
+      Paint()
+        ..color = GameColors.ink
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 4,
+    );
+
+    for (final Rect slot in slotRects) {
+      _drawSlot(canvas, slot);
     }
-    for (var column = 1; column < boardColumns; column += 1) {
-      final double x = column * columnWidth;
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(
-          Rect.fromLTWH(x - 2.5, 7, 5, rect.height - 14),
-          const Radius.circular(3),
-        ),
-        divider,
-      );
-    }
-    for (var row = 0; row < boardRows; row += 1) {
-      final double y = (row + 1) * rowHeight - 9;
-      canvas.drawRect(Rect.fromLTWH(8, y, rect.width - 16, 8), shelfBoard);
-    }
+  }
+
+  void _drawSlot(Canvas canvas, Rect slot) {
+    final RRect r = RRect.fromRectAndRadius(slot, _slotRadius);
+    canvas.drawRRect(
+      r,
+      Paint()
+        ..shader = const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: <Color>[GameColors.cellTop, GameColors.cellBottom],
+        ).createShader(slot),
+    );
+
+    canvas.save();
+    canvas.clipRRect(r);
+    // Soft inset shadow at the top of the slot.
+    canvas.drawRect(
+      Rect.fromLTWH(slot.left, slot.top, slot.width, 8),
+      Paint()
+        ..color = GameColors.shadow(0.16)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
+    );
+    // Shelf lip at the bottom of the slot.
+    canvas.drawRect(
+      Rect.fromLTWH(slot.left, slot.bottom - 6, slot.width, 6),
+      Paint()..color = lipColor,
+    );
+    canvas.drawRect(
+      Rect.fromLTWH(slot.left, slot.bottom - 10, slot.width, 4),
+      Paint()..color = GameColors.shadow(0.12),
+    );
+    canvas.restore();
   }
 }
