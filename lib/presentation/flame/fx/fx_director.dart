@@ -70,8 +70,16 @@ final class FxDirector {
   }
 
   void _scheduleVisualMarker(ShelfWorld world, SessionEvent event) {
-    // The retained world owns actual components; this method is intentionally
-    // non-blocking so gameplay state never waits for presentation effects.
+    // Non-blocking: gameplay state never waits for presentation effects. The
+    // retained world owns the component lifecycle and preserves FX across
+    // board rebuilds until they self-remove.
+    if (event.type == SessionEventType.tripleCleared) {
+      final Object? compartment = event.payload['compartment'];
+      if (compartment is int) {
+        final Object? combo = event.payload['combo'];
+        world.playTripleClearFx(compartment, combo is int ? combo : 0);
+      }
+    }
   }
 }
 

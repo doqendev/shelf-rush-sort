@@ -19,6 +19,7 @@ import 'board/dragged_product_component.dart';
 import 'board/hidden_preview_component.dart';
 import 'board/product_component.dart';
 import 'board/rack_backdrop_component.dart';
+import 'fx/clear_pop_component.dart';
 import 'fx/fx_director.dart';
 import 'input/input_router.dart';
 import 'lanes/moving_lane_component.dart';
@@ -113,7 +114,10 @@ final class ShelfWorld extends World {
       _pendingRebuild = false;
       removeAll(
         children
-            .where((Component child) => child != _productDragComponent)
+            .where(
+              (Component child) =>
+                  child != _productDragComponent && child is! ClearPopComponent,
+            )
             .toList(),
       );
       _laneComponents.clear();
@@ -319,6 +323,22 @@ final class ShelfWorld extends World {
     );
     _productDragComponent = component;
     await add(component);
+  }
+
+  /// Plays a celebration burst over the shelf slot where a triple just cleared.
+  /// FX components are preserved across board rebuilds until they self-remove.
+  void playTripleClearFx(int compartmentIndex, int comboIndex) {
+    final Rect rect = _layout.compartmentRect(compartmentIndex);
+    final FutureOr<void> pending = add(
+      ClearPopComponent(
+        position: Vector2(rect.left, rect.top),
+        size: Vector2(rect.width, rect.height),
+        comboIndex: comboIndex,
+      ),
+    );
+    if (pending is Future<void>) {
+      unawaited(pending);
+    }
   }
 
   bool _isLegalTarget(CellAddress target) {
