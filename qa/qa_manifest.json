@@ -1,6 +1,6 @@
 {
-  "commit": "d4cc4d5",
-  "builtWith": "flutter build web --release --dart-define=SHELF_RUSH_ENV=qa --pwa-strategy=none --base-href \"/\"",
+  "commit": "0e6dbe7",
+  "builtWith": "flutter build web --release --dart-define=SHELF_RUSH_ENV=qa --pwa-strategy=none --no-web-resources-cdn --base-href \"/\"",
   "startRoute": "/",
   "bridge": "window.shelfRushQa",
   "bridgeDocs": "QA_BRIDGE.md",
