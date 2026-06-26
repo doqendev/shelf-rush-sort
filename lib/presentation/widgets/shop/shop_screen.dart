@@ -382,17 +382,17 @@ final class _CoinPackRow extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
+            // Real IAP is out of scope for this build — show the planned price
+            // but mark it as not yet purchasable, so the shop never implies a
+            // working purchase (third-pass audit P2.1).
             DecoratedBox(
-              decoration: GameSurfaces.button(color: GameColors.leaf),
+              decoration: GameSurfaces.panel(color: GameColors.surfaceInset),
               child: Padding(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
+                  horizontal: 12,
                   vertical: 8,
                 ),
-                child: Text(
-                  price,
-                  style: GameTypography.body.copyWith(color: GameColors.ink),
-                ),
+                child: Text('$price · Soon', style: GameTypography.secondary),
               ),
             ),
           ],
@@ -436,7 +436,17 @@ final class _RemoveAdsRow extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: GameColors.mutedInk),
+            // Out of scope for this build — not a working purchase (P2.1).
+            DecoratedBox(
+              decoration: GameSurfaces.panel(color: GameColors.surfaceInset),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                child: Text('Soon', style: GameTypography.secondary),
+              ),
+            ),
           ],
         ),
       ),
