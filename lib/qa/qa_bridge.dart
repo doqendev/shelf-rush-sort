@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../app/providers.dart';
+import '../application/boosters/booster_inventory_service.dart';
 import '../application/game_session/game_session_controller.dart';
 import '../application/game_session/game_session_state.dart';
 import '../domain/boosters/booster_def.dart';
@@ -95,12 +96,32 @@ class QaBridge {
     if (c == null) {
       return;
     }
+    BoosterKind? booster;
     for (final BoosterKind value in BoosterKind.values) {
       if (value.name == kind) {
-        c.useBooster(value);
-        return;
+        booster = value;
+        break;
       }
     }
+    if (booster == null) {
+      return;
+    }
+    // Mirror the real UI flow so the economy behaves identically: the player
+    // must own one, and inventory is consumed only if the booster actually
+    // applies in context (third-pass audit P0.1).
+    final ProviderContainer? ct = container;
+    if (ct != null) {
+      const BoosterInventoryService inventory = BoosterInventoryService();
+      final PlayerSave save = ct.read(playerSaveProvider);
+      if (!inventory.canUse(save, booster) ||
+          !c.canUseBooster(booster).canUse) {
+        return;
+      }
+      final PlayerSave consumed = inventory.consume(save, booster);
+      ct.read(playerSaveProvider.notifier).state = consumed;
+      ct.read(saveRepositoryProvider).save(consumed);
+    }
+    c.useBooster(booster);
   }
 
   // ---- Inspection ------------------------------------------------------------
