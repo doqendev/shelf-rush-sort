@@ -41,6 +41,14 @@ void main() {
       // Mechanic-specific objective copy + a live "N left" progress count.
       expect(find.textContaining('matching'), findsOneWidget);
       expect(find.textContaining('left'), findsOneWidget);
+      // P1.4: the objective copy must stay on one line. It used to wrap to two
+      // lines inside a one-line-tall strip and clip at 320px; FittedBox now
+      // scales the single line down to fit instead.
+      expect(
+        tester.widget<Text>(find.textContaining('matching')).maxLines,
+        1,
+        reason: 'objective must stay one line at ${size.width.toInt()}px',
+      );
       expect(find.byIcon(Icons.map_rounded), findsNothing);
       expect(find.byIcon(Icons.storefront), findsNothing);
       expect(find.byIcon(Icons.settings), findsNothing);

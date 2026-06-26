@@ -222,6 +222,18 @@ class QaBridge {
 
   bool isPresentationBusy() => game?.isPresentationBusy ?? false;
 
+  /// Whether the bridge is fully wired. The provider container is now bound at
+  /// app root, so this is true before the first level opens; manifest runners
+  /// should poll it before resetSave()/getState() (hands-on v3 P1.1).
+  Map<String, Object?> ready() {
+    return <String, Object?>{
+      'ok': container != null,
+      'container': container != null,
+      'router': router != null,
+      'activeGame': controller != null,
+    };
+  }
+
   Map<String, Object?> getState() {
     final GameSessionController? c = controller;
     if (c == null) {
@@ -281,6 +293,20 @@ class QaBridge {
       'winRewardAvailable': won && firstCompletion,
       'doubleRewardAvailable': won && firstCompletion,
       'presentationBusy': game?.isPresentationBusy ?? false,
+      // The hint booster's suggested move and the authored star thresholds, so
+      // a reviewer can verify hint output and the 3-star path (v3 P2.4 / P1.5).
+      'suggestedMove': s.suggestedMove == null
+          ? null
+          : <String, Object?>{
+              'source': s.suggestedMove!.source.key,
+              'target': s.suggestedMove!.target.key,
+            },
+      'score': s.level.score == null
+          ? null
+          : <String, Object?>{
+              'threeStarMoves': s.level.score!.threeStarMoves,
+              'twoStarMoves': s.level.score!.twoStarMoves,
+            },
       'board': <Object?>[
         for (final CompartmentState compartment in s.board.compartments)
           <String, Object?>{

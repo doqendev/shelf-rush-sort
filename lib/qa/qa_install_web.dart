@@ -35,6 +35,7 @@ void installQaBridge(QaBridge bridge) {
   api['getState'] = (() => bridge.getState().jsify()).toJS;
   api['viewportInfo'] = (() => bridge.viewportInfo().jsify()).toJS;
   api['isPresentationBusy'] = (() => bridge.isPresentationBusy().toJS).toJS;
+  api['ready'] = (() => bridge.ready().jsify()).toJS;
 
   globalContext['shelfRushQa'] = api;
 }

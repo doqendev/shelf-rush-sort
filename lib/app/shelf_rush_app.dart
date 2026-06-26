@@ -19,7 +19,12 @@ final class ShelfRushApp extends ConsumerWidget {
       initialLocation: initialLocation,
     );
     if (environmentConfig.debugToolsEnabled) {
-      QaBridge.instance.router = router;
+      // Bind the container at the app root (not only once a level opens) so
+      // resetSave()/getState() work before the first goToLevel — fixes the QA
+      // bridge startup race (hands-on v3 P1.1).
+      QaBridge.instance
+        ..router = router
+        ..container = ProviderScope.containerOf(context, listen: false);
     }
     return MaterialApp.router(
       title: 'Shelf Rush Sort',
