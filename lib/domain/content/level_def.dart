@@ -216,6 +216,23 @@ final class CompartmentDef {
   }
 }
 
+/// Per-level star thresholds (third-pass audit P1.7). When present, stars are
+/// awarded from these authored move counts instead of the generic par
+/// heuristic — intended to be seeded from solver minimum moves and human-tuned.
+final class LevelScore {
+  const LevelScore({required this.threeStarMoves, required this.twoStarMoves});
+
+  factory LevelScore.fromJson(Map<String, Object?> json) {
+    return LevelScore(
+      threeStarMoves: json['threeStarMoves']! as int,
+      twoStarMoves: json['twoStarMoves']! as int,
+    );
+  }
+
+  final int threeStarMoves;
+  final int twoStarMoves;
+}
+
 final class LevelDef {
   LevelDef({
     required this.id,
@@ -233,6 +250,7 @@ final class LevelDef {
     this.humanReview,
     this.validationMetrics = const ValidationMetrics(),
     this.laneFailurePolicy = const LaneFailurePolicy(),
+    this.score,
   }) : compartments = List<CompartmentDef>.unmodifiable(compartments),
        movingLanes = List<MovingLaneDef>.unmodifiable(movingLanes),
        tags = List<LevelTag>.unmodifiable(tags);
@@ -312,6 +330,9 @@ final class LevelDef {
         json['laneFailurePolicy'] as Map<String, Object?>? ??
             const <String, Object?>{},
       ),
+      score: json['score'] == null
+          ? null
+          : LevelScore.fromJson(json['score']! as Map<String, Object?>),
     );
   }
 
@@ -330,6 +351,7 @@ final class LevelDef {
   final HumanReviewMetadata? humanReview;
   final ValidationMetrics validationMetrics;
   final LaneFailurePolicy laneFailurePolicy;
+  final LevelScore? score;
 
   BoardState createBoardState() {
     var instanceCounter = 0;
