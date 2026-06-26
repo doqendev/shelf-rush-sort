@@ -5,6 +5,7 @@ import 'package:flame/components.dart';
 
 import '../../application/game_session/game_session_controller.dart';
 import '../../application/game_session/game_session_state.dart';
+import '../../application/game_session/tutorial_controller.dart';
 import '../../domain/blockers/blocker_def.dart';
 import '../../domain/content/product_def.dart';
 import '../../domain/core/value_objects.dart';
@@ -21,6 +22,7 @@ import 'board/hidden_preview_component.dart';
 import 'board/hover_target_component.dart';
 import 'board/product_component.dart';
 import 'board/rack_backdrop_component.dart';
+import 'board/tutorial_overlay_component.dart';
 import 'fx/clear_pop_component.dart';
 import 'fx/fx_director.dart';
 import 'input/input_router.dart';
@@ -224,6 +226,28 @@ final class ShelfWorld extends World {
         );
       }
     }
+    await _addTutorialOverlay();
+  }
+
+  /// Adds the guided-move overlay while the opening tutorial step is active
+  /// (level 1, before the first move). It is recreated each rebuild and simply
+  /// not re-added once the first move is made (second-pass audit P0.5).
+  Future<void> _addTutorialOverlay() async {
+    final TutorialMoveHint? hint = controller.tutorialController.hintForLevel(
+      _state.level.levelNumber,
+    );
+    if (hint == null || _state.moveCount != 0 || _state.isEnded) {
+      return;
+    }
+    await add(
+      TutorialOverlayComponent(
+        sourceRect: _layout.cellRect(hint.source),
+        targetRect: _layout.cellRect(hint.target),
+        message: 'Drag matching products together',
+        size: _layout.gameSize,
+        reduceMotion: reduceMotion,
+      ),
+    );
   }
 
   Future<void> _addLanes() async {

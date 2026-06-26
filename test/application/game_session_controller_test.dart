@@ -102,28 +102,36 @@ void main() {
     expect(analytics.events.map((event) => event.name), contains('lane_miss'));
   });
 
-  test('tutorial hint does not block normal level-one moves', () {
-    final GameSessionController controller = GameSessionController(
-      level: _tutorialLevel(),
-      analytics: DebugAnalyticsService(),
-    );
+  test(
+    'level-1 first move is restricted to the guided tutorial move (P0.5)',
+    () {
+      final GameSessionController controller = GameSessionController(
+        level: _tutorialLevel(),
+        analytics: DebugAnalyticsService(),
+      );
 
-    controller.selectCell(CellAddress.fromCompartmentIndex(1, 1));
-    expect(
-      controller.state.selectedCell,
-      CellAddress.fromCompartmentIndex(1, 1),
-    );
+      // A non-guided selection is rejected on the very first move.
+      controller.selectCell(CellAddress.fromCompartmentIndex(1, 1));
+      expect(controller.state.selectedCell, isNull);
+      expect(controller.state.lastInvalidReason, isNotNull);
 
-    controller.placeSelectedAt(CellAddress.fromCompartmentIndex(0, 2));
-    expect(controller.state.moveCount, 1);
-    expect(controller.state.lastInvalidReason, isNull);
+      // The guided move (1,0) -> (0,2) is allowed and completes a triple.
+      controller.selectCell(CellAddress.fromCompartmentIndex(1, 0));
+      expect(
+        controller.state.selectedCell,
+        CellAddress.fromCompartmentIndex(1, 0),
+      );
+      controller.placeSelectedAt(CellAddress.fromCompartmentIndex(0, 2));
+      expect(controller.state.moveCount, 1);
 
-    controller.selectCell(CellAddress.fromCompartmentIndex(1, 0));
-    expect(
-      controller.state.selectedCell,
-      CellAddress.fromCompartmentIndex(1, 0),
-    );
-  });
+      // After the first move, free play resumes.
+      controller.selectCell(CellAddress.fromCompartmentIndex(1, 1));
+      expect(
+        controller.state.selectedCell,
+        CellAddress.fromCompartmentIndex(1, 1),
+      );
+    },
+  );
 
   test('paused controller does not advance the timer (P0.3)', () {
     final GameSessionController controller = GameSessionController(
