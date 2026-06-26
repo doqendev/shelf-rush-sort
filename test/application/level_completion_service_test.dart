@@ -65,6 +65,31 @@ void main() {
     expect(first.coins, 104);
     expect(second.coins, 104);
   });
+
+  test('commitWin records the level products as discovered (M6 / P1.8)', () {
+    final LevelDef level = _levelWithProducts();
+    final session = _wonSession(level, attemptId: 'attempt_disc');
+    final PlayerSave save = PlayerSave.newPlayer(
+      playerId: 'player',
+      startingCoins: 0,
+    );
+    const LevelCompletionService service = LevelCompletionService();
+    const RewardGrant reward = RewardGrant(coins: 10, reason: 'level_win');
+
+    final PlayerSave updated = service.commitWin(
+      save: save,
+      level: level,
+      session: session,
+      reward: reward,
+    );
+
+    final List<Object?> discovered =
+        updated.collections['discovered']! as List<Object?>;
+    expect(
+      discovered.cast<String>(),
+      containsAll(<String>['sku_000', 'sku_001', 'sku_002']),
+    );
+  });
 }
 
 GameSessionState _wonSession(LevelDef level, {required String attemptId}) {
@@ -93,6 +118,25 @@ LevelDef _level() {
     objective: ObjectiveRequirement(type: ObjectiveType.clearAll),
     compartments: <CompartmentDef>[
       for (var index = 0; index < 15; index += 1)
+        CompartmentDef(index: index, cells: const <String?>[null, null, null]),
+    ],
+  );
+}
+
+LevelDef _levelWithProducts() {
+  return LevelDef(
+    id: 'level_disc',
+    levelNumber: 2,
+    title: 'Discovery',
+    seed: 2,
+    objective: ObjectiveRequirement(type: ObjectiveType.clearAll),
+    compartments: <CompartmentDef>[
+      CompartmentDef(
+        index: 0,
+        cells: const <String?>['sku_000', 'sku_001', null],
+      ),
+      CompartmentDef(index: 1, cells: const <String?>['sku_002', null, null]),
+      for (var index = 2; index < 15; index += 1)
         CompartmentDef(index: index, cells: const <String?>[null, null, null]),
     ],
   );

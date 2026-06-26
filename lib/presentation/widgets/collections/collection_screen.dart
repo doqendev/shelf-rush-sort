@@ -17,7 +17,12 @@ final class CollectionScreen extends ConsumerWidget {
     final save = ref.watch(playerSaveProvider);
     final products = content.productCatalog.products;
     final int total = products.length;
-    final int collected = save.collections.length;
+    final Set<String> discoveredSkus =
+        (save.collections['discovered'] as List<Object?>?)
+            ?.cast<String>()
+            .toSet() ??
+        const <String>{};
+    final int collected = discoveredSkus.length;
 
     return Scaffold(
       backgroundColor: GameColors.bgPink,
@@ -60,7 +65,7 @@ final class CollectionScreen extends ConsumerWidget {
                 itemCount: total,
                 itemBuilder: (BuildContext context, int index) {
                   final product = products[index];
-                  final bool discovered = save.collections.containsKey(
+                  final bool discovered = discoveredSkus.contains(
                     product.skuId,
                   );
                   // Same stable product art as the board (audit M3 / P0.1).

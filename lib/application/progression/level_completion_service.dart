@@ -28,7 +28,10 @@ final class LevelCompletionService {
         .onLevelWon(save, level)
         .copyWith(
           lastSeenAt: DateTime.now().toUtc(),
-          collections: _recordSupportAttempt(save.collections, session),
+          collections: _recordDiscoveries(
+            _recordSupportAttempt(save.collections, session),
+            level,
+          ),
         );
     if (!firstCompletion || updated.ledger.containsKey(ledgerKey)) {
       return updated;
@@ -76,5 +79,33 @@ final class LevelCompletionService {
     });
     updated['recentAttempts'] = attempts.take(5).toList(growable: false);
     return updated;
+  }
+
+  /// Records every product the [level] contains as "discovered" so the
+  /// Collection screen reflects real progress instead of always-locked tiles
+  /// (second-pass audit M6 / P1.8).
+  Map<String, Object?> _recordDiscoveries(
+    Map<String, Object?> collections,
+    LevelDef level,
+  ) {
+    final Set<String> discovered = <String>{
+      ...?(collections['discovered'] as List<Object?>?)?.cast<String>(),
+    };
+    for (final CompartmentDef compartment in level.compartments) {
+      for (final String? sku in compartment.cells) {
+        if (sku != null) {
+          discovered.add(sku);
+        }
+      }
+      discovered.addAll(compartment.hidden);
+    }
+    for (final lane in level.movingLanes) {
+      for (final product in lane.queue) {
+        discovered.add(product.skuId);
+      }
+    }
+    discovered.addAll(level.objective.targetCounts.keys);
+    final List<String> sorted = discovered.toList()..sort();
+    return <String, Object?>{...collections, 'discovered': sorted};
   }
 }
