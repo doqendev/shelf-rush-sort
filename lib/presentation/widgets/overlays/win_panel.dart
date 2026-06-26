@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../application/game_session/game_session_state.dart';
-import '../../../application/progression/reward_service.dart';
 import '../../../domain/game/star_score.dart';
 import '../../design/game_colors.dart';
 import '../../design/game_surfaces.dart';
@@ -16,12 +15,14 @@ final class WinPanel extends StatefulWidget {
   const WinPanel({
     super.key,
     required this.session,
+    required this.coinsGranted,
     required this.onNext,
     required this.onDoubleReward,
     required this.onRetry,
   });
 
   final GameSessionState session;
+  final int coinsGranted;
   final VoidCallback onNext;
   final VoidCallback onDoubleReward;
   final VoidCallback onRetry;
@@ -52,9 +53,6 @@ class _WinPanelState extends State<WinPanel>
   @override
   Widget build(BuildContext context) {
     final GameSessionState session = widget.session;
-    final RewardGrant reward = const RewardService().levelWinReward(
-      session.level.levelNumber,
-    );
     final bool hardBonus =
         session.level.difficulty == 'hard' ||
         session.level.difficulty == 'superHard';
@@ -113,79 +111,87 @@ class _WinPanelState extends State<WinPanel>
                           errorBuilder: (_, _, _) =>
                               const SizedBox(height: 116),
                         ),
-                        const SizedBox(height: 12),
-                        DecoratedBox(
-                          decoration: GameSurfaces.panel(
-                            radius: 20,
-                            shadowDy: 4,
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 12,
+                        // Only promise coins when coins were actually granted —
+                        // a replay grants none (third-pass audit P0.2).
+                        if (widget.coinsGranted > 0) ...<Widget>[
+                          const SizedBox(height: 12),
+                          DecoratedBox(
+                            decoration: GameSurfaces.panel(
+                              radius: 20,
+                              shadowDy: 4,
                             ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Image.asset(
-                                  cozyAsset('icon/coin.png'),
-                                  width: 38,
-                                  height: 38,
-                                ),
-                                const SizedBox(width: 8),
-                                // Count the reward up rather than showing it
-                                // flat — the coins feel earned (audit M6 / 16.2).
-                                TweenAnimationBuilder<double>(
-                                  tween: Tween<double>(
-                                    begin: 0,
-                                    end: reward.coins.toDouble(),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 12,
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Image.asset(
+                                    cozyAsset('icon/coin.png'),
+                                    width: 38,
+                                    height: 38,
                                   ),
-                                  duration: const Duration(milliseconds: 700),
-                                  curve: Curves.easeOutCubic,
-                                  builder:
-                                      (
-                                        BuildContext context,
-                                        double value,
-                                        Widget? child,
-                                      ) {
-                                        return Text(
-                                          '+${value.round()}',
-                                          style: GameTypography.levelLabel
-                                              .copyWith(fontSize: 22),
-                                        );
-                                      },
-                                ),
-                                if (hardBonus) ...<Widget>[
-                                  const SizedBox(width: 12),
-                                  CozyPill(
-                                    color: GameColors.blossom,
-                                    child: Text(
-                                      'Hard bonus',
-                                      style: GameTypography.compactLabel
-                                          .copyWith(
-                                            color: const Color(0xFFFFFFFF),
-                                          ),
+                                  const SizedBox(width: 8),
+                                  // Count the reward up rather than showing it
+                                  // flat — the coins feel earned (audit M6 / 16.2).
+                                  TweenAnimationBuilder<double>(
+                                    tween: Tween<double>(
+                                      begin: 0,
+                                      end: widget.coinsGranted.toDouble(),
                                     ),
+                                    duration: const Duration(milliseconds: 700),
+                                    curve: Curves.easeOutCubic,
+                                    builder:
+                                        (
+                                          BuildContext context,
+                                          double value,
+                                          Widget? child,
+                                        ) {
+                                          return Text(
+                                            '+${value.round()}',
+                                            style: GameTypography.levelLabel
+                                                .copyWith(fontSize: 22),
+                                          );
+                                        },
                                   ),
+                                  if (hardBonus) ...<Widget>[
+                                    const SizedBox(width: 12),
+                                    CozyPill(
+                                      color: GameColors.blossom,
+                                      child: Text(
+                                        'Hard bonus',
+                                        style: GameTypography.compactLabel
+                                            .copyWith(
+                                              color: const Color(0xFFFFFFFF),
+                                            ),
+                                      ),
+                                    ),
+                                  ],
                                 ],
-                              ],
+                              ),
                             ),
                           ),
-                        ),
+                        ],
                         const SizedBox(height: 20),
                         CozyButton(label: 'NEXT', onTap: widget.onNext),
                         const SizedBox(height: 12),
                         Row(
                           children: <Widget>[
-                            Expanded(
-                              child: _SecondaryAction(
-                                color: GameColors.sunny,
-                                icon: Icons.smart_display_outlined,
-                                label: 'Double',
-                                onTap: widget.onDoubleReward,
+                            // The "Double" rewarded-ad option only makes sense
+                            // when there is a base reward to double (P0.2).
+                            if (widget.coinsGranted > 0) ...<Widget>[
+                              Expanded(
+                                child: _SecondaryAction(
+                                  color: GameColors.sunny,
+                                  icon: Icons.smart_display_outlined,
+                                  label: 'Double',
+                                  onTap: widget.onDoubleReward,
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 10),
+                              const SizedBox(width: 10),
+                            ],
                             Expanded(
                               child: _SecondaryAction(
                                 color: GameColors.surface,

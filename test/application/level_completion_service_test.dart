@@ -21,23 +21,27 @@ void main() {
     const LevelCompletionService service = LevelCompletionService();
     const RewardGrant reward = RewardGrant(coins: 52, reason: 'level_win');
 
-    final PlayerSave first = service.commitWin(
+    final LevelCompletionResult first = service.commitWin(
       save: save,
       level: level,
       session: session,
       reward: reward,
     );
-    final PlayerSave second = service.commitWin(
-      save: first,
+    final LevelCompletionResult second = service.commitWin(
+      save: first.save,
       level: level,
       session: session,
       reward: reward,
     );
 
-    expect(first.highestLevelCompleted, 1);
-    expect(first.coins, 52);
-    expect(second.coins, 52);
-    expect(second.ledger, hasLength(first.ledger.length));
+    expect(first.save.highestLevelCompleted, 1);
+    // First completion grants coins; the replay grants none — the win panel
+    // must reflect this, not a recomputed reward (third-pass audit P0.2).
+    expect(first.coinsGranted, 52);
+    expect(first.save.coins, 52);
+    expect(second.coinsGranted, 0);
+    expect(second.save.coins, 52);
+    expect(second.save.ledger, hasLength(first.save.ledger.length));
   });
 
   test('commitDoubleReward grants only the additional delta once', () {
@@ -76,7 +80,7 @@ void main() {
     const LevelCompletionService service = LevelCompletionService();
     const RewardGrant reward = RewardGrant(coins: 10, reason: 'level_win');
 
-    final PlayerSave updated = service.commitWin(
+    final LevelCompletionResult updated = service.commitWin(
       save: save,
       level: level,
       session: session,
@@ -84,7 +88,7 @@ void main() {
     );
 
     final List<Object?> discovered =
-        updated.collections['discovered']! as List<Object?>;
+        updated.save.collections['discovered']! as List<Object?>;
     expect(
       discovered.cast<String>(),
       containsAll(<String>['sku_000', 'sku_001', 'sku_002']),
@@ -101,18 +105,18 @@ void main() {
     const LevelCompletionService service = LevelCompletionService();
     const RewardGrant reward = RewardGrant(coins: 10, reason: 'level_win');
 
-    final PlayerSave updated = service.commitWin(
+    final LevelCompletionResult updated = service.commitWin(
       save: save,
       level: level,
       session: session,
       reward: reward,
     );
 
-    final int? levelStars = updated.progress.levelStars[level.id];
+    final int? levelStars = updated.save.progress.levelStars[level.id];
     expect(levelStars, isNotNull);
     expect(levelStars, greaterThan(0));
     // Only one level completed, so the total equals that level's rating.
-    expect(updated.progress.stars, levelStars);
+    expect(updated.save.progress.stars, levelStars);
   });
 }
 

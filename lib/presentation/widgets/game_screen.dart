@@ -46,6 +46,9 @@ final class _GameScreenState extends ConsumerState<GameScreen>
   // clear has been seen (review P1.4 / section 16.2), keyed per attempt.
   bool _endOverlayVisible = false;
   String? _endOverlayAttempt;
+  // Coins actually granted for the current win (0 on a replay) — the win panel
+  // shows this, never a recomputed theoretical reward (third-pass audit P0.2).
+  int _winCoinsGranted = 0;
   late int _levelNumber;
   final Set<String> _committedWinAttempts = <String>{};
   final Set<String> _doubleRewardedAttempts = <String>{};
@@ -122,6 +125,7 @@ final class _GameScreenState extends ConsumerState<GameScreen>
           if (session.status == GameSessionStatus.won && _endOverlayVisible)
             WinPanel(
               session: session,
+              coinsGranted: _winCoinsGranted,
               onNext: () => _completeAndNext(doubleReward: false),
               onDoubleReward: () => _completeAndNext(doubleReward: true),
               onRetry: () => _loadLevel(_levelNumber),
@@ -424,15 +428,18 @@ final class _GameScreenState extends ConsumerState<GameScreen>
     final RewardGrant reward = const RewardService().levelWinReward(
       session.level.levelNumber,
     );
-    final PlayerSave committed = const LevelCompletionService().commitWin(
-      save: before,
-      level: session.level,
-      session: session,
-      reward: reward,
-    );
+    final LevelCompletionResult result = const LevelCompletionService()
+        .commitWin(
+          save: before,
+          level: session.level,
+          session: session,
+          reward: reward,
+        );
+    final PlayerSave committed = result.save;
     ref.read(playerSaveProvider.notifier).state = committed;
     await ref.read(saveRepositoryProvider).save(committed);
-    final int granted = committed.coins - before.coins;
+    final int granted = result.coinsGranted;
+    _winCoinsGranted = granted;
     if (granted > 0) {
       await ref
           .read(analyticsServiceProvider)

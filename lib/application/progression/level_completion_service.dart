@@ -6,6 +6,23 @@ import '../game_session/game_session_state.dart';
 import 'progression_service.dart';
 import 'reward_service.dart';
 
+/// The outcome of committing a level win — the updated save plus exactly what
+/// was granted, so the win panel can show the truth instead of a recomputed
+/// theoretical reward (third-pass audit P0.2).
+final class LevelCompletionResult {
+  const LevelCompletionResult({
+    required this.save,
+    required this.coinsGranted,
+    required this.starsEarned,
+    required this.firstCompletion,
+  });
+
+  final PlayerSave save;
+  final int coinsGranted;
+  final int starsEarned;
+  final bool firstCompletion;
+}
+
 final class LevelCompletionService {
   const LevelCompletionService({
     this.progression = const ProgressionService(),
@@ -17,7 +34,7 @@ final class LevelCompletionService {
   final RewardService rewards;
   final EconomyService economy;
 
-  PlayerSave commitWin({
+  LevelCompletionResult commitWin({
     required PlayerSave save,
     required LevelDef level,
     required GameSessionState session,
@@ -39,13 +56,26 @@ final class LevelCompletionService {
       ),
     );
     if (!firstCompletion || updated.ledger.containsKey(ledgerKey)) {
-      return updated;
+      // Replay (or already-credited) win: stars/collection still update, but no
+      // coins are granted — so the panel must not promise any (P0.2).
+      return LevelCompletionResult(
+        save: updated,
+        coinsGranted: 0,
+        starsEarned: earnedStars,
+        firstCompletion: firstCompletion,
+      );
     }
-    return economy.grantCoinsToSave(
+    final PlayerSave granted = economy.grantCoinsToSave(
       updated,
       reward.coins,
       reward.reason,
       sourceId: ledgerKey,
+    );
+    return LevelCompletionResult(
+      save: granted,
+      coinsGranted: granted.coins - updated.coins,
+      starsEarned: earnedStars,
+      firstCompletion: firstCompletion,
     );
   }
 
