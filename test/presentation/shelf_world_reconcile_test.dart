@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui' show Rect;
 
 import 'package:flame/effects.dart';
 import 'package:flame/game.dart';
@@ -34,9 +35,9 @@ void main() {
     );
   });
 
-  ShelfWorld buildWorld() {
+  ShelfWorld buildWorld(LevelDef level) {
     final GameSessionController controller = GameSessionController(
-      level: _relocationLevel(),
+      level: level,
       analytics: DebugAnalyticsService(),
     );
     return ShelfWorld(
@@ -51,8 +52,66 @@ void main() {
   }
 
   testWithGame<_TestGame>(
+    'a completed triple removes the cleared product components',
+    () => _TestGame(buildWorld(_clearLevel())),
+    (_TestGame game) async {
+      final ShelfWorld world = game.world;
+      await _settle(game);
+      // comp0 = [000, 000, _], comp1 = [000, _, _]  -> 3 products on screen.
+      expect(world.children.whereType<ProductComponent>(), hasLength(3));
+
+      // Placing the third sku_000 into comp0 completes the triple, which clears.
+      world.controller.selectCell(CellAddress.fromCompartmentIndex(1, 0));
+      world.controller.placeSelectedAt(CellAddress.fromCompartmentIndex(0, 2));
+      await _settle(game);
+
+      // The cleared products must be gone from the view, not left behind.
+      expect(world.children.whereType<ProductComponent>(), isEmpty);
+    },
+  );
+
+  testWithGame<_TestGame>(
+    'dragging a product to complete a triple clears it (reported bug)',
+    () => _TestGame(buildWorld(_clearLevel())),
+    (_TestGame game) async {
+      final ShelfWorld world = game.world;
+      await _settle(game);
+      expect(world.children.whereType<ProductComponent>(), hasLength(3));
+
+      final BoardLayout layout = const BoardLayoutCalculator().calculate(
+        Vector2(390, 844),
+        hasLane: false,
+        laneDefs: const <MovingLaneDef>[],
+      );
+      final CellAddress source = CellAddress.fromCompartmentIndex(1, 0);
+      final CellAddress target = CellAddress.fromCompartmentIndex(0, 2);
+      final Rect sourceRect = layout.cellRect(source);
+      final Rect targetRect = layout.cellRect(target);
+      final Vector2 targetPos = Vector2(
+        targetRect.center.dx,
+        targetRect.center.dy,
+      );
+
+      // Drive the real drag path: lift the lone sku_000 and drop it onto comp0,
+      // completing 000/000/000.
+      world.inputRouter.onProductDragStart(
+        source,
+        Vector2(sourceRect.center.dx, sourceRect.center.dy),
+      );
+      await _settle(game);
+      world.inputRouter.onProductDragUpdate(targetPos);
+      await _settle(game);
+      world.inputRouter.onProductDragEnd(targetPos);
+      // Real time so the deferred snap animation lands and commits the move.
+      await _pump(game, dt: 0.05, steps: 16);
+
+      expect(world.children.whereType<ProductComponent>(), isEmpty);
+    },
+  );
+
+  testWithGame<_TestGame>(
     'draws exactly one component per visible product',
-    () => _TestGame(buildWorld()),
+    () => _TestGame(buildWorld(_relocationLevel())),
     (_TestGame game) async {
       await _settle(game);
       final List<ProductComponent> products = game.world.children
@@ -71,7 +130,7 @@ void main() {
 
   testWithGame<_TestGame>(
     'a moved product keeps its component and animates to the new slot',
-    () => _TestGame(buildWorld()),
+    () => _TestGame(buildWorld(_relocationLevel())),
     (_TestGame game) async {
       final ShelfWorld world = game.world;
       await _settle(game);
@@ -110,6 +169,40 @@ Future<void> _settle(FlameGame game) async {
     await Future<void>.delayed(Duration.zero);
     game.update(0);
   }
+}
+
+Future<void> _pump(
+  FlameGame game, {
+  required double dt,
+  required int steps,
+}) async {
+  for (var i = 0; i < steps; i += 1) {
+    await Future<void>.delayed(Duration.zero);
+    game.update(dt);
+  }
+}
+
+LevelDef _clearLevel() {
+  return LevelDef(
+    id: 'level_reconcile_clear_test',
+    levelNumber: 9,
+    title: 'Reconcile Clear Test',
+    seed: 9,
+    objective: ObjectiveRequirement(type: ObjectiveType.clearAll),
+    compartments: <CompartmentDef>[
+      CompartmentDef(
+        index: 0,
+        cells: const <String?>['sku_000', 'sku_000', null],
+      ),
+      CompartmentDef(index: 1, cells: const <String?>['sku_000', null, null]),
+      for (var index = 2; index < 15; index += 1)
+        CompartmentDef(
+          index: index,
+          locked: true,
+          cells: const <String?>[null, null, null],
+        ),
+    ],
+  );
 }
 
 LevelDef _relocationLevel() {
