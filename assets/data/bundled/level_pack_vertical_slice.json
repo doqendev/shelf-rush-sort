@@ -1522,10 +1522,10 @@
     {
       "id": "vertical_level_0009",
       "levelNumber": 9,
-      "title": "Full Rack Sort 9",
+      "title": "Time Pressure",
       "seed": 2009,
       "difficulty": "hard",
-      "timeLimitSeconds": 180,
+      "timeLimitSeconds": 50,
       "moveLimit": null,
       "objective": {
         "type": "clearAll",
@@ -1535,9 +1535,9 @@
         {
           "index": 0,
           "cells": [
-            "sku_016",
-            "sku_016",
-            null
+            "sku_000",
+            "sku_000",
+            "sku_001"
           ],
           "hidden": [],
           "locked": false,
@@ -1546,9 +1546,9 @@
         {
           "index": 1,
           "cells": [
-            "sku_016",
-            "sku_017",
-            "sku_017"
+            "sku_001",
+            "sku_001",
+            "sku_002"
           ],
           "hidden": [],
           "locked": false,
@@ -1557,9 +1557,9 @@
         {
           "index": 2,
           "cells": [
-            "sku_017",
-            "sku_018",
-            "sku_018"
+            "sku_002",
+            "sku_002",
+            "sku_000"
           ],
           "hidden": [],
           "locked": false,
@@ -1568,9 +1568,9 @@
         {
           "index": 3,
           "cells": [
-            "sku_018",
-            "sku_019",
-            "sku_019"
+            null,
+            null,
+            null
           ],
           "hidden": [],
           "locked": false,
@@ -1579,146 +1579,140 @@
         {
           "index": 4,
           "cells": [
-            "sku_019",
-            "sku_020",
-            "sku_020"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 5,
           "cells": [
-            "sku_020",
-            "sku_021",
-            "sku_021"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 6,
           "cells": [
-            "sku_021",
-            "sku_022",
-            "sku_022"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 7,
           "cells": [
-            "sku_022",
-            "sku_023",
-            "sku_023"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 8,
           "cells": [
-            "sku_023",
-            "sku_024",
-            "sku_024"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 9,
           "cells": [
-            "sku_024",
-            "sku_025",
-            "sku_025"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 10,
           "cells": [
-            "sku_025",
-            "sku_026",
-            "sku_026"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 11,
           "cells": [
-            "sku_026",
-            "sku_027",
-            "sku_027"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 12,
           "cells": [
-            "sku_027",
-            "sku_028",
-            "sku_028"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 13,
           "cells": [
-            "sku_028",
-            "sku_029",
-            "sku_029"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 14,
           "cells": [
-            "sku_029",
+            null,
             null,
             null
           ],
-          "cellBlockers": [
-            "none",
-            "mysteryBag",
-            "none"
-          ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         }
       ],
-      "movingLanes": [],
       "humanReview": {
-        "author": "engineering_vertical_slice",
-        "intent": "Maintain full-rack density while increasing SKU planning.",
-        "curriculumTag": "full_rack_opening",
-        "difficultyTarget": "normal",
-        "humanReviewGrade": "engineering_reviewed"
+        "author": "studio-curriculum",
+        "intent": "Bring the timer back over a genuine three-SKU staging sort (the level-3 lesson scaled up). Tests planning under pressure with one spare shelf.",
+        "curriculumTag": "timer_under_pressure",
+        "difficultyTarget": "hard",
+        "humanReviewGrade": "reviewed"
       }
     },
     {
       "id": "vertical_level_0010",
       "levelNumber": 10,
-      "title": "Full Rack Sort 10",
+      "title": "Closing Time",
       "seed": 2010,
-      "difficulty": "hard",
-      "timeLimitSeconds": 180,
+      "difficulty": "superHard",
+      "timeLimitSeconds": 75,
       "moveLimit": null,
       "objective": {
         "type": "clearAll",
@@ -1728,31 +1722,39 @@
         {
           "index": 0,
           "cells": [
-            "sku_018",
-            "sku_018",
+            "sku_000",
+            "sku_000",
             null
           ],
-          "hidden": [],
+          "hidden": [
+            "sku_003",
+            "sku_003"
+          ],
           "locked": false,
           "decorative": false
         },
         {
           "index": 1,
           "cells": [
-            "sku_018",
-            "sku_019",
-            "sku_019"
+            "sku_000",
+            "sku_001",
+            "sku_001"
           ],
           "hidden": [],
           "locked": false,
-          "decorative": false
+          "decorative": false,
+          "productBlockers": [
+            "mysteryBag",
+            "none",
+            "none"
+          ]
         },
         {
           "index": 2,
           "cells": [
-            "sku_019",
-            "sku_020",
-            "sku_020"
+            "sku_001",
+            "sku_002",
+            null
           ],
           "hidden": [],
           "locked": false,
@@ -1761,9 +1763,9 @@
         {
           "index": 3,
           "cells": [
-            "sku_020",
-            "sku_021",
-            "sku_021"
+            "sku_002",
+            "sku_002",
+            null
           ],
           "hidden": [],
           "locked": false,
@@ -1772,9 +1774,9 @@
         {
           "index": 4,
           "cells": [
-            "sku_021",
-            "sku_022",
-            "sku_022"
+            "sku_003",
+            null,
+            null
           ],
           "hidden": [],
           "locked": false,
@@ -1783,121 +1785,120 @@
         {
           "index": 5,
           "cells": [
-            "sku_022",
-            "sku_023",
-            "sku_023"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 6,
           "cells": [
-            "sku_023",
-            "sku_024",
-            "sku_024"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 7,
           "cells": [
-            "sku_024",
-            "sku_025",
-            "sku_025"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 8,
           "cells": [
-            "sku_025",
-            "sku_026",
-            "sku_026"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 9,
           "cells": [
-            "sku_026",
-            "sku_027",
-            "sku_027"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 10,
           "cells": [
-            "sku_027",
-            "sku_028",
-            "sku_028"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 11,
           "cells": [
-            "sku_028",
-            "sku_029",
-            "sku_029"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 12,
           "cells": [
-            "sku_029",
-            "sku_030",
-            "sku_030"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 13,
           "cells": [
-            "sku_030",
-            "sku_031",
-            "sku_031"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 14,
           "cells": [
-            "sku_031",
+            null,
             null,
             null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         }
       ],
-      "movingLanes": [],
       "humanReview": {
-        "author": "engineering_vertical_slice",
-        "intent": "Maintain full-rack density while increasing SKU planning.",
-        "curriculumTag": "full_rack_opening",
-        "difficultyTarget": "hard",
-        "humanReviewGrade": "engineering_reviewed"
+        "author": "studio-curriculum",
+        "intent": "Graduation: one board that uses every taught model - staging, a hidden reveal, a mystery bag and four SKUs - against a generous clock. The payoff level that proves the player learned the system.",
+        "curriculumTag": "capstone",
+        "difficultyTarget": "superHard",
+        "humanReviewGrade": "reviewed"
       }
     },
     {
