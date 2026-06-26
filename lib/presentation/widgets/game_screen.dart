@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app/providers.dart';
+import '../../application/boosters/booster_inventory_service.dart';
 import '../../application/content/content_service.dart';
 import '../../application/game_session/game_session_controller.dart';
 import '../../application/game_session/game_session_state.dart';
@@ -103,6 +104,7 @@ final class _GameScreenState extends ConsumerState<GameScreen>
     if (session == null || game == null) {
       return const _CozyLoading();
     }
+    final PlayerSave save = ref.watch(playerSaveProvider);
 
     return Scaffold(
       body: Stack(
@@ -112,7 +114,8 @@ final class _GameScreenState extends ConsumerState<GameScreen>
               session: session,
               viewport: GameViewport(game: game),
               onPause: _showPauseSheet,
-              onUseBooster: (BoosterKind kind) => _controller?.useBooster(kind),
+              onUseBooster: _useBooster,
+              boosterCounts: save.boosters,
             ),
           ),
           if (session.status == GameSessionStatus.won && _endOverlayVisible)
@@ -131,6 +134,24 @@ final class _GameScreenState extends ConsumerState<GameScreen>
         ],
       ),
     );
+  }
+
+  void _useBooster(BoosterKind kind) {
+    final GameSessionController? controller = _controller;
+    if (controller == null || controller.state.isEnded) {
+      return;
+    }
+    const BoosterInventoryService inventory = BoosterInventoryService();
+    final PlayerSave save = ref.read(playerSaveProvider);
+    if (!inventory.canUse(save, kind)) {
+      // Out of this booster — send the player to the shop to get more.
+      context.push('/shop');
+      return;
+    }
+    final PlayerSave consumed = inventory.consume(save, kind);
+    ref.read(playerSaveProvider.notifier).state = consumed;
+    unawaited(ref.read(saveRepositoryProvider).save(consumed));
+    controller.useBooster(kind);
   }
 
   void _scheduleEndOverlay(GameSessionState state) {

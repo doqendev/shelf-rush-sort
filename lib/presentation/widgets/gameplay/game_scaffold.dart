@@ -14,12 +14,14 @@ final class GameScaffold extends StatelessWidget {
     required this.viewport,
     required this.onPause,
     this.onUseBooster,
+    this.boosterCounts = const <BoosterKind, int>{},
   });
 
   final GameSessionState session;
   final Widget viewport;
   final VoidCallback onPause;
   final void Function(BoosterKind booster)? onUseBooster;
+  final Map<BoosterKind, int> boosterCounts;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +33,11 @@ final class GameScaffold extends StatelessWidget {
             GameHeader(session: session, onPause: onPause),
             ObjectiveStrip(session: session),
             Expanded(child: viewport),
-            BoosterDock(session: session, onUseBooster: onUseBooster),
+            BoosterDock(
+              session: session,
+              onUseBooster: onUseBooster,
+              counts: boosterCounts,
+            ),
           ],
         ),
       ),
