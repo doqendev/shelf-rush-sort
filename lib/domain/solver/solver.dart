@@ -160,7 +160,14 @@ final class LevelValidator {
     // opening-quality gates. See the studio-quality upgrade plan, sections 14
     // and 22.
     final bool isTutorial = level.difficulty == 'tutorial';
-    if (emptyVisibleSlots > 20 && !isTutorial) {
+    // Hand-authored levels (the tutorial, or any level carrying human-review
+    // intent) are trusted curated content, so they are exempt from the
+    // generated-content quality proxies below (full-rack density, lock bans).
+    // The hands-on audit told us to stop using "all 15 compartments active" as
+    // the quality bar for the authored opening curriculum (Blocker 1 / Sprint
+    // B). Broken-content and solvability checks still apply to every level.
+    final bool isCurated = isTutorial || level.humanReview != null;
+    if (emptyVisibleSlots > 20 && !isCurated) {
       issues.add(
         ValidationIssue(
           code: 'low_visual_density',
@@ -171,7 +178,7 @@ final class LevelValidator {
     }
     final int activeCompartmentCount =
         level.compartments.length - lockedCompartments - decorativeCompartments;
-    if (level.levelNumber <= 15 && !isTutorial) {
+    if (level.levelNumber <= 15 && !isCurated) {
       if (activeCompartmentCount != compartmentCount) {
         issues.add(
           ValidationIssue(
@@ -202,7 +209,7 @@ final class LevelValidator {
       }
     } else if (productionPack &&
         activeCompartmentCount < compartmentCount &&
-        !isTutorial) {
+        !isCurated) {
       issues.add(
         ValidationIssue(
           code: 'inactive_compartments_require_explicit_mechanic',
@@ -222,7 +229,7 @@ final class LevelValidator {
         ),
       );
     }
-    if (productionPack && metrics.duplicatePatternRatio > 0.24 && !isTutorial) {
+    if (productionPack && metrics.duplicatePatternRatio > 0.24 && !isCurated) {
       issues.add(
         ValidationIssue(
           code: 'duplicate_shelf_pattern',

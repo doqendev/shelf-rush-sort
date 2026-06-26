@@ -5,9 +5,16 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shelf_rush_sort/domain/blockers/blocker_def.dart';
 import 'package:shelf_rush_sort/domain/content/cozy_product_visuals.dart';
 import 'package:shelf_rush_sort/domain/content/level_def.dart';
+import 'package:shelf_rush_sort/domain/content/product_def.dart';
 import 'package:shelf_rush_sort/domain/core/value_objects.dart';
 import 'package:shelf_rush_sort/domain/game/board_rules.dart';
 import 'package:shelf_rush_sort/domain/game/move.dart';
+import 'package:shelf_rush_sort/domain/solver/solver.dart';
+import 'package:shelf_rush_sort/domain/solver/validation_report.dart';
+
+/// Levels 2..[curatedThrough] are the hand-authored Sprint B curriculum; the
+/// rest of the opening pack still uses the full rack until curated too.
+const int curatedThrough = 4;
 
 void main() {
   test('level 1 is a gentle, collision-free teaching board', () async {
@@ -59,31 +66,67 @@ void main() {
     expect(result.clearedTriples.single.skuId, 'sku_000');
   });
 
-  test('levels 2-15 keep every rack compartment playable', () async {
+  test('curriculum levels 2..N are gentle, solvable and collision-free', () async {
     final LevelPack pack = await _verticalSlicePack();
-    // Level 1 is the gentle guided tutorial (partly locked); the remaining
-    // opening levels still use the full rack until they are curated too.
-    for (var levelNumber = 2; levelNumber <= 15; levelNumber += 1) {
+    final ProductCatalog catalog = await _productCatalog();
+    const LevelValidator validator = LevelValidator();
+    // The opening curriculum (Blocker 1 / Sprint B): each early level is a
+    // gentle, hand-authored teaching board — partly locked, few SKUs — and must
+    // be finishable by a cold player. The "all 15 compartments active" rule is a
+    // quality proxy the hands-on audit told us to drop here.
+    for (var levelNumber = 2; levelNumber <= curatedThrough; levelNumber += 1) {
       final LevelDef level = pack.levelByNumber(levelNumber);
+      final ValidationReport report = validator.validateLevel(level, catalog);
+      final LevelValidationMetrics metrics = report.metricsByLevel[level.id]!;
       expect(
-        level.compartments.where((compartment) {
-          return !compartment.locked && !compartment.decorative;
-        }),
-        hasLength(compartmentCount),
-        reason: 'level $levelNumber must use all compartments',
+        metrics.solvable,
+        isTrue,
+        reason: 'level $levelNumber must be solvable by a cold player',
       );
       expect(
-        level.compartments.where((compartment) => compartment.locked),
+        report.issues.where(
+          (ValidationIssue issue) =>
+              issue.code == 'visual_identity_collision' ||
+              issue.code.startsWith('unknown'),
+        ),
         isEmpty,
-        reason: 'level $levelNumber must not use generic locks',
+        reason:
+            'level $levelNumber has broken content: '
+            '${report.issues.map((ValidationIssue i) => i.code).toList()}',
       );
       expect(
-        level.compartments.where((compartment) => compartment.decorative),
-        isEmpty,
-        reason: 'level $levelNumber must not use decorative logical slots',
+        metrics.uniqueSkuCount,
+        lessThanOrEqualTo(6),
+        reason: 'level $levelNumber should keep a small, readable SKU set',
+      );
+      expect(
+        metrics.activeCompartmentCount,
+        lessThan(compartmentCount),
+        reason: 'level $levelNumber should not dump the full rack',
       );
     }
   });
+
+  test(
+    'levels (N+1)-15 keep every rack compartment playable until curated',
+    () async {
+      final LevelPack pack = await _verticalSlicePack();
+      for (
+        var levelNumber = curatedThrough + 1;
+        levelNumber <= 15;
+        levelNumber += 1
+      ) {
+        final LevelDef level = pack.levelByNumber(levelNumber);
+        expect(
+          level.compartments.where((compartment) {
+            return !compartment.locked && !compartment.decorative;
+          }),
+          hasLength(compartmentCount),
+          reason: 'level $levelNumber must use all compartments',
+        );
+      }
+    },
+  );
 
   test('every level renders different SKUs with different sprites (M3)', () async {
     // P0.1 "artwork is the truth": the stable per-SKU manifest must give every
@@ -127,6 +170,13 @@ Future<LevelPack> _verticalSlicePack() async {
     'assets/data/bundled/level_pack_vertical_slice.json',
   ).readAsString();
   return LevelPack.fromJson(jsonDecode(raw) as Map<String, Object?>);
+}
+
+Future<ProductCatalog> _productCatalog() async {
+  final String raw = await File(
+    'assets/data/bundled/product_catalog.json',
+  ).readAsString();
+  return ProductCatalog.fromJson(jsonDecode(raw) as Map<String, Object?>);
 }
 
 int _visibleProductCount(LevelDef level) {
