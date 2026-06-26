@@ -354,7 +354,7 @@ final class _GameScreenState extends ConsumerState<GameScreen>
     if (ref.read(environmentProvider).debugToolsEnabled) {
       QaBridge.instance
         ..container = ProviderScope.containerOf(context, listen: false)
-        ..bindGame(controller, game);
+        ..bindGame(controller, game, _loadLevel);
     }
     loadTimer.stop();
     unawaited(

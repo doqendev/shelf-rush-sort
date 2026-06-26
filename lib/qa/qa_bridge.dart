@@ -6,6 +6,7 @@ import '../application/boosters/booster_inventory_service.dart';
 import '../application/game_session/game_session_controller.dart';
 import '../application/game_session/game_session_state.dart';
 import '../domain/boosters/booster_def.dart';
+import '../domain/boosters/booster_rules.dart';
 import '../domain/core/value_objects.dart';
 import '../domain/game/board_state.dart';
 import '../domain/game/objective.dart';
@@ -13,12 +14,13 @@ import '../infrastructure/save/save_repository.dart';
 import '../presentation/flame/shelf_rush_game.dart';
 
 /// Debug-only automation surface for QA builds. Exposes deterministic entry
-/// points (navigate, drive moves, read full game state) so a reviewer can play
-/// AND verify the canvas game headlessly instead of judging only screenshots.
+/// points (navigate, drive moves, read full game+economy state) so a reviewer
+/// can play AND verify the canvas game headlessly instead of judging only
+/// screenshots.
 ///
 /// Wired to `window.shelfRushQa` on web by [installQaBridge]; only installed in
-/// non-production builds (SHELF_RUSH_ENV=dev|qa). All mutating calls are no-ops
-/// when no game screen is active.
+/// non-production builds (SHELF_RUSH_ENV=dev|qa). Mutators return a structured
+/// result so automation never has to infer success from before/after diffs.
 class QaBridge {
   QaBridge._();
 
@@ -31,27 +33,54 @@ class QaBridge {
   /// Active game handles, set by GameScreen while a level is open.
   GameSessionController? controller;
   ShelfRushGame? game;
+  void Function(int level)? reloadLevel;
 
-  void bindGame(GameSessionController controller, ShelfRushGame game) {
+  void bindGame(
+    GameSessionController controller,
+    ShelfRushGame game,
+    void Function(int level) reloadLevel,
+  ) {
     this.controller = controller;
     this.game = game;
+    this.reloadLevel = reloadLevel;
   }
 
   void unbindGame(GameSessionController controller) {
     if (identical(this.controller, controller)) {
       this.controller = null;
       game = null;
+      reloadLevel = null;
     }
   }
 
   // ---- Navigation / lifecycle ------------------------------------------------
 
-  void goToLevel(int level) => router?.go('/?level=$level');
+  /// Loads [level] in a FRESH session — even if already on that level (so the
+  /// same-level reload trap can't invalidate a flow; third-pass hands-on P0.3).
+  Map<String, Object?> goToLevel(int level) {
+    final void Function(int)? reload = reloadLevel;
+    if (reload != null) {
+      reload(level);
+    } else {
+      router?.go('/?level=$level');
+    }
+    return <String, Object?>{'ok': true, 'level': level};
+  }
 
-  void resetSave() {
+  Map<String, Object?> restartLevel() {
+    final GameSessionController? c = controller;
+    final void Function(int)? reload = reloadLevel;
+    if (c == null || reload == null) {
+      return <String, Object?>{'ok': false, 'reason': 'no_active_game'};
+    }
+    reload(c.state.level.levelNumber);
+    return <String, Object?>{'ok': true, 'level': c.state.level.levelNumber};
+  }
+
+  Map<String, Object?> resetSave() {
     final ProviderContainer? c = container;
     if (c == null) {
-      return;
+      return <String, Object?>{'ok': false, 'reason': 'no_container'};
     }
     final int startingCoins = c
         .read(contentServiceProvider)
@@ -64,20 +93,43 @@ class QaBridge {
     );
     c.read(playerSaveProvider.notifier).state = fresh;
     c.read(saveRepositoryProvider).save(fresh);
+    // Restart the active level so the visible board reflects the fresh save.
+    final GameSessionController? ctrl = controller;
+    final void Function(int)? reload = reloadLevel;
+    if (ctrl != null && reload != null) {
+      reload(ctrl.state.level.levelNumber);
+    }
+    return <String, Object?>{'ok': true};
   }
 
-  void pause() => controller?.setPaused(true);
+  Map<String, Object?> pause() {
+    final bool ok = controller != null;
+    controller?.setPaused(true);
+    return <String, Object?>{'ok': ok};
+  }
 
-  void resume() => controller?.setPaused(false);
+  Map<String, Object?> resume() {
+    final bool ok = controller != null;
+    controller?.setPaused(false);
+    return <String, Object?>{'ok': ok};
+  }
 
   // ---- Driving the board (drives the controller directly — no pixel math, so
   // it is deterministic and respects the same rules as real input) ------------
 
-  void tapCell(int compartment, int cell) {
-    controller?.selectCell(CellAddress.fromCompartmentIndex(compartment, cell));
+  Map<String, Object?> tapCell(int compartment, int cell) {
+    final GameSessionController? c = controller;
+    if (c == null) {
+      return <String, Object?>{'ok': false, 'reason': 'no_active_game'};
+    }
+    c.selectCell(CellAddress.fromCompartmentIndex(compartment, cell));
+    return <String, Object?>{
+      'ok': true,
+      'selectedCell': c.state.selectedCell?.key,
+    };
   }
 
-  void dragCellToCell(
+  Map<String, Object?> dragCellToCell(
     int fromCompartment,
     int fromCell,
     int toCompartment,
@@ -85,16 +137,23 @@ class QaBridge {
   ) {
     final GameSessionController? c = controller;
     if (c == null) {
-      return;
+      return <String, Object?>{'ok': false, 'reason': 'no_active_game'};
     }
+    final int beforeMoves = c.state.moveCount;
     c.selectCell(CellAddress.fromCompartmentIndex(fromCompartment, fromCell));
     c.placeSelectedAt(CellAddress.fromCompartmentIndex(toCompartment, toCell));
+    return <String, Object?>{
+      'ok': c.state.moveCount > beforeMoves,
+      'moveCount': c.state.moveCount,
+      'status': c.state.status.name,
+      'visibleProductCount': c.state.board.visibleProductCount,
+    };
   }
 
-  void useBooster(String kind) {
+  Map<String, Object?> useBooster(String kind) {
     final GameSessionController? c = controller;
     if (c == null) {
-      return;
+      return <String, Object?>{'ok': false, 'reason': 'no_active_game'};
     }
     BoosterKind? booster;
     for (final BoosterKind value in BoosterKind.values) {
@@ -104,27 +163,64 @@ class QaBridge {
       }
     }
     if (booster == null) {
-      return;
+      return <String, Object?>{'ok': false, 'reason': 'unknown_booster'};
     }
-    // Mirror the real UI flow so the economy behaves identically: the player
-    // must own one, and inventory is consumed only if the booster actually
-    // applies in context (third-pass audit P0.1).
+    // Mirror the real UI flow: must own one, and consume only if it applies.
     final ProviderContainer? ct = container;
     if (ct != null) {
       const BoosterInventoryService inventory = BoosterInventoryService();
       final PlayerSave save = ct.read(playerSaveProvider);
-      if (!inventory.canUse(save, booster) ||
-          !c.canUseBooster(booster).canUse) {
-        return;
+      final int beforeCount = save.boosters[booster] ?? 0;
+      if (!inventory.canUse(save, booster)) {
+        return _boosterResult(
+          kind,
+          false,
+          'not_owned',
+          beforeCount,
+          beforeCount,
+        );
+      }
+      final BoosterAvailability availability = c.canUseBooster(booster);
+      if (!availability.canUse) {
+        return _boosterResult(
+          kind,
+          false,
+          availability.reason,
+          beforeCount,
+          beforeCount,
+        );
       }
       final PlayerSave consumed = inventory.consume(save, booster);
       ct.read(playerSaveProvider.notifier).state = consumed;
       ct.read(saveRepositoryProvider).save(consumed);
+      c.useBooster(booster);
+      final int afterCount = ct.read(playerSaveProvider).boosters[booster] ?? 0;
+      return _boosterResult(kind, true, 'used', beforeCount, afterCount);
     }
     c.useBooster(booster);
+    return <String, Object?>{'ok': true, 'kind': kind, 'reason': 'used'};
+  }
+
+  Map<String, Object?> _boosterResult(
+    String kind,
+    bool ok,
+    String? reason,
+    int beforeCount,
+    int afterCount,
+  ) {
+    return <String, Object?>{
+      'ok': ok,
+      'kind': kind,
+      'reason': reason,
+      'consumed': afterCount < beforeCount,
+      'beforeCount': beforeCount,
+      'afterCount': afterCount,
+    };
   }
 
   // ---- Inspection ------------------------------------------------------------
+
+  bool isPresentationBusy() => game?.isPresentationBusy ?? false;
 
   Map<String, Object?> getState() {
     final GameSessionController? c = controller;
@@ -133,18 +229,34 @@ class QaBridge {
     }
     final GameSessionState s = c.state;
     final Map<String, int> boosterCounts = <String, int>{};
+    int coins = 0;
+    int stars = 0;
+    Map<String, Object?> levelStars = const <String, Object?>{};
+    List<Object?> discovered = const <Object?>[];
+    List<Object?> ledgerKeys = const <Object?>[];
+    bool firstCompletion = false;
     final ProviderContainer? container = this.container;
     if (container != null) {
-      container.read(playerSaveProvider).boosters.forEach((
-        BoosterKind kind,
-        int count,
-      ) {
+      final PlayerSave save = container.read(playerSaveProvider);
+      save.boosters.forEach((BoosterKind kind, int count) {
         boosterCounts[kind.name] = count;
       });
+      coins = save.coins;
+      stars = save.progress.stars;
+      levelStars = <String, Object?>{
+        for (final MapEntry<String, int> e in save.progress.levelStars.entries)
+          e.key: e.value,
+      };
+      discovered =
+          (save.collections['discovered'] as List<Object?>?) ??
+          const <Object?>[];
+      ledgerKeys = save.ledger.keys.toList();
+      firstCompletion = s.level.levelNumber > save.highestLevelCompleted;
     }
     final int? timerSeconds = s.level.timeLimitSeconds == null
         ? null
         : (s.level.timeLimitSeconds! - s.timer.elapsed.inSeconds);
+    final bool won = s.status == GameSessionStatus.won;
     return <String, Object?>{
       'level': s.level.levelNumber,
       'levelId': s.level.id,
@@ -157,7 +269,18 @@ class QaBridge {
       'selectedCell': s.selectedCell?.key,
       'failReason': s.failReason.name,
       'timerSeconds': timerSeconds,
+      'coins': coins,
+      'stars': stars,
+      'levelStars': levelStars,
+      'discoveredSkus': discovered,
+      'ledgerKeys': ledgerKeys,
       'boosterCounts': boosterCounts,
+      'canRevive': c.canRevive,
+      // first completion still pending a coin grant -> the win panel will show
+      // the coin row + Double option (third-pass hands-on P2.2).
+      'winRewardAvailable': won && firstCompletion,
+      'doubleRewardAvailable': won && firstCompletion,
+      'presentationBusy': game?.isPresentationBusy ?? false,
       'board': <Object?>[
         for (final CompartmentState compartment in s.board.compartments)
           <String, Object?>{
