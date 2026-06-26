@@ -79,6 +79,12 @@ final class ShelfWorld extends World {
   /// products that just arrived via a drag snap (they already animated).
   bool _hasReconciledOnce = false;
   final Set<ProductInstanceId> _suppressEntrance = <ProductInstanceId>{};
+
+  /// When a clear fires in the same beat as a hidden reveal, the revealed
+  /// products wait this long (≈ the clear-pop duration) before fading in, so a
+  /// reveal lands after the pop instead of overlapping it (Sprint C / P1.1).
+  static const double _revealAfterClearDelay = 0.30;
+  double _pendingRevealDelay = 0;
   final Map<String, MovingLaneComponent> _laneComponents =
       <String, MovingLaneComponent>{};
 
@@ -108,6 +114,12 @@ final class ShelfWorld extends World {
   void syncState(GameSessionState state) {
     final String previousBoardHash = _boardSyncHash;
     _state = state;
+    // A hidden reveal landing in the same beat as a clear waits for the pop to
+    // finish before fading in (hands-on P1.1 / Sprint C presentation order).
+    final bool clearedThisBeat = state.events.any(
+      (SessionEvent event) => event.type == SessionEventType.tripleCleared,
+    );
+    _pendingRevealDelay = clearedThisBeat ? _revealAfterClearDelay : 0;
     unawaited(
       fxDirector.handleEvents(
         state.events,
@@ -279,6 +291,11 @@ final class ShelfWorld extends World {
       final _ProductPlacement placement = entry.value;
       final ProductComponent? existing = _productComponents[entry.key];
       if (existing == null || !existing.isMounted) {
+        // A not-yet-mounted component for this id is about to be replaced in
+        // the map; remove it first so it cannot later mount as an orphan that
+        // `gone` (which only scans the map) would never collect. Surfaces when
+        // a hidden reveal re-syncs the board before the first component mounts.
+        existing?.removeFromParent();
         final ProductComponent created = ProductComponent(
           address: placement.address,
           productDef: placement.productDef,
@@ -296,11 +313,21 @@ final class ShelfWorld extends World {
         // that just arrived via a drag snap (audit M2 / section 7).
         final bool suppressed = _suppressEntrance.remove(entry.key);
         if (_hasReconciledOnce && animate && !reduceMotion && !suppressed) {
+          final double revealDelay = _pendingRevealDelay;
           created.position = placement.position - Vector2(0, 16);
+          // A reveal arriving with a clear stays invisible until the pop
+          // finishes, then fades + drops into the freed slot (Sprint C).
+          if (revealDelay > 0) {
+            created.playRevealEntrance(revealDelay);
+          }
           created.add(
             MoveToEffect(
               placement.position.clone(),
-              EffectController(duration: 0.2, curve: Curves.easeOutBack),
+              EffectController(
+                duration: 0.2,
+                startDelay: revealDelay,
+                curve: Curves.easeOutBack,
+              ),
             ),
           );
         }
@@ -589,7 +616,8 @@ final class ShelfWorld extends World {
         return true;
       }
       if (child is ProductComponent &&
-          child.children.whereType<MoveToEffect>().isNotEmpty) {
+          (child.isRevealing ||
+              child.children.whereType<MoveToEffect>().isNotEmpty)) {
         return true;
       }
     }

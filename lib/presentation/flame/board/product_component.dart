@@ -36,6 +36,27 @@ final class ProductComponent extends PositionComponent
   BlockerKind productBlocker;
   Vector2? _lastDragCanvasPosition;
 
+  /// Fade level for the cozy sprite (0 = invisible). Hidden reveals enter at 0
+  /// and ramp to 1 after the clear pop has played, so a reveal never overlaps
+  /// the pop it replaces (hands-on audit P1.1 / Sprint C presentation order).
+  double opacity = 1;
+  double _revealDelay = 0;
+  double _revealElapsed = 0;
+  bool _revealing = false;
+  static const double _revealFade = 0.22;
+
+  /// True while this product is still fading in from a delayed reveal.
+  bool get isRevealing => _revealing;
+
+  /// Hold this product invisible for [delay] seconds, then fade it in — used
+  /// for hidden products revealed by a clear so the reveal lands after the pop.
+  void playRevealEntrance(double delay) {
+    _revealDelay = delay;
+    _revealElapsed = 0;
+    _revealing = true;
+    opacity = 0;
+  }
+
   @override
   void onTapDown(TapDownEvent event) {
     inputRouter.onProductTapped(address);
@@ -66,6 +87,24 @@ final class ProductComponent extends PositionComponent
   }
 
   @override
+  void update(double dt) {
+    super.update(dt);
+    if (!_revealing) {
+      return;
+    }
+    _revealElapsed += dt;
+    final double local = _revealElapsed - _revealDelay;
+    if (local <= 0) {
+      opacity = 0;
+      return;
+    }
+    opacity = (local / _revealFade).clamp(0.0, 1.0);
+    if (opacity >= 1) {
+      _revealing = false;
+    }
+  }
+
+  @override
   void render(Canvas canvas) {
     ProductRenderer.render(
       canvas,
@@ -74,6 +113,7 @@ final class ProductComponent extends PositionComponent
       selected: selected,
       cellBlocker: cellBlocker,
       productBlocker: productBlocker,
+      opacity: opacity,
     );
   }
 }

@@ -177,6 +177,53 @@ void main() {
       expect(world.isPresentationBusy, isFalse, reason: 'settled');
     },
   );
+
+  testWithGame<_TestGame>(
+    'a hidden reveal arriving with a clear stays hidden until the pop settles',
+    () => _TestGame(buildWorld(_revealLevel())),
+    (_TestGame game) async {
+      final ShelfWorld world = game.world;
+      await _settle(game);
+      // comp0 = [000, 000, _], comp1 = [000, _, _] -> 3 products.
+      expect(world.children.whereType<ProductComponent>(), hasLength(3));
+
+      // Complete the 000 triple in comp0; its hidden [001,002,003] layer reveals.
+      world.controller.selectCell(CellAddress.fromCompartmentIndex(1, 0));
+      world.controller.placeSelectedAt(CellAddress.fromCompartmentIndex(0, 2));
+      await _settle(game);
+
+      final List<ProductComponent> revealed = world.children
+          .whereType<ProductComponent>()
+          .toList();
+      // The three hidden products exist, but are held invisible while the clear
+      // pop plays out (Sprint C reveal-after-clear sequencing / P1.1).
+      expect(revealed, hasLength(3));
+      expect(revealed.every((ProductComponent c) => c.isRevealing), isTrue);
+      expect(revealed.every((ProductComponent c) => c.opacity == 0), isTrue);
+      expect(world.isPresentationBusy, isTrue, reason: 'pop + pending reveal');
+
+      // After the pop (0.30s) + fade (0.22s) the reveal has fully settled in.
+      await _pump(game, dt: 0.05, steps: 16);
+      final List<ProductComponent> settled = world.children
+          .whereType<ProductComponent>()
+          .toList();
+      final int boardCount = world.controller.state.board.visibleProductCount;
+      // Sprint C contract: the reveal animation runs to completion (nothing is
+      // left stuck invisible) and the revealed products fade fully in.
+      expect(
+        settled.where((ProductComponent c) => c.isRevealing),
+        isEmpty,
+        reason: 'no product stuck mid-reveal',
+      );
+      expect(
+        settled.where((ProductComponent c) => c.opacity >= 1.0),
+        isNotEmpty,
+        reason: 'reveal faded in',
+      );
+      // The view holds exactly one component per board product (no duplicates).
+      expect(settled, hasLength(boardCount));
+    },
+  );
 }
 
 final class _TestGame extends FlameGame<ShelfWorld> {
@@ -234,6 +281,30 @@ LevelDef _relocationLevel() {
     compartments: <CompartmentDef>[
       CompartmentDef(index: 0, cells: const <String?>['sku_000', null, null]),
       CompartmentDef(index: 1, cells: const <String?>['sku_001', null, null]),
+      for (var index = 2; index < 15; index += 1)
+        CompartmentDef(
+          index: index,
+          locked: true,
+          cells: const <String?>[null, null, null],
+        ),
+    ],
+  );
+}
+
+LevelDef _revealLevel() {
+  return LevelDef(
+    id: 'level_reconcile_reveal_test',
+    levelNumber: 9,
+    title: 'Reconcile Reveal Test',
+    seed: 9,
+    objective: ObjectiveRequirement(type: ObjectiveType.clearAll),
+    compartments: <CompartmentDef>[
+      CompartmentDef(
+        index: 0,
+        cells: const <String?>['sku_000', 'sku_000', null],
+        hidden: const <String>['sku_001', 'sku_002', 'sku_003'],
+      ),
+      CompartmentDef(index: 1, cells: const <String?>['sku_000', null, null]),
       for (var index = 2; index < 15; index += 1)
         CompartmentDef(
           index: index,

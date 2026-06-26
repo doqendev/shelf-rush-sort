@@ -14,10 +14,10 @@ State as of the QA bundle. Third-pass audit Phase A + the achievable P1s are don
 - M3 stable per-SKU sprites + collision-validated; M4 booster economy; M5 reason-specific revives; M6 stars/collection/coin count-up.
 
 ## Still pending (not done)
-- **Phase B — presentation sequencing**: clear → reveal → cascade are not yet an ordered timeline. The retained-component foundation, settle-gated overlay, and drop-in entrance ARE in; hidden-reveal vs pop-FX ordering can still overlap.
+- **Phase B — presentation sequencing**: hidden-reveal-after-clear is now sequenced — a reveal landing in the same beat as a clear stays invisible until the pop finishes, then fades in (settle-gated, `isPresentationBusy` covers the gap). The fuller ordered cascade timeline (multi-clear chains, anticipation + level-end steps) is still pending.
 - **Phase C — first-session curriculum**: level 1 is a hand-tuned guided tutorial, but levels 2–10 are still generated/full-rack, not a hand-authored ramp.
 - **Lanes (P1.3)**: conveyor rendering is still prototype-grade (rebuilt per tick, no carried-lane drag).
-- **Responsive (P1.9)**: phone fit is tested; tablet/desktop layouts are not tuned.
+- **Responsive (P1.9)**: phone fit is tested. Product scope is **mobile-only** — tablet/desktop layouts are explicitly out of scope (product-owner decision). The 320×568 small-phone objective-strip clip (P1.4) is still in scope.
 - **P1.7 seeding**: star thresholds currently come from the (improved) heuristic; per-level `score` is not yet seeded from solver minimum moves.
 - **P1.6 edge**: a hidden product that is revealed and then cleared mid-session may not be recorded as discovered (the recorder is conservative — it counts front cells + still-visible products).
 
