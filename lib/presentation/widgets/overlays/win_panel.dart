@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../application/game_session/game_session_state.dart';
 import '../../../application/progression/reward_service.dart';
+import '../../../domain/game/star_score.dart';
 import '../../design/game_colors.dart';
 import '../../design/game_surfaces.dart';
 import '../../design/game_typography.dart';
@@ -29,6 +30,10 @@ final class WinPanel extends StatelessWidget {
     final bool hardBonus =
         session.level.difficulty == 'hard' ||
         session.level.difficulty == 'superHard';
+    final int stars = starsForLevel(
+      moveCount: session.moveCount,
+      level: session.level,
+    );
     return Positioned.fill(
       child: ColoredBox(
         color: GameColors.bezel.withValues(alpha: 0.62),
@@ -59,21 +64,10 @@ final class WinPanel extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: <Widget>[
-                          Image.asset(
-                            cozyAsset('icon/star.png'),
-                            width: 50,
-                            height: 50,
-                          ),
-                          Image.asset(
-                            cozyAsset('icon/star.png'),
-                            width: 66,
-                            height: 66,
-                          ),
-                          Image.asset(
-                            cozyAsset('icon/star.png'),
-                            width: 50,
-                            height: 50,
-                          ),
+                          // Stars fill from the centre outward as they are earned.
+                          _StarSlot(filled: stars >= 2, size: 50),
+                          _StarSlot(filled: stars >= 1, size: 66),
+                          _StarSlot(filled: stars >= 3, size: 50),
                         ],
                       ),
                       const SizedBox(height: 12),
@@ -155,6 +149,23 @@ final class WinPanel extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _StarSlot extends StatelessWidget {
+  const _StarSlot({required this.filled, required this.size});
+
+  final bool filled;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.asset(
+      cozyAsset(filled ? 'icon/star.png' : 'icon/empty-star.png'),
+      width: size,
+      height: size,
+      errorBuilder: (_, _, _) => SizedBox(width: size, height: size),
     );
   }
 }
