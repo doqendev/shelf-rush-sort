@@ -275,28 +275,43 @@ final class ShelfWorld extends World {
     }
   }
 
-  void _finishProductDragVisual(bool placed) {
+  void _finishProductDragVisual(CellAddress? target) {
     final _ProductDragVisual? visual = _productDragVisual;
-    _productDragVisual = null;
     final DraggedProductComponent? component = _productDragComponent;
-    if (component == null) {
-      unawaited(rebuild());
-      return;
-    }
-    if (placed || visual == null || reduceMotion) {
+    // No drag visual, or reduced motion: commit immediately and settle.
+    if (component == null || visual == null || reduceMotion) {
+      _productDragVisual = null;
       _productDragComponent = null;
-      component.removeFromParent();
+      if (target != null) {
+        controller.placeSelectedAt(target);
+      }
+      component?.removeFromParent();
       unawaited(rebuild());
       return;
     }
-    // Invalid drop: spring the lifted product back to its source shelf, then
-    // settle the board (P1.2 — a cancelled drag should animate home, not snap
-    // back instantly).
-    final Rect source = _layout.cellRect(visual.source);
-    component.animateReturnTo(
-      Vector2(source.left, source.top),
+    _productDragVisual = null;
+    if (target == null) {
+      // Invalid drop: spring the lifted product back to its source shelf
+      // (P1.2 — a cancelled drag animates home, it does not snap back instantly).
+      final Rect source = _layout.cellRect(visual.source);
+      component.animateTo(
+        Vector2(source.left, source.top),
+        onComplete: () {
+          _productDragComponent = null;
+          component.removeFromParent();
+          unawaited(rebuild());
+        },
+      );
+      return;
+    }
+    // Valid drop: spring the product into the destination slot, THEN commit the
+    // move, so it visibly settles before the board resolves (review section 10).
+    final Rect destination = _layout.cellRect(target);
+    component.animateTo(
+      Vector2(destination.left, destination.top),
       onComplete: () {
         _productDragComponent = null;
+        controller.placeSelectedAt(target);
         component.removeFromParent();
         unawaited(rebuild());
       },

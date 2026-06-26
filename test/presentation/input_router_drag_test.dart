@@ -22,6 +22,7 @@ void main() {
     CellAddress? startedAddress;
     Vector2? startedPosition;
     var finishedCount = 0;
+    CellAddress? finishedTarget;
     final InputRouter router = InputRouter(
       controller: controller,
       layout: layout,
@@ -30,7 +31,8 @@ void main() {
         startedPosition = canvasPosition;
       },
       onProductDragUpdated: updates.add,
-      onProductDragFinished: (bool placed) {
+      onProductDragFinished: (CellAddress? target) {
+        finishedTarget = target;
         finishedCount += 1;
       },
     );
@@ -46,6 +48,13 @@ void main() {
     expect(startedPosition, Vector2(140, 320));
     expect(updates, <Vector2>[Vector2(155, 300)]);
     expect(finishedCount, 1);
+    // The router reports the snapped target but defers the commit to the
+    // presentation layer (which places it after the snap animation lands).
+    expect(finishedTarget, target);
+    expect(controller.state.moveCount, 0);
+
+    // Simulate the presentation committing the move once the snap completes.
+    controller.placeSelectedAt(finishedTarget!);
     expect(controller.state.moveCount, 1);
     expect(controller.state.board.visibleProductCount, 0);
   });

@@ -33,10 +33,10 @@ final class DraggedProductComponent extends PositionComponent {
   double _lift = 0;
   bool _returning = false;
 
-  /// Springs the lifted product back to [target] (its source shelf origin),
-  /// then invokes [onComplete]. Skips straight to [onComplete] under reduced
-  /// motion.
-  void animateReturnTo(Vector2 target, {required void Function() onComplete}) {
+  /// Springs the product to [target] — its source shelf on an invalid drop, or
+  /// the destination slot on a valid one — lowering as it travels, then invokes
+  /// [onComplete]. Skips straight to [onComplete] under reduced motion.
+  void animateTo(Vector2 target, {required void Function() onComplete}) {
     if (reduceMotion) {
       onComplete();
       return;

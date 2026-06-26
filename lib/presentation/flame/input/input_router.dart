@@ -21,7 +21,7 @@ final class InputRouter {
   void Function(CellAddress address, Vector2 canvasPosition)?
   onProductDragStarted;
   void Function(Vector2 canvasPosition)? onProductDragUpdated;
-  void Function(bool placed)? onProductDragFinished;
+  void Function(CellAddress? target)? onProductDragFinished;
   BoardLayout _layout;
 
   set layout(BoardLayout layout) {
@@ -56,10 +56,10 @@ final class InputRouter {
       board: controller.state.board,
       movingProduct: movingProduct,
     );
-    if (target != null) {
-      controller.placeSelectedAt(target);
-    }
-    onProductDragFinished?.call(target != null);
+    // The presentation layer commits the move after the snap animation lands
+    // (ShelfWorld._finishProductDragVisual), so the lifted product visibly
+    // springs into the shelf instead of teleporting to it.
+    onProductDragFinished?.call(target);
   }
 
   void onLaneProductTapped(String laneId) {
