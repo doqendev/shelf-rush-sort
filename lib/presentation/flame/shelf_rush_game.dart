@@ -5,10 +5,7 @@ import 'package:flame/components.dart';
 import 'package:flutter/painting.dart';
 
 import '../../application/game_session/game_session_controller.dart';
-import '../../domain/content/level_def.dart';
 import '../../domain/content/product_def.dart';
-import '../../domain/core/value_objects.dart';
-import '../../domain/moving_lanes/moving_lane_def.dart';
 import '../../infrastructure/analytics/analytics_event.dart';
 import '../../infrastructure/analytics/analytics_service.dart';
 import '../../infrastructure/platform/audio_service.dart';
@@ -83,7 +80,6 @@ final class ShelfRushGame extends FlameGame<ShelfWorld> {
   @override
   Future<void> onLoad() async {
     await CozySpriteCache.instance.ensureLoaded(images);
-    CozySpriteCache.instance.assignLevel(_levelSkuIds(controller.state.level));
     camera.viewfinder.anchor = Anchor.topLeft;
     camera.viewfinder.position = Vector2.zero();
     _shelfWorld.resize(size);
@@ -145,26 +141,4 @@ final class ShelfRushGame extends FlameGame<ShelfWorld> {
     _frameTelemetryFrames = 0;
     _frameSpikeCount = 0;
   }
-}
-
-/// Collects every SKU the [level] can show — front cells, hidden stacks, lane
-/// queues and objective targets — so the sprite cache can assign each a unique
-/// visual identity for the level (see [CozySpriteCache.assignLevel]).
-Set<String> _levelSkuIds(LevelDef level) {
-  final Set<String> skus = <String>{};
-  for (final CompartmentDef compartment in level.compartments) {
-    for (final SkuId? sku in compartment.cells) {
-      if (sku != null) {
-        skus.add(sku);
-      }
-    }
-    skus.addAll(compartment.hidden);
-  }
-  for (final MovingLaneDef lane in level.movingLanes) {
-    for (final MovingLaneProductDef product in lane.queue) {
-      skus.add(product.skuId);
-    }
-  }
-  skus.addAll(level.objective.targetCounts.keys);
-  return skus;
 }

@@ -1,56 +1,22 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shelf_rush_sort/presentation/flame/board/cozy_sprite_cache.dart';
+import 'package:shelf_rush_sort/domain/content/cozy_product_visuals.dart';
 
-/// P0.1 — "artwork is the truth": two different SKUs active in the same level
-/// must never render with the same sprite. These cover the per-level injective
-/// assignment and the collision detector that guards content.
+/// P0.1 — each SKU has ONE stable product visual (the same on the board, in
+/// previews, and on the collection screen), drawn from the cozy product set.
 void main() {
-  group('CozySpriteCache visual identity', () {
-    tearDown(CozySpriteCache.instance.clearLevelAssignment);
+  test('every mapped SKU resolves to a known product, stably', () {
+    for (final MapEntry<String, String> entry in kSkuProductVisual.entries) {
+      expect(kCozyProducts, contains(entry.value));
+      // Stable: the same SKU always resolves to the same product.
+      expect(productVisualForSku(entry.key), entry.value);
+      expect(productVisualForSku(entry.key), entry.value);
+    }
+  });
 
-    test('distinct SKUs within the budget get distinct sprites', () {
-      // sku_002 and sku_013 are 11 apart — the exact collision the review
-      // reproduced under the old `% 11` mapping.
-      const List<String> skus = <String>[
-        'sku_002',
-        'sku_013',
-        'sku_024',
-        'sku_000',
-        'sku_011',
-      ];
-      CozySpriteCache.instance.assignLevel(skus);
-
-      final List<String> sprites = skus
-          .map(CozySpriteCache.instance.spriteNameForSku)
-          .toList();
-      expect(sprites.toSet().length, sprites.length);
-      expect(
-        CozySpriteCache.instance.spriteNameForSku('sku_002'),
-        isNot(CozySpriteCache.instance.spriteNameForSku('sku_013')),
-      );
-    });
-
-    test('visualCollisions is empty within the budget, non-empty over it', () {
-      final List<String> within = <String>[
-        for (var i = 0; i < CozySpriteCache.visualBudget; i += 1) 'sku_$i',
-      ];
-      expect(CozySpriteCache.visualCollisions(within), isEmpty);
-
-      final List<String> over = <String>[
-        for (var i = 0; i < CozySpriteCache.visualBudget + 1; i += 1) 'sku_$i',
-      ];
-      expect(CozySpriteCache.visualCollisions(over), isNotEmpty);
-    });
-
-    test('assignment wraps only when a level exceeds the visual budget', () {
-      final List<String> over = <String>[
-        for (var i = 0; i < CozySpriteCache.visualBudget + 3; i += 1) 'sku_$i',
-      ];
-      CozySpriteCache.instance.assignLevel(over);
-      final Set<String> distinctSprites = over
-          .map(CozySpriteCache.instance.spriteNameForSku)
-          .toSet();
-      expect(distinctSprites.length, CozySpriteCache.visualBudget);
-    });
+  test('unknown SKUs fall back deterministically to a known product', () {
+    final String first = productVisualForSku('sku_unknown_999');
+    final String second = productVisualForSku('sku_unknown_999');
+    expect(kCozyProducts, contains(first));
+    expect(first, second);
   });
 }

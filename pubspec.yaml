@@ -75,6 +75,7 @@ flutter:
     - assets/images/cozy/icon/
     - assets/images/cozy/object/
     - assets/images/cozy/object-no/
+    - assets/images/cozy/products/
     - assets/images/cozy/reward/
     - assets/images/cozy/ui/
 
