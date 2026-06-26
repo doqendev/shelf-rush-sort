@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shelf_rush_sort/domain/blockers/blocker_def.dart';
+import 'package:shelf_rush_sort/domain/content/cozy_product_visuals.dart';
 import 'package:shelf_rush_sort/domain/content/level_def.dart';
 import 'package:shelf_rush_sort/domain/core/value_objects.dart';
 import 'package:shelf_rush_sort/domain/game/board_rules.dart';
@@ -83,6 +84,42 @@ void main() {
       );
     }
   });
+
+  test('every level renders different SKUs with different sprites (M3)', () async {
+    // P0.1 "artwork is the truth": the stable per-SKU manifest must give every
+    // active SKU in a level a distinct product sprite — no two match identities
+    // share artwork. (CI's validate_levels enforces the same on level_pack_000.)
+    final LevelPack pack = await _verticalSlicePack();
+    for (final LevelDef level in pack.levels) {
+      final Map<String, List<String>> byVisual = <String, List<String>>{};
+      for (final String sku in _activeSkus(level)) {
+        byVisual
+            .putIfAbsent(productVisualForSku(sku), () => <String>[])
+            .add(sku);
+      }
+      byVisual.removeWhere((_, List<String> skus) => skus.length < 2);
+      expect(
+        byVisual,
+        isEmpty,
+        reason:
+            'level ${level.levelNumber} has different SKUs sharing one sprite: '
+            '$byVisual',
+      );
+    }
+  });
+}
+
+Iterable<String> _activeSkus(LevelDef level) {
+  final Set<String> skus = <String>{};
+  for (final CompartmentDef compartment in level.compartments) {
+    skus.addAll(compartment.cells.whereType<String>());
+    skus.addAll(compartment.hidden);
+  }
+  for (final lane in level.movingLanes) {
+    skus.addAll(lane.queue.map((product) => product.skuId));
+  }
+  skus.addAll(level.objective.targetCounts.keys);
+  return skus;
 }
 
 Future<LevelPack> _verticalSlicePack() async {

@@ -1,8 +1,10 @@
+import '../content/cozy_product_visuals.dart';
 import '../content/level_def.dart';
 import '../content/product_def.dart';
 import '../core/value_objects.dart';
 import '../game/board_rules.dart';
 import '../game/board_state.dart';
+import '../moving_lanes/moving_lane_def.dart';
 import 'bot_simulator.dart';
 import 'validation_report.dart';
 
@@ -46,6 +48,24 @@ final class LevelValidator {
     final List<ValidationIssue> issues = <ValidationIssue>[];
     final SolverResult solverResult = botSimulator.solve(level);
     final LevelValidationMetrics metrics = _metricsFor(level, solverResult);
+
+    // P0.1 "artwork is the truth": two different match identities must never
+    // share a product sprite within a level (second-pass audit M3).
+    final Map<String, List<SkuId>> visualCollisions = _visualCollisions(level);
+    for (final MapEntry<String, List<SkuId>> entry
+        in visualCollisions.entries) {
+      final List<SkuId> grouped = entry.value..sort();
+      issues.add(
+        ValidationIssue(
+          code: 'visual_identity_collision',
+          levelId: level.id,
+          message:
+              'SKUs ${grouped.join(', ')} all render as "${entry.key}" — '
+              'different match identities must not share artwork.',
+        ),
+      );
+    }
+
     if (level.compartments.length != compartmentCount) {
       issues.add(
         ValidationIssue(
@@ -253,6 +273,33 @@ final class LevelValidator {
 
   void _countSku(Map<SkuId, int> counts, SkuId skuId) {
     counts[skuId] = (counts[skuId] ?? 0) + 1;
+  }
+
+  /// Groups of active SKUs in [level] that resolve to the SAME product sprite —
+  /// a different-SKU/same-visual collision that breaks "artwork is the truth"
+  /// (second-pass audit M3 / P0.1). Empty when every active SKU is distinct.
+  Map<String, List<SkuId>> _visualCollisions(LevelDef level) {
+    final Set<SkuId> skus = <SkuId>{};
+    for (final CompartmentDef compartment in level.compartments) {
+      for (final SkuId? sku in compartment.cells) {
+        if (sku != null) {
+          skus.add(sku);
+        }
+      }
+      skus.addAll(compartment.hidden);
+    }
+    for (final MovingLaneDef lane in level.movingLanes) {
+      for (final MovingLaneProductDef product in lane.queue) {
+        skus.add(product.skuId);
+      }
+    }
+    skus.addAll(level.objective.targetCounts.keys);
+    final Map<String, List<SkuId>> byVisual = <String, List<SkuId>>{};
+    for (final SkuId sku in skus) {
+      byVisual.putIfAbsent(productVisualForSku(sku), () => <SkuId>[]).add(sku);
+    }
+    byVisual.removeWhere((_, List<SkuId> grouped) => grouped.length < 2);
+    return byVisual;
   }
 
   LevelValidationMetrics _metricsFor(

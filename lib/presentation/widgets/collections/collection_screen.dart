@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/providers.dart';
+import '../../../domain/content/cozy_product_visuals.dart';
 import '../../design/game_colors.dart';
 import '../../design/game_surfaces.dart';
 import '../../design/game_typography.dart';
@@ -9,22 +10,6 @@ import '../cozy/cozy_widgets.dart';
 
 final class CollectionScreen extends ConsumerWidget {
   const CollectionScreen({super.key});
-
-  static const List<String> _sprites = <String>[
-    'strawberry',
-    'popsicle',
-    'banana',
-    'honey',
-    'smoothie',
-    'carrot',
-    'lemon-juice',
-    'orange-soda',
-    'vase',
-    'cactus',
-    'popsicle-2',
-  ];
-
-  String _spriteFor(int index) => _sprites[index % _sprites.length];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -78,6 +63,8 @@ final class CollectionScreen extends ConsumerWidget {
                   final bool discovered = save.collections.containsKey(
                     product.skuId,
                   );
+                  // Same stable product art as the board (audit M3 / P0.1).
+                  final String sprite = productVisualForSku(product.skuId);
                   return DecoratedBox(
                     decoration: GameSurfaces.panel(radius: 16),
                     child: Padding(
@@ -92,9 +79,7 @@ final class CollectionScreen extends ConsumerWidget {
                                 Opacity(
                                   opacity: discovered ? 1.0 : 0.35,
                                   child: Image.asset(
-                                    cozyAsset(
-                                      'object-no/${_spriteFor(index)}.png',
-                                    ),
+                                    cozyAsset('products/$sprite.png'),
                                     fit: BoxFit.contain,
                                     errorBuilder:
                                         (
