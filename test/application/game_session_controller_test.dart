@@ -151,6 +151,29 @@ void main() {
 
     controller.dispose();
   });
+
+  test(
+    'cancelSelection clears selection so a cancelled drag cannot move (P1.1)',
+    () {
+      final GameSessionController controller = GameSessionController(
+        level: _tutorialLevel(),
+        analytics: DebugAnalyticsService(),
+      );
+
+      controller.selectCell(CellAddress.fromCompartmentIndex(1, 0));
+      expect(controller.state.selectedCell, isNotNull);
+
+      controller.cancelSelection();
+      expect(controller.state.selectedCell, isNull);
+
+      // With nothing selected, a later tap on an empty cell must not move.
+      final int movesBefore = controller.state.moveCount;
+      controller.placeSelectedAt(CellAddress.fromCompartmentIndex(0, 2));
+      expect(controller.state.moveCount, movesBefore);
+
+      controller.dispose();
+    },
+  );
 }
 
 LevelDef _moveLimitLevel() {

@@ -188,6 +188,16 @@ final class GameSessionController {
     );
   }
 
+  /// Clears the current selection without making a move — used when a drag is
+  /// cancelled (released off-board) so a stale selection can't cause an
+  /// accidental tap-to-place afterwards (second-pass audit P1.1).
+  void cancelSelection() {
+    if (_state.selectedCell == null) {
+      return;
+    }
+    _emit(_state.copyWith(clearSelectedCell: true, clearInvalidReason: true));
+  }
+
   void placeSelectedAt(CellAddress target) {
     if (_state.isEnded) {
       return;

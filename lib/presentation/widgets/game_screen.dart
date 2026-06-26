@@ -159,26 +159,29 @@ final class _GameScreenState extends ConsumerState<GameScreen>
 
   void _showPauseSheet() {
     // Pause both the simulation (timer + lanes) and the Flame engine while the
-    // sheet is open, then resume on close — unless the session was replaced
-    // (Restart), the player left (Home), or the level already ended.
+    // sheet is open. Resume ONLY when the game screen is the top-most route
+    // again — so opening Settings/Debug from pause keeps the game paused behind
+    // them and resumes on return, never running underneath another route
+    // (second-pass audit P0.3).
     final ShelfRushGame? pausedGame = _game;
     final GameSessionController? pausedController = _controller;
     pausedController?.setPaused(true);
     pausedGame?.pauseEngine();
 
-    bool resumeHandled = false;
-    void resumeIfSafe() {
-      if (resumeHandled) {
+    var resumed = false;
+    void resumeGame() {
+      if (resumed || !mounted) {
         return;
       }
-      resumeHandled = true;
+      final bool onTop = ModalRoute.of(context)?.isCurrent ?? false;
       final bool sameSession =
           identical(pausedGame, _game) &&
           identical(pausedController, _controller);
-      if (mounted &&
+      if (onTop &&
           sameSession &&
           pausedController != null &&
           !pausedController.state.isEnded) {
+        resumed = true;
         pausedController.setPaused(false);
         pausedGame?.resumeEngine();
       }
@@ -197,23 +200,24 @@ final class _GameScreenState extends ConsumerState<GameScreen>
           action();
         }
 
+        // Close the sheet, open a route over the (still-paused) game, and
+        // resume only once that route is popped and the game is current again.
+        void openRouteThenResume(String location) {
+          Navigator.of(sheetContext).pop();
+          unawaited(context.push(location).then((_) => resumeGame()));
+        }
+
         return PauseSheet(
           onResume: () => Navigator.of(sheetContext).pop(),
-          onRestart: () => closeThen(() {
-            resumeHandled = true; // a fresh session starts unpaused
-            _loadLevel(_levelNumber);
-          }),
-          onSettings: () => closeThen(() => context.push('/settings')),
-          onExitToMap: () => closeThen(() {
-            resumeHandled = true; // leaving the game screen entirely
-            context.go('/home');
-          }),
+          onRestart: () => closeThen(() => _loadLevel(_levelNumber)),
+          onSettings: () => openRouteThenResume('/settings'),
+          onExitToMap: () => closeThen(() => context.go('/home')),
           onDebug: ref.watch(environmentProvider).debugToolsEnabled
-              ? () => closeThen(() => context.push('/debug/analytics'))
+              ? () => openRouteThenResume('/debug/analytics')
               : null,
         );
       },
-    ).whenComplete(resumeIfSafe);
+    ).whenComplete(resumeGame);
   }
 
   void _loadLevel(int requestedLevel) {

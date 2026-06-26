@@ -284,6 +284,8 @@ final class ShelfWorld extends World {
       _productDragComponent = null;
       if (target != null) {
         controller.placeSelectedAt(target);
+      } else {
+        controller.cancelSelection();
       }
       component?.removeFromParent();
       unawaited(rebuild());
@@ -298,6 +300,7 @@ final class ShelfWorld extends World {
         Vector2(source.left, source.top),
         onComplete: () {
           _productDragComponent = null;
+          controller.cancelSelection();
           component.removeFromParent();
           unawaited(rebuild());
         },
