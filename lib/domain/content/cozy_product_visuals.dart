@@ -6,7 +6,7 @@
 
 const List<String> kCozyProducts = <String>[
   'apple',
-  'aspargus',
+  'asparagus',
   'avocado',
   'banana',
   'blackberry',
@@ -43,7 +43,7 @@ const Map<String, String> kSkuProductVisual = <String, String>{
   'sku_000': 'apple',
   'sku_001': 'lemon',
   'sku_002': 'coconut',
-  'sku_003': 'aspargus',
+  'sku_003': 'asparagus',
   'sku_004': 'cucumber',
   'sku_005': 'lime',
   'sku_006': 'avocado',
@@ -79,7 +79,7 @@ const Map<String, String> kSkuProductVisual = <String, String>{
   'sku_036': 'cucumber',
   'sku_037': 'mango',
   'sku_038': 'dragonfruit',
-  'sku_039': 'aspargus',
+  'sku_039': 'asparagus',
   'sku_040': 'garlic',
   'sku_041': 'lime',
   'sku_042': 'avocado',
