@@ -112,7 +112,25 @@ final class BoosterRules {
   final MovingLaneRules laneRules;
 
   BoosterUseResult useBooster(BoosterContext context, BoosterKind booster) {
-    final BoosterCommand command = switch (booster) {
+    final BoosterCommand command = _commandFor(booster);
+    final BoosterAvailability availability = command.canUse(context);
+    if (!availability.canUse) {
+      return command.invalid(context, availability.reason!);
+    }
+    return command.apply(context);
+  }
+
+  /// Whether [booster] can apply in [context] WITHOUT applying it, so the UI can
+  /// avoid charging the player for a no-op use (third-pass audit P0.1).
+  BoosterAvailability availability(
+    BoosterContext context,
+    BoosterKind booster,
+  ) {
+    return _commandFor(booster).canUse(context);
+  }
+
+  BoosterCommand _commandFor(BoosterKind booster) {
+    return switch (booster) {
       BoosterKind.hint => _HintCommand(boardRules: boardRules),
       BoosterKind.hammer => _HammerCommand(
         boardRules: boardRules,
@@ -124,11 +142,6 @@ final class BoosterRules {
       BoosterKind.revealHidden => _RevealHiddenCommand(),
       BoosterKind.slowConveyor => _SlowConveyorCommand(laneRules: laneRules),
     };
-    final BoosterAvailability availability = command.canUse(context);
-    if (!availability.canUse) {
-      return command.invalid(context, availability.reason!);
-    }
-    return command.apply(context);
   }
 }
 

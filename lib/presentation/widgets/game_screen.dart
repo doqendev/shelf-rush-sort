@@ -13,6 +13,7 @@ import '../../application/monetization/monetization_service.dart';
 import '../../application/progression/level_completion_service.dart';
 import '../../application/progression/reward_service.dart';
 import '../../domain/boosters/booster_def.dart';
+import '../../domain/boosters/booster_rules.dart';
 import '../../domain/content/level_def.dart';
 import '../../infrastructure/analytics/analytics_event.dart';
 import '../../infrastructure/analytics/analytics_service.dart';
@@ -148,10 +149,44 @@ final class _GameScreenState extends ConsumerState<GameScreen>
       context.push('/shop');
       return;
     }
+    // Don't consume inventory for a booster that can't do anything in the
+    // current context (third-pass audit P0.1) — preflight the domain first.
+    final BoosterAvailability availability = controller.canUseBooster(kind);
+    if (!availability.canUse) {
+      _showBoosterUnavailable(availability.reason);
+      return;
+    }
     final PlayerSave consumed = inventory.consume(save, kind);
     ref.read(playerSaveProvider.notifier).state = consumed;
     unawaited(ref.read(saveRepositoryProvider).save(consumed));
     controller.useBooster(kind);
+  }
+
+  void _showBoosterUnavailable(String? reason) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(_boosterUnavailableMessage(reason)),
+          duration: const Duration(milliseconds: 1800),
+        ),
+      );
+  }
+
+  String _boosterUnavailableMessage(String? reason) {
+    return switch (reason) {
+      'freeze_needs_timer' => "There's no timer to freeze on this level.",
+      'no_hidden_to_reveal' => 'No hidden products to reveal here.',
+      'shuffle_needs_products' ||
+      'shuffle_would_not_improve' => "Shuffling won't help right now.",
+      'no_legal_hint' => 'No useful move to hint at.',
+      'hammer_needs_selection' => 'Tap a product first, then the hammer.',
+      'hammer_invalid_cell' ||
+      'hammer_empty_cell' => 'Pick a product to remove.',
+      'extra_shelf_unavailable' => "Can't add a shelf right now.",
+      'no_active_conveyor' => 'No moving lane to slow here.',
+      _ => "That booster can't be used right now.",
+    };
   }
 
   void _scheduleEndOverlay(GameSessionState state) {

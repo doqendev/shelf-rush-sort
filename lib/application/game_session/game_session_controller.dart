@@ -396,21 +396,34 @@ final class GameSessionController {
     _emit(_state.copyWith(timer: timer, lanes: lanes, events: events));
   }
 
+  BoosterContext _boosterContext() {
+    return BoosterContext(
+      board: _state.board,
+      objective: _state.objective,
+      timer: _state.timer,
+      lanes: _state.lanes,
+      selectedCell: _state.selectedCell,
+      seed: _state.level.seed,
+      level: _state.level,
+    );
+  }
+
+  /// Whether [booster] would actually change something now, WITHOUT using it, so
+  /// the UI never consumes inventory for a no-op (third-pass audit P0.1).
+  BoosterAvailability canUseBooster(BoosterKind booster) {
+    if (_state.isEnded) {
+      return const BoosterAvailability.unavailable('level_ended');
+    }
+    return boosterRules.availability(_boosterContext(), booster);
+  }
+
   void useBooster(BoosterKind booster) {
     if (_state.isEnded) {
       return;
     }
     final String preStateHash = _sessionHash(_state);
     final BoosterUseResult result = boosterRules.useBooster(
-      BoosterContext(
-        board: _state.board,
-        objective: _state.objective,
-        timer: _state.timer,
-        lanes: _state.lanes,
-        selectedCell: _state.selectedCell,
-        seed: _state.level.seed,
-        level: _state.level,
-      ),
+      _boosterContext(),
       booster,
     );
     final String postStateHash = _sessionHash(

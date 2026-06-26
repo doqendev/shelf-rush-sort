@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shelf_rush_sort/application/game_session/game_session_controller.dart';
 import 'package:shelf_rush_sort/application/game_session/game_session_state.dart';
+import 'package:shelf_rush_sort/domain/boosters/booster_def.dart';
 import 'package:shelf_rush_sort/domain/content/level_def.dart';
 import 'package:shelf_rush_sort/domain/core/value_objects.dart';
 import 'package:shelf_rush_sort/domain/game/fail_reason.dart';
@@ -212,6 +213,48 @@ void main() {
 
     controller.dispose();
   });
+
+  test(
+    'canUseBooster blocks no-op boosters so inventory is not wasted (P0.1)',
+    () {
+      final GameSessionController controller = GameSessionController(
+        level: _moveLimitLevel(),
+        analytics: DebugAnalyticsService(),
+      );
+      // Untimed level -> nothing to freeze; no hidden products -> nothing to
+      // reveal. A booster that can actually act stays available.
+      expect(controller.canUseBooster(BoosterKind.freezeTime).canUse, isFalse);
+      expect(
+        controller.canUseBooster(BoosterKind.revealHidden).canUse,
+        isFalse,
+      );
+      expect(controller.canUseBooster(BoosterKind.hint).canUse, isTrue);
+      controller.dispose();
+
+      final GameSessionController solo = GameSessionController(
+        level: _singleProductLevel(),
+        analytics: DebugAnalyticsService(),
+      );
+      // Shuffle needs at least two movable products.
+      expect(solo.canUseBooster(BoosterKind.shuffle).canUse, isFalse);
+      solo.dispose();
+    },
+  );
+}
+
+LevelDef _singleProductLevel() {
+  return LevelDef(
+    id: 'level_single_product',
+    levelNumber: 5,
+    title: 'Single Product',
+    seed: 5,
+    objective: ObjectiveRequirement(type: ObjectiveType.clearAll),
+    compartments: <CompartmentDef>[
+      CompartmentDef(index: 0, cells: const <String?>['sku_000', null, null]),
+      for (var index = 1; index < 15; index += 1)
+        CompartmentDef(index: index, cells: const <String?>[null, null, null]),
+    ],
+  );
 }
 
 LevelDef _moveLimitLevel() {
