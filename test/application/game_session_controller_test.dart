@@ -182,6 +182,36 @@ void main() {
       controller.dispose();
     },
   );
+
+  test('canReviveFrom only allows rescuable failures (P1.5)', () {
+    expect(canReviveFrom(LevelFailReason.timerExpired), isTrue);
+    expect(canReviveFrom(LevelFailReason.moveLimitExceeded), isTrue);
+    expect(canReviveFrom(LevelFailReason.boardJammed), isTrue);
+    expect(canReviveFrom(LevelFailReason.objectiveImpossible), isFalse);
+    expect(canReviveFrom(LevelFailReason.laneExhausted), isFalse);
+    expect(canReviveFrom(LevelFailReason.blockerRemaining), isFalse);
+  });
+
+  test('reviving a move-limit failure restores moves and resumes (P1.5)', () {
+    final GameSessionController controller = GameSessionController(
+      level: _moveLimitLevel(),
+      analytics: DebugAnalyticsService(),
+    );
+
+    controller.selectCell(CellAddress.fromCompartmentIndex(1, 0));
+    controller.placeSelectedAt(CellAddress.fromCompartmentIndex(0, 2));
+    expect(controller.state.status, GameSessionStatus.failed);
+    expect(controller.state.failReason, LevelFailReason.moveLimitExceeded);
+
+    final int movesAtFail = controller.state.moveCount;
+    expect(controller.canRevive, isTrue);
+    controller.revive();
+
+    expect(controller.state.status, GameSessionStatus.playing);
+    expect(controller.state.moveCount, lessThan(movesAtFail));
+
+    controller.dispose();
+  });
 }
 
 LevelDef _moveLimitLevel() {

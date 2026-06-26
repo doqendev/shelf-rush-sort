@@ -398,7 +398,7 @@ final class _GameScreenState extends ConsumerState<GameScreen>
   Future<void> _reviveWithRewardedAd() async {
     final GameSessionState? session = _session;
     final GameSessionController? controller = _controller;
-    if (session == null || controller == null) {
+    if (session == null || controller == null || !controller.canRevive) {
       return;
     }
     final MonetizationService monetization = MonetizationService(

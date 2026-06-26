@@ -62,8 +62,15 @@ final class LossPanel extends StatelessWidget {
                               style: GameTypography.secondary,
                             ),
                             const SizedBox(height: 18),
-                            _WatchRow(label: copy.rescueLabel, onTap: onRevive),
-                            const SizedBox(height: 14),
+                            // Only offer a revive that can actually rescue this
+                            // failure (second-pass audit P1.5).
+                            if (canReviveFrom(session.failReason)) ...<Widget>[
+                              _WatchRow(
+                                label: copy.rescueLabel,
+                                onTap: onRevive,
+                              ),
+                              const SizedBox(height: 14),
+                            ],
                             CozyButton(
                               label: 'RETRY',
                               onTap: onRetry,
@@ -103,12 +110,12 @@ final class LossPanel extends StatelessWidget {
       LevelFailReason.noUsefulMoves => const _LossCopy(
         'STUCK!',
         'The remaining moves cannot create a clear or rescue path.',
-        'Use rescue',
+        'Shuffle board',
       ),
       LevelFailReason.moveLimitExceeded => const _LossCopy(
         'OUT OF MOVES',
         'The order needed fewer shelf moves.',
-        'Extra shelf',
+        'Add 5 moves',
       ),
       LevelFailReason.objectiveImpossible => const _LossCopy(
         'ORDER LOST',
@@ -125,7 +132,7 @@ final class LossPanel extends StatelessWidget {
       LevelFailReason.none => const _LossCopy(
         'SHELF JAMMED',
         'The board has no clean rescue path left.',
-        'Revive',
+        'Shuffle board',
       ),
     };
   }

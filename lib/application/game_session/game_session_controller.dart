@@ -534,14 +534,66 @@ final class GameSessionController {
     );
   }
 
-  void revive({Duration rewind = const Duration(seconds: 30)}) {
+  /// Whether the current failure can be rescued by a rewarded revive.
+  bool get canRevive =>
+      _state.status == GameSessionStatus.failed &&
+      canReviveFrom(_state.failReason);
+
+  /// Applies a rescue matched to the failure cause (second-pass audit P1.5):
+  /// timer failures regain time, move-limit failures regain moves, and jammed /
+  /// no-useful-move boards are reshuffled into a playable state. Failures with
+  /// no meaningful rescue are not revived (and are never offered one).
+  void revive({
+    Duration rewind = const Duration(seconds: 30),
+    int extraMoves = 5,
+  }) {
     if (_state.status != GameSessionStatus.failed) {
       return;
     }
-    final Duration elapsed = _state.timer.elapsed - rewind;
-    final LevelTimer timer = _state.timer.copyWith(
-      elapsed: elapsed.isNegative ? Duration.zero : elapsed,
-    );
+    final LevelFailReason reason = _state.failReason;
+    if (!canReviveFrom(reason)) {
+      return;
+    }
+
+    LevelTimer timer = _state.timer;
+    BoardState board = _state.board;
+    ObjectiveState objective = _state.objective;
+    var moveCount = _state.moveCount;
+
+    switch (reason) {
+      case LevelFailReason.timerExpired:
+        final Duration elapsed = _state.timer.elapsed - rewind;
+        timer = _state.timer.copyWith(
+          elapsed: elapsed.isNegative ? Duration.zero : elapsed,
+        );
+      case LevelFailReason.moveLimitExceeded:
+        moveCount = (_state.moveCount - extraMoves).clamp(0, _state.moveCount);
+      case LevelFailReason.boardJammed:
+      case LevelFailReason.noUsefulMoves:
+      case LevelFailReason.reserveMismanaged:
+        final BoosterUseResult shuffle = boosterRules.useBooster(
+          BoosterContext(
+            board: _state.board,
+            objective: _state.objective,
+            timer: _state.timer,
+            lanes: _state.lanes,
+            selectedCell: null,
+            seed: _state.level.seed,
+            level: _state.level,
+          ),
+          BoosterKind.shuffle,
+        );
+        if (shuffle.used) {
+          board = shuffle.board;
+          objective = shuffle.objective;
+        }
+      case LevelFailReason.laneExhausted:
+      case LevelFailReason.blockerRemaining:
+      case LevelFailReason.objectiveImpossible:
+      case LevelFailReason.none:
+        return;
+    }
+
     unawaited(
       analytics.track(
         AnalyticsEvent(
@@ -549,7 +601,7 @@ final class GameSessionController {
           parameters: <String, Object?>{
             'level_id': _state.level.id,
             'level_number': _state.level.levelNumber,
-            'fail_reason': _state.failReason.name,
+            'fail_reason': reason.name,
             'moves': _state.moveCount,
           },
         ),
@@ -557,8 +609,10 @@ final class GameSessionController {
     );
     _emit(
       _state.copyWith(
-        board: _state.board.copyWith(levelEnded: false),
+        board: board.copyWith(levelEnded: false),
         timer: timer,
+        objective: objective,
+        moveCount: moveCount,
         status: GameSessionStatus.playing,
         failReason: LevelFailReason.none,
         clearInvalidReason: true,
