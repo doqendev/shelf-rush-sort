@@ -133,11 +133,27 @@ class _WinPanelState extends State<WinPanel>
                                   height: 38,
                                 ),
                                 const SizedBox(width: 8),
-                                Text(
-                                  '+${reward.coins}',
-                                  style: GameTypography.levelLabel.copyWith(
-                                    fontSize: 22,
+                                // Count the reward up rather than showing it
+                                // flat — the coins feel earned (audit M6 / 16.2).
+                                TweenAnimationBuilder<double>(
+                                  tween: Tween<double>(
+                                    begin: 0,
+                                    end: reward.coins.toDouble(),
                                   ),
+                                  duration: const Duration(milliseconds: 700),
+                                  curve: Curves.easeOutCubic,
+                                  builder:
+                                      (
+                                        BuildContext context,
+                                        double value,
+                                        Widget? child,
+                                      ) {
+                                        return Text(
+                                          '+${value.round()}',
+                                          style: GameTypography.levelLabel
+                                              .copyWith(fontSize: 22),
+                                        );
+                                      },
                                 ),
                                 if (hardBonus) ...<Widget>[
                                   const SizedBox(width: 12),
