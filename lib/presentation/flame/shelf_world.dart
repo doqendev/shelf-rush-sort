@@ -17,6 +17,7 @@ import '../../infrastructure/platform/haptics_service.dart';
 import 'board/board_layout_calculator.dart';
 import 'board/cell_target_component.dart';
 import 'board/compartment_component.dart';
+import 'board/cozy_sprite_cache.dart';
 import 'board/dragged_product_component.dart';
 import 'board/hidden_preview_component.dart';
 import 'board/hover_target_component.dart';
@@ -25,6 +26,7 @@ import 'board/rack_backdrop_component.dart';
 import 'board/tutorial_overlay_component.dart';
 import 'fx/clear_pop_component.dart';
 import 'fx/fx_director.dart';
+import 'fx/product_pop_component.dart';
 import 'input/input_router.dart';
 import 'lanes/moving_lane_component.dart';
 
@@ -123,7 +125,8 @@ final class ShelfWorld extends World {
               (Component child) =>
                   child != _productDragComponent &&
                   child != _hoverComponent &&
-                  child is! ClearPopComponent,
+                  child is! ClearPopComponent &&
+                  child is! ProductPopComponent,
             )
             .toList(),
       );
@@ -439,15 +442,35 @@ final class ShelfWorld extends World {
 
   /// Plays a celebration burst over the shelf slot where a triple just cleared.
   /// FX components are preserved across board rebuilds until they self-remove.
-  void playTripleClearFx(int compartmentIndex, int comboIndex) {
+  void playTripleClearFx(int compartmentIndex, int comboIndex, String skuId) {
     final Rect rect = _layout.compartmentRect(compartmentIndex);
-    final FutureOr<void> pending = add(
+    _spawnFx(
       ClearPopComponent(
         position: Vector2(rect.left, rect.top),
         size: Vector2(rect.width, rect.height),
         comboIndex: comboIndex,
       ),
     );
+    // Squash/pop each cleared product out of its slot (staggered) so the match
+    // resolves as objects, not an instant board swap (second-pass audit M2).
+    final Image? sprite = CozySpriteCache.instance.imageForSku(skuId);
+    for (var cell = 0; cell < cellsPerCompartment; cell += 1) {
+      final Rect cellRect = _layout.cellRect(
+        CellAddress.fromCompartmentIndex(compartmentIndex, cell),
+      );
+      _spawnFx(
+        ProductPopComponent(
+          image: sprite,
+          position: Vector2(cellRect.left, cellRect.top),
+          size: Vector2(cellRect.width, cellRect.height),
+          delay: cell * 0.04,
+        ),
+      );
+    }
+  }
+
+  void _spawnFx(Component component) {
+    final FutureOr<void> pending = add(component);
     if (pending is Future<void>) {
       unawaited(pending);
     }

@@ -75,9 +75,10 @@ final class FxDirector {
     // board rebuilds until they self-remove.
     if (event.type == SessionEventType.tripleCleared) {
       final Object? compartment = event.payload['compartment'];
-      if (compartment is int) {
+      final Object? sku = event.payload['sku_id'];
+      if (compartment is int && sku is String) {
         final Object? combo = event.payload['combo'];
-        world.playTripleClearFx(compartment, combo is int ? combo : 0);
+        world.playTripleClearFx(compartment, combo is int ? combo : 0, sku);
       }
     }
   }
