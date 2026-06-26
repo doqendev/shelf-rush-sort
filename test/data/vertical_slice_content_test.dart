@@ -66,6 +66,58 @@ void main() {
     expect(result.clearedTriples.single.skuId, 'sku_000');
   });
 
+  test('level 4 hidden-reveal sequence completes (v3 P0.2 regression)', () async {
+    // The reviewer's QA run stalled in-browser after the first hidden-reveal
+    // clear on level 4 (a CPU-render thread starvation in his no-WebGL sandbox).
+    // This pins the exact reproduction move sequence to a clean completion so
+    // the reveal path itself is proven correct in CI.
+    final LevelDef level = (await _verticalSlicePack()).levelByNumber(4);
+    const BoardRules rules = BoardRules();
+
+    // Move 1: clear the front triple, which reveals the two hidden products.
+    final r1 = rules.applyMove(
+      level.createBoardState(),
+      MoveAction(
+        source: CellAddress.fromCompartmentIndex(1, 0),
+        target: CellAddress.fromCompartmentIndex(0, 2),
+      ),
+    );
+    expect(r1.isValid, isTrue);
+    expect(r1.clearedTriples, hasLength(1));
+    expect(
+      r1.revealedProducts,
+      hasLength(2),
+      reason: 'clearing the front shelf must reveal the two hidden products',
+    );
+
+    // Move 2: complete one revealed triple.
+    final r2 = rules.applyMove(
+      r1.state,
+      MoveAction(
+        source: CellAddress.fromCompartmentIndex(0, 0),
+        target: CellAddress.fromCompartmentIndex(1, 0),
+      ),
+    );
+    expect(r2.isValid, isTrue);
+    expect(r2.clearedTriples, hasLength(1));
+
+    // Move 3: complete the last triple; the board is now empty.
+    final r3 = rules.applyMove(
+      r2.state,
+      MoveAction(
+        source: CellAddress.fromCompartmentIndex(0, 1),
+        target: CellAddress.fromCompartmentIndex(2, 2),
+      ),
+    );
+    expect(r3.isValid, isTrue);
+    expect(r3.clearedTriples, hasLength(1));
+    expect(
+      r3.state.visibleProductCount,
+      0,
+      reason: 'level 4 completes through the hidden reveal without stalling',
+    );
+  });
+
   test('curriculum levels 2..N are gentle, solvable and collision-free', () async {
     final LevelPack pack = await _verticalSlicePack();
     final ProductCatalog catalog = await _productCatalog();

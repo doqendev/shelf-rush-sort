@@ -4,7 +4,7 @@
   "startRoute": "/",
   "bridge": "window.shelfRushQa",
   "bridgeDocs": "QA_BRIDGE.md",
-  "notes": "App boots into a playable level at '/'. Drive and verify via window.shelfRushQa (present in this qa build only). Cells are addressed as (compartment, cell); read getState().board to map shelves to products. NEW since the last package: levels 1-10 are a hand-authored curriculum (one new model per level), per-level star thresholds are seeded from the solver optimum (getState().level... use levelStars after a win), and the 320px objective strip no longer clips.",
+  "notes": "App boots into a playable level at '/'. Drive and verify via window.shelfRushQa (present in this qa build only). Cells are addressed as (compartment, cell); read getState().board to map shelves to products. NEW since the last package: levels 1-10 are a hand-authored curriculum (one new model per level), per-level star thresholds are seeded from the solver optimum (getState().level... use levelStars after a win), and the 320px objective strip no longer clips. Poll shelfRushQa.ready().ok before the first call (the container now binds at app root, so resetSave()/getState() work before any level loads - v3 P1.1). getState() also exposes suggestedMove (the hint booster's output) and score (3-star/2-star move thresholds).",
   "testViewports": [
     [320, 568],
     [390, 844],
@@ -33,6 +33,16 @@
           "call": "for n in 1..10: shelfRushQa.goToLevel(n)",
           "expect": "getState(): status 'playing', a non-empty objectiveText, visibleProductCount > 0; timerSeconds is a number on 6/9/10 and null elsewhere"
         }
+      ]
+    },
+    {
+      "name": "level_4_hidden_reveal_completes",
+      "description": "Level 4's hidden-reveal sequence completes cleanly (v3 P0.2 regression). The reviewer's in-browser run stalled here under CPU-only CanvasKit; the move sequence is proven in CI and the bridge drives it deterministically.",
+      "setup": ["shelfRushQa.ready()", "shelfRushQa.resetSave()", "shelfRushQa.goToLevel(4)"],
+      "steps": [
+        { "call": "shelfRushQa.dragCellToCell(1,0,0,2)", "expect": "clears the front triple and reveals 2 hidden products; visibleProductCount 6, status 'playing'" },
+        { "call": "shelfRushQa.dragCellToCell(0,0,1,0)", "expect": "status 'playing'" },
+        { "call": "shelfRushQa.dragCellToCell(0,1,2,2)", "expect": "status 'won', visibleProductCount 0" }
       ]
     },
     {

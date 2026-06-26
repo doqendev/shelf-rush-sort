@@ -38,6 +38,7 @@ Available once the app has loaded a level. All mutating calls **drive the game c
 | `resetSave()` | `() => {ok}` | Reset to a fresh player (coins/stars/collection/boosters) **and** restart the active level. |
 | `isPresentationBusy()` | `() => bool` | True while clear/move animations are still playing — poll until false to wait for settle. |
 | `viewportInfo()` | `() => object` | `{gameWidth, gameHeight, hasActiveGame}`. |
+| `ready()` | `() => {ok, container, router, activeGame}` | Whether the bridge is wired. The container binds at app root, so `ok` is true before the first level opens — poll it before `resetSave()`/`getState()` (v3 P1.1). |
 
 ### Addressing
 
@@ -68,6 +69,8 @@ Available once the app has loaded a level. All mutating calls **drive the game c
   "winRewardAvailable": false,   // first-completion coin reward still pending
   "doubleRewardAvailable": false,
   "presentationBusy": false,
+  "suggestedMove": null,         // { "source": "2:0", "target": "0:2" } after a hint booster
+  "score": { "threeStarMoves": 2, "twoStarMoves": 4 },  // authored star thresholds, null if unset
   "board": [
     { "index": 0, "locked": false, "decorative": false, "interactable": true, "cells": ["sku_000", "sku_000", null] }
   ]
