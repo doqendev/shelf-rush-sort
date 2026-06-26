@@ -1,24 +1,98 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/providers.dart';
+import '../../../application/boosters/booster_inventory_service.dart';
 import '../../../domain/boosters/booster_def.dart';
+import '../../../infrastructure/save/save_repository.dart';
 import '../../design/game_colors.dart';
 import '../../design/game_surfaces.dart';
 import '../../design/game_typography.dart';
 import '../cozy/cozy_widgets.dart';
+
+/// Player-facing booster name/description/icon so the shop never shows raw enum
+/// names (second-pass audit P2.1).
+class _BoosterPresentation {
+  const _BoosterPresentation(this.name, this.description, this.icon);
+
+  final String name;
+  final String description;
+  final String icon;
+}
+
+const Map<BoosterKind, _BoosterPresentation> _boosterPresentation =
+    <BoosterKind, _BoosterPresentation>{
+      BoosterKind.hint: _BoosterPresentation(
+        'Hint',
+        'Show a winning move',
+        'icon/star.png',
+      ),
+      BoosterKind.shuffle: _BoosterPresentation(
+        'Shuffle',
+        'Reshuffle the board',
+        'ui/arrow2.png',
+      ),
+      BoosterKind.hammer: _BoosterPresentation(
+        'Hammer',
+        'Remove one product',
+        'ui/x.png',
+      ),
+      BoosterKind.freezeTime: _BoosterPresentation(
+        'Freeze Time',
+        'Stop the timer for 10s',
+        'icon/ray.png',
+      ),
+      BoosterKind.extraShelf: _BoosterPresentation(
+        'Extra Shelf',
+        'Open a spare shelf',
+        'ui/cart.png',
+      ),
+      BoosterKind.revealHidden: _BoosterPresentation(
+        'Reveal',
+        'Reveal hidden products',
+        'ui/question.png',
+      ),
+      BoosterKind.slowConveyor: _BoosterPresentation(
+        'Slow Lane',
+        'Slow the conveyor',
+        'ui/arrow.png',
+      ),
+    };
 
 final class ShopScreen extends ConsumerWidget {
   const ShopScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final prices = ref
+    final Map<BoosterKind, int> prices = ref
         .watch(contentServiceProvider)
         .content
         .economy
         .boosterPrices;
-    final save = ref.watch(playerSaveProvider);
+    final PlayerSave save = ref.watch(playerSaveProvider);
+
+    void buy(BoosterKind kind, int price) {
+      final PlayerSave current = ref.read(playerSaveProvider);
+      if (price <= 0 || current.coins < price) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Not enough coins'),
+            duration: Duration(seconds: 1),
+          ),
+        );
+        return;
+      }
+      final PlayerSave next = const BoosterInventoryService().purchase(
+        current,
+        kind,
+        1,
+        price,
+      );
+      ref.read(playerSaveProvider.notifier).state = next;
+      unawaited(ref.read(saveRepositoryProvider).save(next));
+    }
 
     return Scaffold(
       backgroundColor: GameColors.bgYellow,
@@ -32,7 +106,7 @@ final class ShopScreen extends ConsumerWidget {
               const SizedBox(height: 20),
               Text('BOOSTERS', style: GameTypography.eyebrow),
               const SizedBox(height: 10),
-              _BoosterGrid(prices: prices),
+              _BoosterGrid(prices: prices, owned: save.boosters, onBuy: buy),
               const SizedBox(height: 24),
               Text('COIN PACKS', style: GameTypography.eyebrow),
               const SizedBox(height: 10),
@@ -91,9 +165,8 @@ final class _Header extends StatelessWidget {
                 cozyAsset('icon/coin.png'),
                 width: 26,
                 height: 26,
-                errorBuilder:
-                    (BuildContext context, Object error, StackTrace? stack) =>
-                        const SizedBox(width: 26, height: 26),
+                errorBuilder: (_, _, _) =>
+                    const SizedBox(width: 26, height: 26),
               ),
               const SizedBox(width: 6),
               Text('$coins', style: GameTypography.compactLabel),
@@ -117,16 +190,15 @@ final class _Header extends StatelessWidget {
 // ---------------------------------------------------------------------------
 
 final class _BoosterGrid extends StatelessWidget {
-  const _BoosterGrid({required this.prices});
+  const _BoosterGrid({
+    required this.prices,
+    required this.owned,
+    required this.onBuy,
+  });
 
   final Map<BoosterKind, int> prices;
-
-  static const List<String> _icons = <String>[
-    'icon/ray.png',
-    'icon/star.png',
-    'icon/ray.png',
-    'icon/star.png',
-  ];
+  final Map<BoosterKind, int> owned;
+  final void Function(BoosterKind kind, int price) onBuy;
 
   @override
   Widget build(BuildContext context) {
@@ -135,13 +207,14 @@ final class _BoosterGrid extends StatelessWidget {
       spacing: 12,
       runSpacing: 12,
       children: <Widget>[
-        for (int i = 0; i < boosters.length; i++)
+        for (final BoosterKind kind in boosters)
           SizedBox(
             width: (MediaQuery.sizeOf(context).width - 44) / 2,
             child: _BoosterCard(
-              booster: boosters[i],
-              price: prices[boosters[i]] ?? 0,
-              iconAsset: _icons[i % _icons.length],
+              booster: kind,
+              price: prices[kind] ?? 0,
+              owned: owned[kind] ?? 0,
+              onBuy: () => onBuy(kind, prices[kind] ?? 0),
             ),
           ),
       ],
@@ -153,15 +226,20 @@ final class _BoosterCard extends StatelessWidget {
   const _BoosterCard({
     required this.booster,
     required this.price,
-    required this.iconAsset,
+    required this.owned,
+    required this.onBuy,
   });
 
   final BoosterKind booster;
   final int price;
-  final String iconAsset;
+  final int owned;
+  final VoidCallback onBuy;
 
   @override
   Widget build(BuildContext context) {
+    final _BoosterPresentation info =
+        _boosterPresentation[booster] ??
+        const _BoosterPresentation('Booster', '', 'icon/star.png');
     return DecoratedBox(
       decoration: GameSurfaces.panel(),
       child: Padding(
@@ -170,7 +248,6 @@ final class _BoosterCard extends StatelessWidget {
           clipBehavior: Clip.none,
           children: <Widget>[
             Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Center(
                   child: DecoratedBox(
@@ -184,15 +261,11 @@ final class _BoosterCard extends StatelessWidget {
                       height: 58,
                       child: Center(
                         child: Image.asset(
-                          cozyAsset(iconAsset),
+                          cozyAsset(info.icon),
                           width: 36,
                           height: 36,
-                          errorBuilder:
-                              (
-                                BuildContext context,
-                                Object error,
-                                StackTrace? stack,
-                              ) => const SizedBox(width: 36, height: 36),
+                          errorBuilder: (_, _, _) =>
+                              const SizedBox(width: 36, height: 36),
                         ),
                       ),
                     ),
@@ -200,49 +273,66 @@ final class _BoosterCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  booster.name,
+                  info.name,
                   style: GameTypography.body,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  info.description,
+                  style: GameTypography.secondary,
                   textAlign: TextAlign.center,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 8),
-                CozyPill(
-                  color: GameColors.sunny,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Image.asset(
-                        cozyAsset('icon/coin.png'),
-                        width: 16,
-                        height: 16,
-                        errorBuilder:
-                            (
-                              BuildContext context,
-                              Object error,
-                              StackTrace? stack,
-                            ) => const SizedBox(width: 16, height: 16),
+                GestureDetector(
+                  onTap: onBuy,
+                  behavior: HitTestBehavior.opaque,
+                  child: DecoratedBox(
+                    decoration: GameSurfaces.button(
+                      color: GameColors.sunny,
+                      radius: 13,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
                       ),
-                      const SizedBox(width: 4),
-                      Text('$price', style: GameTypography.compactLabel),
-                    ],
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Image.asset(
+                            cozyAsset('icon/coin.png'),
+                            width: 16,
+                            height: 16,
+                            errorBuilder: (_, _, _) =>
+                                const SizedBox(width: 16, height: 16),
+                          ),
+                          const SizedBox(width: 4),
+                          Text('$price', style: GameTypography.compactLabel),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ],
             ),
-            // Blossom badge (optional static qty indicator)
+            // Real owned count (not a fake static badge).
             Positioned(
               top: -6,
               right: -6,
               child: CozyPill(
                 color: GameColors.blossom,
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                child: Text('x3', style: GameTypography.compactLabel),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                child: Text(
+                  'x$owned',
+                  style: GameTypography.compactLabel.copyWith(
+                    color: const Color(0xFFFFFFFF),
+                  ),
+                ),
               ),
             ),
           ],
@@ -279,9 +369,7 @@ final class _CoinPackRow extends StatelessWidget {
               cozyAsset(rewardAsset),
               width: 52,
               height: 52,
-              errorBuilder:
-                  (BuildContext context, Object error, StackTrace? stack) =>
-                      const SizedBox(width: 52, height: 52),
+              errorBuilder: (_, _, _) => const SizedBox(width: 52, height: 52),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -294,19 +382,16 @@ final class _CoinPackRow extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            GestureDetector(
-              onTap: null,
-              child: DecoratedBox(
-                decoration: GameSurfaces.button(color: GameColors.leaf),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 8,
-                  ),
-                  child: Text(
-                    price,
-                    style: GameTypography.body.copyWith(color: GameColors.ink),
-                  ),
+            DecoratedBox(
+              decoration: GameSurfaces.button(color: GameColors.leaf),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
+                child: Text(
+                  price,
+                  style: GameTypography.body.copyWith(color: GameColors.ink),
                 ),
               ),
             ),
@@ -336,9 +421,7 @@ final class _RemoveAdsRow extends StatelessWidget {
               cozyAsset('icon/star.png'),
               width: 48,
               height: 48,
-              errorBuilder:
-                  (BuildContext context, Object error, StackTrace? stack) =>
-                      const SizedBox(width: 48, height: 48),
+              errorBuilder: (_, _, _) => const SizedBox(width: 48, height: 48),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -347,7 +430,7 @@ final class _RemoveAdsRow extends StatelessWidget {
                 children: <Widget>[
                   Text('Remove Ads', style: GameTypography.body),
                   Text(
-                    'Sandbox purchase adapter wired',
+                    'Remove banner & interstitial ads',
                     style: GameTypography.secondary,
                   ),
                 ],
