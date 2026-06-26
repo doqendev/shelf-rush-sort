@@ -18,6 +18,7 @@ import '../../domain/content/level_def.dart';
 import '../../infrastructure/analytics/analytics_event.dart';
 import '../../infrastructure/analytics/analytics_service.dart';
 import '../../infrastructure/save/save_repository.dart';
+import '../../qa/qa_bridge.dart';
 import '../design/game_colors.dart';
 import '../flame/shelf_rush_game.dart';
 import 'cozy/cozy_widgets.dart';
@@ -76,7 +77,11 @@ final class _GameScreenState extends ConsumerState<GameScreen>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     unawaited(_subscription?.cancel());
-    _controller?.dispose();
+    final GameSessionController? controller = _controller;
+    if (controller != null) {
+      QaBridge.instance.unbindGame(controller);
+    }
+    controller?.dispose();
     super.dispose();
   }
 
@@ -346,6 +351,11 @@ final class _GameScreenState extends ConsumerState<GameScreen>
       _endOverlayVisible = false;
       _endOverlayAttempt = null;
     });
+    if (ref.read(environmentProvider).debugToolsEnabled) {
+      QaBridge.instance
+        ..container = ProviderScope.containerOf(context, listen: false)
+        ..bindGame(controller, game);
+    }
     loadTimer.stop();
     unawaited(
       analytics.track(

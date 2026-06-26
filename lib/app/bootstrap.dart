@@ -13,6 +13,8 @@ import '../infrastructure/iap/purchase_service.dart';
 import '../infrastructure/platform/device_info_service.dart';
 import '../infrastructure/save/local_save_repository.dart';
 import '../infrastructure/save/save_repository.dart';
+import '../qa/qa_bridge.dart';
+import '../qa/qa_install.dart';
 import 'environment.dart';
 import 'providers.dart';
 import 'shelf_rush_app.dart';
@@ -22,6 +24,11 @@ Future<void> bootstrap({EnvironmentConfig? environmentConfig}) async {
   setUrlStrategy(const HashUrlStrategy());
   final EnvironmentConfig resolvedEnvironment =
       environmentConfig ?? EnvironmentConfig.fromDartDefine();
+  // Expose the QA automation bridge (window.shelfRushQa) in non-production
+  // builds only, so reviewers can drive + verify the game headlessly.
+  if (resolvedEnvironment.debugToolsEnabled) {
+    installQaBridge(QaBridge.instance);
+  }
   final contentService = await JsonContentLoader().load();
   final SaveRepository saveRepository = LocalSaveRepository();
   final PlayerSave save =
