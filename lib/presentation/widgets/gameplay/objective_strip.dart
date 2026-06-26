@@ -45,11 +45,19 @@ final class ObjectiveStrip extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     Expanded(
-                      child: Text(
-                        _objectiveText(objective.requirement.type),
-                        style: GameTypography.objective,
-                        maxLines: width < 340 ? 2 : 1,
-                        overflow: TextOverflow.ellipsis,
+                      // At very narrow widths (~320px) the full objective copy
+                      // used to wrap to two lines inside a one-line-tall strip
+                      // and clip (hands-on P1.4). Scale the single line down to
+                      // fit instead: it never clips, stays on one line, and
+                      // costs no board height on small phones.
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          _objectiveText(objective.requirement.type),
+                          style: GameTypography.objective,
+                          maxLines: 1,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 8),
