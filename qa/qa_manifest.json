@@ -1,10 +1,10 @@
 {
-  "commit": "0e6dbe7",
+  "commit": "5cc4c72",
   "builtWith": "flutter build web --release --dart-define=SHELF_RUSH_ENV=qa --pwa-strategy=none --no-web-resources-cdn --base-href \"/\"",
   "startRoute": "/",
   "bridge": "window.shelfRushQa",
   "bridgeDocs": "QA_BRIDGE.md",
-  "notes": "App boots into a playable level at '/'. Drive and verify via window.shelfRushQa (present in this qa build only). Cells are addressed as (compartment, cell); read getState().board to map shelves to products.",
+  "notes": "App boots into a playable level at '/'. Drive and verify via window.shelfRushQa (present in this qa build only). Cells are addressed as (compartment, cell); read getState().board to map shelves to products. NEW since the last package: levels 1-10 are a hand-authored curriculum (one new model per level), per-level star thresholds are seeded from the solver optimum (getState().level... use levelStars after a win), and the 320px objective strip no longer clips.",
   "testViewports": [
     [320, 568],
     [390, 844],
@@ -23,6 +23,27 @@
           "expect": { "moveCount": 1, "status": "playing" }
         }
       ]
+    },
+    {
+      "name": "curriculum_walk_1_10",
+      "description": "Levels 1-10 are the new hand-authored curriculum, one new mental model per level: 1 first clear (guided), 2 second clear, 3 empty-space staging, 4 first hidden reveal, 5 first mystery bag, 6 first timer (45s), 7 hidden+staging combo, 8 bag+hidden combo, 9 timed 3-SKU sort (50s), 10 capstone (bag+hidden+4 SKUs, 75s). Each should load with a clear objectiveText and be completable cold. Levels 6, 9 and 10 report a timerSeconds; the rest are untimed (null).",
+      "setup": ["shelfRushQa.resetSave()"],
+      "steps": [
+        {
+          "call": "for n in 1..10: shelfRushQa.goToLevel(n)",
+          "expect": "getState(): status 'playing', a non-empty objectiveText, visibleProductCount > 0; timerSeconds is a number on 6/9/10 and null elsewhere"
+        }
+      ]
+    },
+    {
+      "name": "mystery_bag_reveal_L5",
+      "description": "Level 5 introduces mystery bags. The product on shelf 1 cell 0 is wrapped in a bag; it can be selected and moved, and moving it opens the bag (the only blocker the engine clears through normal play). After the move its shelf can complete a triple. mysteryBag is used because tape/frost/crate blockers are hammer-only and intentionally deferred.",
+      "setup": ["shelfRushQa.resetSave()", "shelfRushQa.goToLevel(5)"]
+    },
+    {
+      "name": "three_star_seeded_P1_7",
+      "description": "Per-level star thresholds (levels 1-10) are seeded from the solver's minimum solution moves, so 3 stars is achievable and fair (the old par heuristic under-counted staging moves and could make 3 stars impossible). Complete a level within its optimum move count and getState().levelStars[levelId] should be 3; take a couple more moves for 2, more for 1.",
+      "setup": ["shelfRushQa.resetSave()"]
     },
     {
       "name": "booster_no_consume_on_noop_P0_1",
