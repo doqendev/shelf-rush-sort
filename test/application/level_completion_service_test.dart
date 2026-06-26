@@ -93,6 +93,9 @@ void main() {
       discovered.cast<String>(),
       containsAll(<String>['sku_000', 'sku_001', 'sku_002']),
     );
+    // The hidden product was never revealed, so it must NOT be unlocked: only
+    // products actually seen on a shelf count (third-pass audit P1.6).
+    expect(discovered.cast<String>(), isNot(contains('sku_050')));
   });
 
   test('commitWin persists per-level stars and the running total (M6)', () {
@@ -163,7 +166,12 @@ LevelDef _levelWithProducts() {
         index: 0,
         cells: const <String?>['sku_000', 'sku_001', null],
       ),
-      CompartmentDef(index: 1, cells: const <String?>['sku_002', null, null]),
+      CompartmentDef(
+        index: 1,
+        cells: const <String?>['sku_002', null, null],
+        // A hidden product the player never reveals in a status-only win.
+        hidden: const <String>['sku_050'],
+      ),
       for (var index = 2; index < 15; index += 1)
         CompartmentDef(index: index, cells: const <String?>[null, null, null]),
     ],

@@ -53,6 +53,7 @@ final class LevelCompletionService {
       collections: _recordDiscoveries(
         _recordSupportAttempt(save.collections, session),
         level,
+        session,
       ),
     );
     if (!firstCompletion || updated.ledger.containsKey(ledgerKey)) {
@@ -135,24 +136,25 @@ final class LevelCompletionService {
   Map<String, Object?> _recordDiscoveries(
     Map<String, Object?> collections,
     LevelDef level,
+    GameSessionState session,
   ) {
     final Set<String> discovered = <String>{
       ...?(collections['discovered'] as List<Object?>?)?.cast<String>(),
     };
+    // Only products the player actually saw on a shelf: the level's front cells
+    // plus whatever was still visible at the end (e.g. a revealed hidden
+    // product). NOT the hidden stack / lane queue / objective targets, which
+    // they may never have uncovered (third-pass audit P1.6).
     for (final CompartmentDef compartment in level.compartments) {
       for (final String? sku in compartment.cells) {
         if (sku != null) {
           discovered.add(sku);
         }
       }
-      discovered.addAll(compartment.hidden);
     }
-    for (final lane in level.movingLanes) {
-      for (final product in lane.queue) {
-        discovered.add(product.skuId);
-      }
+    for (final product in session.board.visibleProducts) {
+      discovered.add(product.skuId);
     }
-    discovered.addAll(level.objective.targetCounts.keys);
     final List<String> sorted = discovered.toList()..sort();
     return <String, Object?>{...collections, 'discovered': sorted};
   }
