@@ -377,7 +377,7 @@ final class _CoinPackRow extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text('$amount Coins', style: GameTypography.body),
-                  Text('One-time purchase', style: GameTypography.secondary),
+                  Text('Coming soon', style: GameTypography.secondary),
                 ],
               ),
             ),

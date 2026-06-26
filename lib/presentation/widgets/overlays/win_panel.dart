@@ -174,6 +174,29 @@ class _WinPanelState extends State<WinPanel>
                             ),
                           ),
                         ],
+                        // Replay win (no coins granted): fill the reward space
+                        // with an honest, non-blank message (hands-on P1.2).
+                        if (widget.coinsGranted == 0) ...<Widget>[
+                          const SizedBox(height: 12),
+                          DecoratedBox(
+                            decoration: GameSurfaces.panel(
+                              color: GameColors.surfaceInset,
+                              radius: 20,
+                              shadowDy: 4,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                              child: Text(
+                                'Reward already claimed',
+                                textAlign: TextAlign.center,
+                                style: GameTypography.secondary,
+                              ),
+                            ),
+                          ),
+                        ],
                         const SizedBox(height: 20),
                         CozyButton(label: 'NEXT', onTap: widget.onNext),
                         const SizedBox(height: 12),
