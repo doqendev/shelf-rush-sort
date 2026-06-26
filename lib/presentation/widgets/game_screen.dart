@@ -163,18 +163,40 @@ final class _GameScreenState extends ConsumerState<GameScreen>
     }
     // Hold the cleared board and let the final celebration play before the
     // win/loss panel arrives (review P1.4 — don't interrupt the final moment).
+    // Rather than a fixed delay, wait until the board's FX/animations actually
+    // settle, bounded by a min hold and a max fallback (audit M2 / section 7).
     _endOverlayAttempt = state.attemptId;
-    Future<void>.delayed(const Duration(milliseconds: 480), () {
+    _awaitPresentationSettled(state.attemptId, elapsed: Duration.zero);
+  }
+
+  void _awaitPresentationSettled(
+    String attemptId, {
+    required Duration elapsed,
+  }) {
+    const Duration step = Duration(milliseconds: 80);
+    const Duration minHold = Duration(milliseconds: 360);
+    const Duration maxHold = Duration(milliseconds: 1600);
+    Future<void>.delayed(step, () {
       if (!mounted) {
         return;
       }
       final GameSessionState? current = _controller?.state;
-      if (current != null &&
-          current.attemptId == state.attemptId &&
+      final bool stillEnded =
+          current != null &&
+          current.attemptId == attemptId &&
           (current.status == GameSessionStatus.won ||
-              current.status == GameSessionStatus.failed)) {
-        setState(() => _endOverlayVisible = true);
+              current.status == GameSessionStatus.failed);
+      if (!stillEnded) {
+        // Reloaded or revived before the overlay showed — abandon this wait.
+        return;
       }
+      final Duration now = elapsed + step;
+      final bool busy = _game?.isPresentationBusy ?? false;
+      if (now < minHold || (busy && now < maxHold)) {
+        _awaitPresentationSettled(attemptId, elapsed: now);
+        return;
+      }
+      setState(() => _endOverlayVisible = true);
     });
   }
 

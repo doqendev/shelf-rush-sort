@@ -158,6 +158,25 @@ void main() {
       expect(after.children.whereType<MoveToEffect>(), isNotEmpty);
     },
   );
+
+  testWithGame<_TestGame>(
+    'isPresentationBusy is true while a move animates and clears when settled',
+    () => _TestGame(buildWorld(_relocationLevel())),
+    (_TestGame game) async {
+      final ShelfWorld world = game.world;
+      await _settle(game);
+      expect(world.isPresentationBusy, isFalse, reason: 'at rest');
+
+      world.controller.selectCell(CellAddress.fromCompartmentIndex(0, 0));
+      world.controller.placeSelectedAt(CellAddress.fromCompartmentIndex(1, 1));
+      await _settle(game);
+      expect(world.isPresentationBusy, isTrue, reason: 'move animating');
+
+      // Advance past the relocation tween (0.26s); it self-removes on finish.
+      await _pump(game, dt: 0.05, steps: 10);
+      expect(world.isPresentationBusy, isFalse, reason: 'settled');
+    },
+  );
 }
 
 final class _TestGame extends FlameGame<ShelfWorld> {

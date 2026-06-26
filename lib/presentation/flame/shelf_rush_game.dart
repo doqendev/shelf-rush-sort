@@ -77,6 +77,10 @@ final class ShelfRushGame extends FlameGame<ShelfWorld> {
   @override
   Color backgroundColor() => GameColors.bgYellow;
 
+  /// True while the board is still animating its end-of-level celebration. The
+  /// win/loss overlay waits for this to clear (second-pass audit M2 / section 7).
+  bool get isPresentationBusy => _shelfWorld.isPresentationBusy;
+
   @override
   Future<void> onLoad() async {
     await CozySpriteCache.instance.ensureLoaded(images);

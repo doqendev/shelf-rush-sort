@@ -556,6 +556,22 @@ final class ShelfWorld extends World {
     }
   }
 
+  /// Whether the board is still animating its end-of-level celebration — active
+  /// clear/pop FX or in-flight product move tweens. The win/loss overlay waits
+  /// for this to settle so the final beat is seen first (audit M2 / section 7).
+  bool get isPresentationBusy {
+    for (final Component child in children) {
+      if (child is ClearPopComponent || child is ProductPopComponent) {
+        return true;
+      }
+      if (child is ProductComponent &&
+          child.children.whereType<MoveToEffect>().isNotEmpty) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   bool _isLegalTarget(CellAddress target) {
     final CellAddress? selected = _state.selectedCell;
     if (selected != null) {
