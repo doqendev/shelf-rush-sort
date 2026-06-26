@@ -90,6 +90,30 @@ void main() {
       containsAll(<String>['sku_000', 'sku_001', 'sku_002']),
     );
   });
+
+  test('commitWin persists per-level stars and the running total (M6)', () {
+    final LevelDef level = _levelWithProducts();
+    final session = _wonSession(level, attemptId: 'attempt_stars');
+    final PlayerSave save = PlayerSave.newPlayer(
+      playerId: 'player',
+      startingCoins: 0,
+    );
+    const LevelCompletionService service = LevelCompletionService();
+    const RewardGrant reward = RewardGrant(coins: 10, reason: 'level_win');
+
+    final PlayerSave updated = service.commitWin(
+      save: save,
+      level: level,
+      session: session,
+      reward: reward,
+    );
+
+    final int? levelStars = updated.progress.levelStars[level.id];
+    expect(levelStars, isNotNull);
+    expect(levelStars, greaterThan(0));
+    // Only one level completed, so the total equals that level's rating.
+    expect(updated.progress.stars, levelStars);
+  });
 }
 
 GameSessionState _wonSession(LevelDef level, {required String attemptId}) {

@@ -1,4 +1,5 @@
 import '../../domain/content/level_def.dart';
+import '../../domain/game/star_score.dart';
 import '../../infrastructure/save/save_repository.dart';
 import '../economy/economy_service.dart';
 import '../game_session/game_session_state.dart';
@@ -24,15 +25,19 @@ final class LevelCompletionService {
   }) {
     final String ledgerKey = 'level_win:${level.id}:${session.attemptId}';
     final bool firstCompletion = level.levelNumber > save.highestLevelCompleted;
-    final PlayerSave updated = progression
-        .onLevelWon(save, level)
-        .copyWith(
-          lastSeenAt: DateTime.now().toUtc(),
-          collections: _recordDiscoveries(
-            _recordSupportAttempt(save.collections, session),
-            level,
-          ),
-        );
+    final int earnedStars = starsForLevel(
+      moveCount: session.moveCount,
+      level: level,
+    );
+    final PlayerSave progressed = progression.onLevelWon(save, level);
+    final PlayerSave updated = progressed.copyWith(
+      lastSeenAt: DateTime.now().toUtc(),
+      progress: _withStars(progressed.progress, level.id, earnedStars),
+      collections: _recordDiscoveries(
+        _recordSupportAttempt(save.collections, session),
+        level,
+      ),
+    );
     if (!firstCompletion || updated.ledger.containsKey(ledgerKey)) {
       return updated;
     }
@@ -57,6 +62,19 @@ final class LevelCompletionService {
       'level_win_double_reward',
       sourceId: ledgerKey,
     );
+  }
+
+  /// Keeps the best star rating earned for [levelId] and the running total in
+  /// sync, so the map can show per-level stars (second-pass audit M6 / 16).
+  SaveProgress _withStars(SaveProgress progress, String levelId, int earned) {
+    final int best = progress.levelStars[levelId] ?? 0;
+    if (earned <= best) {
+      return progress;
+    }
+    final Map<String, int> levelStars = Map<String, int>.of(progress.levelStars)
+      ..[levelId] = earned;
+    final int total = levelStars.values.fold<int>(0, (int a, int b) => a + b);
+    return progress.copyWith(levelStars: levelStars, stars: total);
   }
 
   Map<String, Object?> _recordSupportAttempt(

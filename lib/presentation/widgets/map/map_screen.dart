@@ -77,6 +77,7 @@ final class MapScreen extends ConsumerWidget {
                       number: level.levelNumber,
                       unlocked: unlocked,
                       isCurrent: isCurrent,
+                      stars: save.progress.levelStars[level.id] ?? 0,
                       onTap: unlocked
                           ? () => context.go('/?level=${level.levelNumber}')
                           : null,
@@ -97,12 +98,14 @@ class _LevelTile extends StatelessWidget {
     required this.number,
     required this.unlocked,
     required this.isCurrent,
+    required this.stars,
     this.onTap,
   });
 
   final int number;
   final bool unlocked;
   final bool isCurrent;
+  final int stars;
   final VoidCallback? onTap;
 
   @override
@@ -124,7 +127,31 @@ class _LevelTile extends StatelessWidget {
         ),
         child: Center(
           child: unlocked
-              ? Text('$number', style: GameTypography.levelLabel)
+              ? Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text('$number', style: GameTypography.levelLabel),
+                    if (stars > 0)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            for (var i = 0; i < 3; i += 1)
+                              Icon(
+                                i < stars
+                                    ? Icons.star_rounded
+                                    : Icons.star_outline_rounded,
+                                size: 11,
+                                color: i < stars
+                                    ? GameColors.sunny
+                                    : GameColors.mutedInk,
+                              ),
+                          ],
+                        ),
+                      ),
+                  ],
+                )
               : const Icon(
                   Icons.lock_rounded,
                   size: 20,

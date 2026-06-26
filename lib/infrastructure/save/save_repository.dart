@@ -9,6 +9,7 @@ final class SaveProgress {
     required this.stars,
     required this.xp,
     required this.winStreak,
+    this.levelStars = const <String, int>{},
   });
 
   factory SaveProgress.initial() {
@@ -28,6 +29,7 @@ final class SaveProgress {
       stars: json['stars']! as int,
       xp: json['xp']! as int,
       winStreak: json['winStreak']! as int,
+      levelStars: _levelStarsFromJson(json['levelStars']),
     );
   }
 
@@ -36,6 +38,7 @@ final class SaveProgress {
   final int stars;
   final int xp;
   final int winStreak;
+  final Map<String, int> levelStars;
 
   SaveProgress copyWith({
     int? highestLevelCompleted,
@@ -43,6 +46,7 @@ final class SaveProgress {
     int? stars,
     int? xp,
     int? winStreak,
+    Map<String, int>? levelStars,
   }) {
     return SaveProgress(
       highestLevelCompleted:
@@ -51,6 +55,7 @@ final class SaveProgress {
       stars: stars ?? this.stars,
       xp: xp ?? this.xp,
       winStreak: winStreak ?? this.winStreak,
+      levelStars: levelStars ?? this.levelStars,
     );
   }
 
@@ -61,6 +66,17 @@ final class SaveProgress {
       'stars': stars,
       'xp': xp,
       'winStreak': winStreak,
+      'levelStars': levelStars,
+    };
+  }
+
+  static Map<String, int> _levelStarsFromJson(Object? json) {
+    if (json is! Map) {
+      return const <String, int>{};
+    }
+    return <String, int>{
+      for (final MapEntry<Object?, Object?> entry in json.entries)
+        entry.key.toString(): (entry.value as num).toInt(),
     };
   }
 }
