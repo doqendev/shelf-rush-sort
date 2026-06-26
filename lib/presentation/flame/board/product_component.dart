@@ -19,14 +19,21 @@ final class ProductComponent extends PositionComponent
     this.productBlocker = BlockerKind.none,
     required super.position,
     required super.size,
-  });
+  }) {
+    // Above the shelf scaffold (rack/targets at priority 0) but below hover
+    // (50), drag (1000) and FX, so a retained product still renders correctly
+    // after the scaffold is re-added on rebuild (second-pass audit M2).
+    priority = 10;
+  }
 
-  final CellAddress address;
+  /// Mutable so a retained component can be re-homed on a move instead of being
+  /// destroyed and recreated (the move then animates — see ShelfWorld).
+  CellAddress address;
   final ProductDef productDef;
   final InputRouter inputRouter;
-  final bool selected;
-  final BlockerKind cellBlocker;
-  final BlockerKind productBlocker;
+  bool selected;
+  BlockerKind cellBlocker;
+  BlockerKind productBlocker;
   Vector2? _lastDragCanvasPosition;
 
   @override

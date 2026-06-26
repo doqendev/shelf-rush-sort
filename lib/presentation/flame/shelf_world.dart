@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
+import 'package:flutter/animation.dart';
 
 import '../../application/game_session/game_session_controller.dart';
 import '../../application/game_session/game_session_state.dart';
@@ -66,6 +68,12 @@ final class ShelfWorld extends World {
   _ProductDragVisual? _productDragVisual;
   DraggedProductComponent? _productDragComponent;
   HoverTargetComponent? _hoverComponent;
+
+  /// Retained product components, keyed by stable [ProductInstance.id]. A moved
+  /// product keeps its component (and animates) rather than being rebuilt in
+  /// place (second-pass audit M2).
+  final Map<ProductInstanceId, ProductComponent> _productComponents =
+      <ProductInstanceId, ProductComponent>{};
   final Map<String, MovingLaneComponent> _laneComponents =
       <String, MovingLaneComponent>{};
 
@@ -88,7 +96,8 @@ final class ShelfWorld extends World {
       laneDefs: _state.lanes.map((lane) => lane.def).toList(growable: false),
     );
     inputRouter.layout = _layout;
-    unawaited(rebuild());
+    // Re-layout snaps products to their new slots (a resize is not a "move").
+    unawaited(rebuild(animateMoves: false));
   }
 
   void syncState(GameSessionState state) {
@@ -111,7 +120,7 @@ final class ShelfWorld extends World {
     unawaited(_syncLanes());
   }
 
-  Future<void> rebuild() async {
+  Future<void> rebuild({bool animateMoves = true}) async {
     if (_rebuilding) {
       _pendingRebuild = true;
       return;
@@ -125,6 +134,7 @@ final class ShelfWorld extends World {
               (Component child) =>
                   child != _productDragComponent &&
                   child != _hoverComponent &&
+                  child is! ProductComponent &&
                   child is! ClearPopComponent &&
                   child is! ProductPopComponent,
             )
@@ -134,6 +144,7 @@ final class ShelfWorld extends World {
       await _addBoard();
       await _addLanes();
       await _syncProductDragComponent();
+      await _reconcileProducts(animate: animateMoves);
       _boardSyncHash = _currentBoardSyncHash();
     } while (_pendingRebuild);
     _rebuilding = false;
@@ -191,38 +202,19 @@ final class ShelfWorld extends World {
       }
       for (var cell = 0; cell < cellsPerCompartment; cell += 1) {
         final CellAddress address = compartment.addressForCell(cell);
-        final Rect cellRect = _layout.cellRect(address);
         final ShelfCell shelfCell = compartment.cellAt(cell);
-        if (shelfCell.product == null) {
-          await add(
-            CellTargetComponent(
-              address: address,
-              inputRouter: inputRouter,
-              highlighted: _isLegalTarget(address),
-              blocker: shelfCell.blocker,
-              position: Vector2(cellRect.left, cellRect.top),
-              size: Vector2(cellRect.width, cellRect.height),
-            ),
-          );
+        // Products are retained components managed by _reconcileProducts; the
+        // scaffold only lays down interactive targets for the empty slots.
+        if (shelfCell.product != null) {
           continue;
         }
-        final ProductDef? productDef = productCatalog.bySku(
-          shelfCell.product!.skuId,
-        );
-        if (productDef == null) {
-          continue;
-        }
-        if (_productDragVisual?.source == address) {
-          continue;
-        }
+        final Rect cellRect = _layout.cellRect(address);
         await add(
-          ProductComponent(
+          CellTargetComponent(
             address: address,
-            productDef: productDef,
             inputRouter: inputRouter,
-            selected: _state.selectedCell == address,
-            cellBlocker: shelfCell.blocker,
-            productBlocker: shelfCell.product!.blocker,
+            highlighted: _isLegalTarget(address),
+            blocker: shelfCell.blocker,
             position: Vector2(cellRect.left, cellRect.top),
             size: Vector2(cellRect.width, cellRect.height),
           ),
@@ -230,6 +222,94 @@ final class ShelfWorld extends World {
       }
     }
     await _addTutorialOverlay();
+  }
+
+  /// Reconciles the retained product components against the current board.
+  /// Because [ProductInstance.id] is stable, a product that changed slots
+  /// (booster shuffle, settle) keeps its component and animates to the new slot
+  /// instead of teleporting (second-pass audit M2). Products that are gone
+  /// (cleared, or lifted by a drag) are removed — their exit is shown by the
+  /// clear FX / the dragged visual.
+  Future<void> _reconcileProducts({required bool animate}) async {
+    final Map<ProductInstanceId, _ProductPlacement> desired =
+        <ProductInstanceId, _ProductPlacement>{};
+    for (final CompartmentState compartment in _state.board.compartments) {
+      if (!compartment.interactable) {
+        continue;
+      }
+      for (var cell = 0; cell < cellsPerCompartment; cell += 1) {
+        final CellAddress address = compartment.addressForCell(cell);
+        final ShelfCell shelfCell = compartment.cellAt(cell);
+        final ProductInstance? product = shelfCell.product;
+        if (product == null || _productDragVisual?.source == address) {
+          continue;
+        }
+        final ProductDef? productDef = productCatalog.bySku(product.skuId);
+        if (productDef == null) {
+          continue;
+        }
+        final Rect rect = _layout.cellRect(address);
+        desired[product.id] = _ProductPlacement(
+          address: address,
+          productDef: productDef,
+          selected: _state.selectedCell == address,
+          cellBlocker: shelfCell.blocker,
+          productBlocker: product.blocker,
+          position: Vector2(rect.left, rect.top),
+          size: Vector2(rect.width, rect.height),
+        );
+      }
+    }
+
+    final List<ProductInstanceId> gone = <ProductInstanceId>[
+      for (final ProductInstanceId id in _productComponents.keys)
+        if (!desired.containsKey(id)) id,
+    ];
+    for (final ProductInstanceId id in gone) {
+      _productComponents.remove(id)?.removeFromParent();
+    }
+
+    for (final MapEntry<ProductInstanceId, _ProductPlacement> entry
+        in desired.entries) {
+      final _ProductPlacement placement = entry.value;
+      final ProductComponent? existing = _productComponents[entry.key];
+      if (existing == null || !existing.isMounted) {
+        final ProductComponent created = ProductComponent(
+          address: placement.address,
+          productDef: placement.productDef,
+          inputRouter: inputRouter,
+          selected: placement.selected,
+          cellBlocker: placement.cellBlocker,
+          productBlocker: placement.productBlocker,
+          position: placement.position.clone(),
+          size: placement.size,
+        );
+        _productComponents[entry.key] = created;
+        await add(created);
+        continue;
+      }
+      existing
+        ..address = placement.address
+        ..selected = placement.selected
+        ..cellBlocker = placement.cellBlocker
+        ..productBlocker = placement.productBlocker
+        ..size = placement.size;
+      // Cancel any in-flight relocation before deciding the next one.
+      existing.children.whereType<MoveToEffect>().toList().forEach(
+        (MoveToEffect effect) => effect.removeFromParent(),
+      );
+      final Vector2 target = placement.position;
+      if (!animate || existing.position.distanceTo(target) < 0.5) {
+        existing.position = target.clone();
+        continue;
+      }
+      existing.add(
+        MoveToEffect(
+          target.clone(),
+          EffectController(duration: 0.26, curve: Curves.easeOutCubic),
+        ),
+      );
+    }
   }
 
   /// Adds the guided-move overlay while the opening tutorial step is active
@@ -536,4 +616,25 @@ final class _ProductDragVisual {
       position: position,
     );
   }
+}
+
+/// The desired on-screen placement for one product during reconciliation.
+final class _ProductPlacement {
+  const _ProductPlacement({
+    required this.address,
+    required this.productDef,
+    required this.selected,
+    required this.cellBlocker,
+    required this.productBlocker,
+    required this.position,
+    required this.size,
+  });
+
+  final CellAddress address;
+  final ProductDef productDef;
+  final bool selected;
+  final BlockerKind cellBlocker;
+  final BlockerKind productBlocker;
+  final Vector2 position;
+  final Vector2 size;
 }
