@@ -18,6 +18,7 @@ import 'board/cell_target_component.dart';
 import 'board/compartment_component.dart';
 import 'board/dragged_product_component.dart';
 import 'board/hidden_preview_component.dart';
+import 'board/hover_target_component.dart';
 import 'board/product_component.dart';
 import 'board/rack_backdrop_component.dart';
 import 'fx/clear_pop_component.dart';
@@ -60,6 +61,7 @@ final class ShelfWorld extends World {
   String _boardSyncHash = '';
   _ProductDragVisual? _productDragVisual;
   DraggedProductComponent? _productDragComponent;
+  HoverTargetComponent? _hoverComponent;
   final Map<String, MovingLaneComponent> _laneComponents =
       <String, MovingLaneComponent>{};
 
@@ -117,7 +119,9 @@ final class ShelfWorld extends World {
         children
             .where(
               (Component child) =>
-                  child != _productDragComponent && child is! ClearPopComponent,
+                  child != _productDragComponent &&
+                  child != _hoverComponent &&
+                  child is! ClearPopComponent,
             )
             .toList(),
       );
@@ -288,9 +292,60 @@ final class ShelfWorld extends World {
     } else {
       unawaited(_syncProductDragComponent());
     }
+    _updateHoverTarget(canvasPosition);
+  }
+
+  /// Strongly emphasises the slot the dragged product is aimed at — gold (with
+  /// a "3" badge) when the drop completes a triple, otherwise green — so the
+  /// outcome is visible before release (second-pass audit P1.2).
+  void _updateHoverTarget(Vector2 canvasPosition) {
+    final CellAddress? source = _productDragVisual?.source;
+    if (source == null) {
+      _clearHoverTarget();
+      return;
+    }
+    final ProductInstance? moving = _state.board.productAt(source);
+    final CellAddress? target = inputRouter.magnetTargeting.targetFor(
+      _layout,
+      canvasPosition,
+      board: _state.board,
+      movingProduct: moving,
+    );
+    if (target == null || target == source) {
+      _clearHoverTarget();
+      return;
+    }
+    final MoveQuality quality = controller.boardRules.classifyMove(
+      _state.board,
+      MoveAction(source: source, target: target),
+    );
+    final Rect rect = _layout.cellRect(target);
+    final HoverTargetComponent? existing = _hoverComponent;
+    if (existing != null && existing.isMounted) {
+      existing.position = Vector2(rect.left, rect.top);
+      existing.size = Vector2(rect.width, rect.height);
+      existing.quality = quality;
+      return;
+    }
+    final HoverTargetComponent created = HoverTargetComponent(
+      quality: quality,
+      position: Vector2(rect.left, rect.top),
+      size: Vector2(rect.width, rect.height),
+    );
+    _hoverComponent = created;
+    final FutureOr<void> pending = add(created);
+    if (pending is Future<void>) {
+      unawaited(pending);
+    }
+  }
+
+  void _clearHoverTarget() {
+    _hoverComponent?.removeFromParent();
+    _hoverComponent = null;
   }
 
   void _finishProductDragVisual(CellAddress? target) {
+    _clearHoverTarget();
     final _ProductDragVisual? visual = _productDragVisual;
     final DraggedProductComponent? component = _productDragComponent;
     // No drag visual, or reduced motion: commit immediately and settle.
