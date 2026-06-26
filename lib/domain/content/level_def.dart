@@ -233,6 +233,24 @@ final class LevelScore {
   final int twoStarMoves;
 }
 
+/// A short player-facing lesson shown when a level opens, teaching the one new
+/// mental model the level introduces. The curriculum carried human-written
+/// intent metadata, but the player only ever saw the generic objective line;
+/// this surfaces the lesson in the UI (hands-on v3 P1.2).
+final class LevelTeachingCopy {
+  const LevelTeachingCopy({required this.headline, required this.body});
+
+  factory LevelTeachingCopy.fromJson(Map<String, Object?> json) {
+    return LevelTeachingCopy(
+      headline: json['headline']! as String,
+      body: json['body']! as String,
+    );
+  }
+
+  final String headline;
+  final String body;
+}
+
 final class LevelDef {
   LevelDef({
     required this.id,
@@ -251,6 +269,7 @@ final class LevelDef {
     this.validationMetrics = const ValidationMetrics(),
     this.laneFailurePolicy = const LaneFailurePolicy(),
     this.score,
+    this.tutorialCopy,
   }) : compartments = List<CompartmentDef>.unmodifiable(compartments),
        movingLanes = List<MovingLaneDef>.unmodifiable(movingLanes),
        tags = List<LevelTag>.unmodifiable(tags);
@@ -333,6 +352,11 @@ final class LevelDef {
       score: json['score'] == null
           ? null
           : LevelScore.fromJson(json['score']! as Map<String, Object?>),
+      tutorialCopy: json['tutorialCopy'] == null
+          ? null
+          : LevelTeachingCopy.fromJson(
+              json['tutorialCopy']! as Map<String, Object?>,
+            ),
     );
   }
 
@@ -352,6 +376,7 @@ final class LevelDef {
   final ValidationMetrics validationMetrics;
   final LaneFailurePolicy laneFailurePolicy;
   final LevelScore? score;
+  final LevelTeachingCopy? tutorialCopy;
 
   BoardState createBoardState() {
     var instanceCounter = 0;

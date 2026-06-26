@@ -189,6 +189,10 @@
         "curriculumTag": "first_triple",
         "difficultyTarget": "tutorial",
         "humanReviewGrade": "engineering_reviewed"
+      },
+      "tutorialCopy": {
+        "headline": "Make a match",
+        "body": "Drag matching products together to clear a shelf."
       }
     },
     {
@@ -380,6 +384,10 @@
       "score": {
         "threeStarMoves": 2,
         "twoStarMoves": 4
+      },
+      "tutorialCopy": {
+        "headline": "Your turn",
+        "body": "Now sort both pairs yourself."
       }
     },
     {
@@ -571,6 +579,10 @@
       "score": {
         "threeStarMoves": 3,
         "twoStarMoves": 5
+      },
+      "tutorialCopy": {
+        "headline": "Make room",
+        "body": "Use the empty shelf to stage a product and free up space."
       }
     },
     {
@@ -765,6 +777,10 @@
       "score": {
         "threeStarMoves": 3,
         "twoStarMoves": 5
+      },
+      "tutorialCopy": {
+        "headline": "Hidden products",
+        "body": "Clear the front shelf to reveal what's hidden behind it."
       }
     },
     {
@@ -961,6 +977,10 @@
       "score": {
         "threeStarMoves": 2,
         "twoStarMoves": 4
+      },
+      "tutorialCopy": {
+        "headline": "Mystery bags",
+        "body": "Move a mystery bag to open it, then match what's inside."
       }
     },
     {
@@ -1152,6 +1172,10 @@
       "score": {
         "threeStarMoves": 2,
         "twoStarMoves": 4
+      },
+      "tutorialCopy": {
+        "headline": "Beat the clock",
+        "body": "Clear the shelves before time runs out."
       }
     },
     {
@@ -1346,6 +1370,10 @@
       "score": {
         "threeStarMoves": 3,
         "twoStarMoves": 5
+      },
+      "tutorialCopy": {
+        "headline": "Plan ahead",
+        "body": "Use your space to stage, then clear to reveal."
       }
     },
     {
@@ -1545,6 +1573,10 @@
       "score": {
         "threeStarMoves": 3,
         "twoStarMoves": 5
+      },
+      "tutorialCopy": {
+        "headline": "Bagged & hidden",
+        "body": "Open the bag, then finish the hidden set."
       }
     },
     {
@@ -1736,6 +1768,10 @@
       "score": {
         "threeStarMoves": 4,
         "twoStarMoves": 6
+      },
+      "tutorialCopy": {
+        "headline": "Under pressure",
+        "body": "Sort fast - but keep one shelf free for staging."
       }
     },
     {
@@ -1935,6 +1971,10 @@
       "score": {
         "threeStarMoves": 4,
         "twoStarMoves": 6
+      },
+      "tutorialCopy": {
+        "headline": "Closing time",
+        "body": "Use everything: space, bags, hidden products, and the clock."
       }
     },
     {

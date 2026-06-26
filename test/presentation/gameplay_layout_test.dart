@@ -56,15 +56,69 @@ void main() {
       expect(find.text('500'), findsNothing);
     });
   }
+
+  testWidgets('teaching banner shows the level lesson before the first move', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: GameScaffold(
+          session: _session(
+            teaching: const LevelTeachingCopy(
+              headline: 'Make room',
+              body: 'Use the empty shelf to stage a product.',
+            ),
+          ),
+          onPause: () {},
+          viewport: const ColoredBox(color: Color(0xFF00AAFF)),
+        ),
+      ),
+    );
+    expect(find.text('Make room'), findsOneWidget);
+    expect(
+      find.text('Use the empty shelf to stage a product.'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('teaching banner is gone once the player has moved', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: GameScaffold(
+          session: _session(
+            teaching: const LevelTeachingCopy(
+              headline: 'Make room',
+              body: 'Use the empty shelf to stage a product.',
+            ),
+            moveCount: 1,
+          ),
+          onPause: () {},
+          viewport: const ColoredBox(color: Color(0xFF00AAFF)),
+        ),
+      ),
+    );
+    expect(find.text('Make room'), findsNothing);
+  });
 }
 
-GameSessionState _session() {
+GameSessionState _session({LevelTeachingCopy? teaching, int moveCount = 0}) {
   final LevelDef level = LevelDef(
     id: 'layout_test',
     levelNumber: 1,
     title: 'Layout Test',
     seed: 1,
     objective: ObjectiveRequirement(type: ObjectiveType.clearAll),
+    tutorialCopy: teaching,
     compartments: <CompartmentDef>[
       CompartmentDef(
         index: 0,
@@ -86,6 +140,7 @@ GameSessionState _session() {
     timer: LevelTimer.fromSeconds(level.timeLimitSeconds),
     replay: ReplayLog(levelId: level.id, seed: level.seed),
     lanes: const [],
+    moveCount: moveCount,
     attemptId: 'layout_attempt',
   );
 }

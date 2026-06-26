@@ -118,6 +118,23 @@ void main() {
     );
   });
 
+  test(
+    'curriculum levels 1-10 carry player-facing teaching copy (v3 P1.2)',
+    () async {
+      final LevelPack pack = await _verticalSlicePack();
+      for (var levelNumber = 1; levelNumber <= 10; levelNumber += 1) {
+        final LevelDef level = pack.levelByNumber(levelNumber);
+        expect(
+          level.tutorialCopy,
+          isNotNull,
+          reason: 'level $levelNumber needs a player-facing lesson',
+        );
+        expect(level.tutorialCopy!.headline, isNotEmpty);
+        expect(level.tutorialCopy!.body, isNotEmpty);
+      }
+    },
+  );
+
   test('curriculum levels 2..N are gentle, solvable and collision-free', () async {
     final LevelPack pack = await _verticalSlicePack();
     final ProductCatalog catalog = await _productCatalog();
