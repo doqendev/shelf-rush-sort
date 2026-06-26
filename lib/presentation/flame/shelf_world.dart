@@ -74,6 +74,11 @@ final class ShelfWorld extends World {
   /// place (second-pass audit M2).
   final Map<ProductInstanceId, ProductComponent> _productComponents =
       <ProductInstanceId, ProductComponent>{};
+
+  /// Gates the product drop-in entrance: skip the very first build, and skip
+  /// products that just arrived via a drag snap (they already animated).
+  bool _hasReconciledOnce = false;
+  final Set<ProductInstanceId> _suppressEntrance = <ProductInstanceId>{};
   final Map<String, MovingLaneComponent> _laneComponents =
       <String, MovingLaneComponent>{};
 
@@ -286,6 +291,19 @@ final class ShelfWorld extends World {
         );
         _productComponents[entry.key] = created;
         await add(created);
+        // Drop newly-appeared products (hidden reveals, lane placements) into
+        // their slot rather than popping in. Skip the first build and products
+        // that just arrived via a drag snap (audit M2 / section 7).
+        final bool suppressed = _suppressEntrance.remove(entry.key);
+        if (_hasReconciledOnce && animate && !reduceMotion && !suppressed) {
+          created.position = placement.position - Vector2(0, 16);
+          created.add(
+            MoveToEffect(
+              placement.position.clone(),
+              EffectController(duration: 0.2, curve: Curves.easeOutBack),
+            ),
+          );
+        }
         continue;
       }
       existing
@@ -310,6 +328,7 @@ final class ShelfWorld extends World {
         ),
       );
     }
+    _hasReconciledOnce = true;
   }
 
   /// Adds the guided-move overlay while the opening tutorial step is active
@@ -487,10 +506,15 @@ final class ShelfWorld extends World {
     // Valid drop: spring the product into the destination slot, THEN commit the
     // move, so it visibly settles before the board resolves (review section 10).
     final Rect destination = _layout.cellRect(target);
+    final ProductInstance? placed = _state.board.productAt(visual.source);
     component.animateTo(
       Vector2(destination.left, destination.top),
       onComplete: () {
         _productDragComponent = null;
+        // The product already sprang into the slot — don't also drop it in.
+        if (placed != null) {
+          _suppressEntrance.add(placed.id);
+        }
         controller.placeSelectedAt(target);
         component.removeFromParent();
         unawaited(rebuild());
