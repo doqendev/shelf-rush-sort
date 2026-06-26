@@ -758,10 +758,10 @@
     {
       "id": "vertical_level_0005",
       "levelNumber": 5,
-      "title": "Full Rack Sort 5",
+      "title": "Mystery Bags",
       "seed": 2005,
       "difficulty": "normal",
-      "timeLimitSeconds": 180,
+      "timeLimitSeconds": null,
       "moveLimit": null,
       "objective": {
         "type": "clearAll",
@@ -771,8 +771,8 @@
         {
           "index": 0,
           "cells": [
-            "sku_008",
-            "sku_008",
+            "sku_000",
+            "sku_000",
             null
           ],
           "hidden": [],
@@ -782,20 +782,25 @@
         {
           "index": 1,
           "cells": [
-            "sku_008",
-            "sku_009",
-            "sku_009"
+            "sku_000",
+            "sku_001",
+            "sku_001"
           ],
           "hidden": [],
           "locked": false,
-          "decorative": false
+          "decorative": false,
+          "productBlockers": [
+            "mysteryBag",
+            "none",
+            "none"
+          ]
         },
         {
           "index": 2,
           "cells": [
-            "sku_009",
-            "sku_010",
-            "sku_010"
+            "sku_001",
+            null,
+            null
           ],
           "hidden": [],
           "locked": false,
@@ -804,152 +809,151 @@
         {
           "index": 3,
           "cells": [
-            "sku_010",
-            "sku_011",
-            "sku_011"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 4,
           "cells": [
-            "sku_011",
-            "sku_012",
-            "sku_012"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 5,
           "cells": [
-            "sku_012",
-            "sku_013",
-            "sku_013"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 6,
           "cells": [
-            "sku_013",
-            "sku_014",
-            "sku_014"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 7,
           "cells": [
-            "sku_014",
-            "sku_015",
-            "sku_015"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 8,
           "cells": [
-            "sku_015",
-            "sku_016",
-            "sku_016"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 9,
           "cells": [
-            "sku_016",
-            "sku_017",
-            "sku_017"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 10,
           "cells": [
-            "sku_017",
-            "sku_018",
-            "sku_018"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 11,
           "cells": [
-            "sku_018",
-            "sku_019",
-            "sku_019"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 12,
           "cells": [
-            "sku_019",
-            "sku_020",
-            "sku_020"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 13,
           "cells": [
-            "sku_020",
-            "sku_021",
-            "sku_021"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 14,
           "cells": [
-            "sku_021",
+            null,
             null,
             null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         }
       ],
-      "movingLanes": [],
       "humanReview": {
-        "author": "engineering_vertical_slice",
-        "intent": "Maintain full-rack density while increasing SKU planning.",
-        "curriculumTag": "full_rack_opening",
-        "difficultyTarget": "normal",
-        "humanReviewGrade": "engineering_reviewed"
+        "author": "studio-curriculum",
+        "intent": "Introduce mystery bags: a product wrapped in a bag must be moved to reveal it before its shelf can clear. Exactly one new model on top of hidden products.",
+        "curriculumTag": "first_mystery_bag",
+        "difficultyTarget": "easy",
+        "humanReviewGrade": "reviewed"
       }
     },
     {
       "id": "vertical_level_0006",
       "levelNumber": 6,
-      "title": "Full Rack Sort 6",
+      "title": "Beat the Clock",
       "seed": 2006,
       "difficulty": "normal",
-      "timeLimitSeconds": 180,
+      "timeLimitSeconds": 45,
       "moveLimit": null,
       "objective": {
         "type": "clearAll",
@@ -959,8 +963,8 @@
         {
           "index": 0,
           "cells": [
-            "sku_010",
-            "sku_010",
+            "sku_000",
+            "sku_000",
             null
           ],
           "hidden": [],
@@ -970,9 +974,9 @@
         {
           "index": 1,
           "cells": [
-            "sku_010",
-            "sku_011",
-            "sku_011"
+            "sku_001",
+            "sku_001",
+            null
           ],
           "hidden": [],
           "locked": false,
@@ -981,9 +985,9 @@
         {
           "index": 2,
           "cells": [
-            "sku_011",
-            "sku_012",
-            "sku_012"
+            "sku_000",
+            "sku_001",
+            null
           ],
           "hidden": [],
           "locked": false,
@@ -992,152 +996,151 @@
         {
           "index": 3,
           "cells": [
-            "sku_012",
-            "sku_013",
-            "sku_013"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 4,
           "cells": [
-            "sku_013",
-            "sku_014",
-            "sku_014"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 5,
           "cells": [
-            "sku_014",
-            "sku_015",
-            "sku_015"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 6,
           "cells": [
-            "sku_015",
-            "sku_016",
-            "sku_016"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 7,
           "cells": [
-            "sku_016",
-            "sku_017",
-            "sku_017"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 8,
           "cells": [
-            "sku_017",
-            "sku_018",
-            "sku_018"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 9,
           "cells": [
-            "sku_018",
-            "sku_019",
-            "sku_019"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 10,
           "cells": [
-            "sku_019",
-            "sku_020",
-            "sku_020"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 11,
           "cells": [
-            "sku_020",
-            "sku_021",
-            "sku_021"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 12,
           "cells": [
-            "sku_021",
-            "sku_022",
-            "sku_022"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 13,
           "cells": [
-            "sku_022",
-            "sku_023",
-            "sku_023"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 14,
           "cells": [
-            "sku_023",
+            null,
             null,
             null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         }
       ],
-      "movingLanes": [],
       "humanReview": {
-        "author": "engineering_vertical_slice",
-        "intent": "Maintain full-rack density while increasing SKU planning.",
-        "curriculumTag": "full_rack_opening",
-        "difficultyTarget": "normal",
-        "humanReviewGrade": "engineering_reviewed"
+        "author": "studio-curriculum",
+        "intent": "Introduce the countdown timer on a board the player already cleared in level 2, with generous time. The new model is time pressure itself, not added complexity.",
+        "curriculumTag": "first_timer",
+        "difficultyTarget": "easy",
+        "humanReviewGrade": "reviewed"
       }
     },
     {
       "id": "vertical_level_0007",
       "levelNumber": 7,
-      "title": "Full Rack Sort 7",
+      "title": "Double Trouble",
       "seed": 2007,
       "difficulty": "normal",
-      "timeLimitSeconds": 180,
+      "timeLimitSeconds": null,
       "moveLimit": null,
       "objective": {
         "type": "clearAll",
@@ -1147,20 +1150,23 @@
         {
           "index": 0,
           "cells": [
-            "sku_012",
-            "sku_012",
+            "sku_000",
+            "sku_000",
             null
           ],
-          "hidden": [],
+          "hidden": [
+            "sku_002",
+            "sku_002"
+          ],
           "locked": false,
           "decorative": false
         },
         {
           "index": 1,
           "cells": [
-            "sku_012",
-            "sku_013",
-            "sku_013"
+            "sku_000",
+            "sku_001",
+            "sku_001"
           ],
           "hidden": [],
           "locked": false,
@@ -1169,9 +1175,9 @@
         {
           "index": 2,
           "cells": [
-            "sku_013",
-            "sku_014",
-            "sku_014"
+            "sku_001",
+            "sku_002",
+            null
           ],
           "hidden": [],
           "locked": false,
@@ -1180,152 +1186,151 @@
         {
           "index": 3,
           "cells": [
-            "sku_014",
-            "sku_015",
-            "sku_015"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 4,
           "cells": [
-            "sku_015",
-            "sku_016",
-            "sku_016"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 5,
           "cells": [
-            "sku_016",
-            "sku_017",
-            "sku_017"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 6,
           "cells": [
-            "sku_017",
-            "sku_018",
-            "sku_018"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 7,
           "cells": [
-            "sku_018",
-            "sku_019",
-            "sku_019"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 8,
           "cells": [
-            "sku_019",
-            "sku_020",
-            "sku_020"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 9,
           "cells": [
-            "sku_020",
-            "sku_021",
-            "sku_021"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 10,
           "cells": [
-            "sku_021",
-            "sku_022",
-            "sku_022"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 11,
           "cells": [
-            "sku_022",
-            "sku_023",
-            "sku_023"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 12,
           "cells": [
-            "sku_023",
-            "sku_024",
-            "sku_024"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 13,
           "cells": [
-            "sku_024",
-            "sku_025",
-            "sku_025"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 14,
           "cells": [
-            "sku_025",
+            null,
             null,
             null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         }
       ],
-      "movingLanes": [],
       "humanReview": {
-        "author": "engineering_vertical_slice",
-        "intent": "Maintain full-rack density while increasing SKU planning.",
-        "curriculumTag": "full_rack_opening",
+        "author": "studio-curriculum",
+        "intent": "Combine a hidden reveal with empty-space staging at higher density. No new model — a confidence-building ramp using three SKUs.",
+        "curriculumTag": "combine_hidden_staging",
         "difficultyTarget": "normal",
-        "humanReviewGrade": "engineering_reviewed"
+        "humanReviewGrade": "reviewed"
       }
     },
     {
       "id": "vertical_level_0008",
       "levelNumber": 8,
-      "title": "Full Rack Sort 8",
+      "title": "Bagged & Hidden",
       "seed": 2008,
       "difficulty": "hard",
-      "timeLimitSeconds": 180,
+      "timeLimitSeconds": null,
       "moveLimit": null,
       "objective": {
         "type": "clearAll",
@@ -1335,41 +1340,39 @@
         {
           "index": 0,
           "cells": [
-            "sku_014",
-            "sku_014",
+            "sku_000",
+            "sku_000",
             null
           ],
-          "hiddenLayers": [
-            {
-              "previewMode": "silhouette",
-              "cells": [
-                "sku_039",
-                "sku_039",
-                "sku_039"
-              ]
-            }
+          "hidden": [
+            "sku_002",
+            "sku_002"
           ],
-          "hidden": [],
           "locked": false,
           "decorative": false
         },
         {
           "index": 1,
           "cells": [
-            "sku_014",
-            "sku_015",
-            "sku_015"
+            "sku_000",
+            "sku_001",
+            "sku_001"
           ],
           "hidden": [],
           "locked": false,
-          "decorative": false
+          "decorative": false,
+          "productBlockers": [
+            "mysteryBag",
+            "none",
+            "none"
+          ]
         },
         {
           "index": 2,
           "cells": [
-            "sku_015",
-            "sku_016",
-            "sku_016"
+            "sku_001",
+            "sku_002",
+            null
           ],
           "hidden": [],
           "locked": false,
@@ -1378,143 +1381,142 @@
         {
           "index": 3,
           "cells": [
-            "sku_016",
-            "sku_017",
-            "sku_017"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 4,
           "cells": [
-            "sku_017",
-            "sku_018",
-            "sku_018"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 5,
           "cells": [
-            "sku_018",
-            "sku_019",
-            "sku_019"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 6,
           "cells": [
-            "sku_019",
-            "sku_020",
-            "sku_020"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 7,
           "cells": [
-            "sku_020",
-            "sku_021",
-            "sku_021"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 8,
           "cells": [
-            "sku_021",
-            "sku_022",
-            "sku_022"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 9,
           "cells": [
-            "sku_022",
-            "sku_023",
-            "sku_023"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 10,
           "cells": [
-            "sku_023",
-            "sku_024",
-            "sku_024"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 11,
           "cells": [
-            "sku_024",
-            "sku_025",
-            "sku_025"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 12,
           "cells": [
-            "sku_025",
-            "sku_026",
-            "sku_026"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 13,
           "cells": [
-            "sku_026",
-            "sku_027",
-            "sku_027"
+            null,
+            null,
+            null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         },
         {
           "index": 14,
           "cells": [
-            "sku_027",
+            null,
             null,
             null
           ],
           "hidden": [],
-          "locked": false,
+          "locked": true,
           "decorative": false
         }
       ],
-      "movingLanes": [],
       "humanReview": {
-        "author": "engineering_vertical_slice",
-        "intent": "Maintain full-rack density while increasing SKU planning.",
-        "curriculumTag": "full_rack_opening",
-        "difficultyTarget": "normal",
-        "humanReviewGrade": "engineering_reviewed"
+        "author": "studio-curriculum",
+        "intent": "Layer two learned obstacles at once — a mystery bag on the key product and a hidden reveal behind the first clear. The first real planning step-up.",
+        "curriculumTag": "combine_bag_hidden",
+        "difficultyTarget": "hard",
+        "humanReviewGrade": "reviewed"
       }
     },
     {

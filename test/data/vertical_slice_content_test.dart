@@ -14,7 +14,7 @@ import 'package:shelf_rush_sort/domain/solver/validation_report.dart';
 
 /// Levels 2..[curatedThrough] are the hand-authored Sprint B curriculum; the
 /// rest of the opening pack still uses the full rack until curated too.
-const int curatedThrough = 4;
+const int curatedThrough = 8;
 
 void main() {
   test('level 1 is a gentle, collision-free teaching board', () async {
