@@ -38,7 +38,9 @@ void main() {
       expect(find.byTooltip('Pause'), findsOneWidget);
       expect(tester.getSize(find.byTooltip('Pause')), const Size(44, 44));
       expect(find.text('Level 1'), findsOneWidget);
-      expect(find.textContaining('Clear'), findsOneWidget);
+      // Mechanic-specific objective copy + a live "N left" progress count.
+      expect(find.textContaining('matching'), findsOneWidget);
+      expect(find.textContaining('left'), findsOneWidget);
       expect(find.byIcon(Icons.map_rounded), findsNothing);
       expect(find.byIcon(Icons.storefront), findsNothing);
       expect(find.byIcon(Icons.settings), findsNothing);

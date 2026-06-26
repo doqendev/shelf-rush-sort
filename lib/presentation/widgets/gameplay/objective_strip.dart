@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../application/game_session/game_session_state.dart';
+import '../../../domain/game/board_state.dart';
 import '../../../domain/game/objective.dart';
 import '../../../presentation/design/game_colors.dart';
 import '../../../presentation/design/game_surfaces.dart';
@@ -8,6 +9,9 @@ import '../../../presentation/design/game_typography.dart';
 import '../../../presentation/design/layout_tokens.dart';
 import '../cozy/cozy_widgets.dart';
 
+/// The in-game objective strip: a mechanic-specific instruction plus a live
+/// progress count ("N left"), per the second-pass audit P1.3. A combo pill is
+/// shown only once an actual chain (x2+) happens — never a static `x0`.
 final class ObjectiveStrip extends StatelessWidget {
   const ObjectiveStrip({super.key, required this.session});
 
@@ -15,6 +19,10 @@ final class ObjectiveStrip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ObjectiveState objective = session.objective;
+    final bool showCombo =
+        objective.maxCombo >= 2 &&
+        objective.requirement.type != ObjectiveType.comboTarget;
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final double width = constraints.maxWidth;
@@ -38,14 +46,18 @@ final class ObjectiveStrip extends StatelessWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        _objectiveText(),
+                        _objectiveText(objective.requirement.type),
                         style: GameTypography.objective,
                         maxLines: width < 340 ? 2 : 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     const SizedBox(width: 8),
-                    _ComboPill(combo: session.objective.maxCombo),
+                    Text(_progressText(), style: GameTypography.compactLabel),
+                    if (showCombo) ...<Widget>[
+                      const SizedBox(width: 6),
+                      _ComboPill(combo: objective.maxCombo),
+                    ],
                   ],
                 ),
               ),
@@ -56,17 +68,51 @@ final class ObjectiveStrip extends StatelessWidget {
     );
   }
 
-  String _objectiveText() {
-    final ObjectiveState objective = session.objective;
-    return switch (objective.requirement.type) {
-      ObjectiveType.clearAll => 'Clear every product',
-      ObjectiveType.clearSkuTargets => 'Fill customer order',
-      ObjectiveType.clearCategoryTargets => 'Clear categories',
-      ObjectiveType.clearSpecialTargets => 'Clear specials',
-      ObjectiveType.comboTarget => 'Build combo chain',
+  String _objectiveText(ObjectiveType type) {
+    return switch (type) {
+      ObjectiveType.clearAll => 'Put 3 matching products on one shelf',
+      ObjectiveType.clearSkuTargets => 'Fill the customer order',
+      ObjectiveType.clearCategoryTargets => 'Clear the categories',
+      ObjectiveType.clearSpecialTargets => 'Clear the specials',
+      ObjectiveType.comboTarget => 'Build a combo chain',
       ObjectiveType.timeChallenge => 'Clear before time runs out',
       ObjectiveType.laneDeliveryTarget => 'Deliver lane products',
     };
+  }
+
+  String _progressText() {
+    final ObjectiveState objective = session.objective;
+    switch (objective.requirement.type) {
+      case ObjectiveType.clearAll:
+      case ObjectiveType.timeChallenge:
+        return '${_remainingProducts()} left';
+      case ObjectiveType.clearSkuTargets:
+        return '${_sumRemaining(objective.remainingTargets.values)} left';
+      case ObjectiveType.clearCategoryTargets:
+        return '${_sumRemaining(objective.remainingCategoryTargets.values)} left';
+      case ObjectiveType.clearSpecialTargets:
+        return '${_sumRemaining(objective.remainingSpecialTargets.values)} left';
+      case ObjectiveType.comboTarget:
+        return 'x${objective.maxCombo} / x${objective.requirement.comboTarget}';
+      case ObjectiveType.laneDeliveryTarget:
+        return '${objective.laneDeliveredProducts} / '
+            '${objective.requirement.laneDeliveryTarget}';
+    }
+  }
+
+  int _remainingProducts() {
+    var total = session.board.visibleProductCount;
+    for (final CompartmentState compartment in session.board.compartments) {
+      total += compartment.hiddenStack.length;
+    }
+    return total;
+  }
+
+  int _sumRemaining(Iterable<int> values) {
+    return values.fold(
+      0,
+      (int sum, int count) => sum + (count > 0 ? count : 0),
+    );
   }
 }
 
