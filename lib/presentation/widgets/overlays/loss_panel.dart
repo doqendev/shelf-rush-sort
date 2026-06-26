@@ -11,11 +11,13 @@ final class LossPanel extends StatelessWidget {
   const LossPanel({
     super.key,
     required this.session,
+    required this.canRevive,
     required this.onRetry,
     required this.onRevive,
   });
 
   final GameSessionState session;
+  final bool canRevive;
   final VoidCallback onRetry;
   final VoidCallback onRevive;
 
@@ -63,8 +65,9 @@ final class LossPanel extends StatelessWidget {
                             ),
                             const SizedBox(height: 18),
                             // Only offer a revive that can actually rescue this
-                            // failure (second-pass audit P1.5).
-                            if (canReviveFrom(session.failReason)) ...<Widget>[
+                            // failure right now — context-aware, not just
+                            // reason-based (audit P1.5 + P0.3).
+                            if (canRevive) ...<Widget>[
                               _WatchRow(
                                 label: copy.rescueLabel,
                                 onTap: onRevive,

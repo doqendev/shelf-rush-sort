@@ -548,9 +548,28 @@ final class GameSessionController {
   }
 
   /// Whether the current failure can be rescued by a rewarded revive.
-  bool get canRevive =>
-      _state.status == GameSessionStatus.failed &&
-      canReviveFrom(_state.failReason);
+  bool get canRevive {
+    if (_state.status != GameSessionStatus.failed) {
+      return false;
+    }
+    final LevelFailReason reason = _state.failReason;
+    if (!canReviveFrom(reason)) {
+      return false;
+    }
+    // Jam / no-useful / reserve failures are only revivable if a shuffle can
+    // actually produce a playable board — never offer a revive that returns the
+    // player to the same dead state (third-pass audit P0.3).
+    if (reason == LevelFailReason.boardJammed ||
+        reason == LevelFailReason.noUsefulMoves ||
+        reason == LevelFailReason.reserveMismanaged) {
+      final BoosterUseResult shuffle = boosterRules.useBooster(
+        _boosterContext(),
+        BoosterKind.shuffle,
+      );
+      return shuffle.used && boardRules.usefulMoves(shuffle.board).isNotEmpty;
+    }
+    return true;
+  }
 
   /// Applies a rescue matched to the failure cause (second-pass audit P1.5):
   /// timer failures regain time, move-limit failures regain moves, and jammed /
@@ -585,21 +604,16 @@ final class GameSessionController {
       case LevelFailReason.noUsefulMoves:
       case LevelFailReason.reserveMismanaged:
         final BoosterUseResult shuffle = boosterRules.useBooster(
-          BoosterContext(
-            board: _state.board,
-            objective: _state.objective,
-            timer: _state.timer,
-            lanes: _state.lanes,
-            selectedCell: null,
-            seed: _state.level.seed,
-            level: _state.level,
-          ),
+          _boosterContext(),
           BoosterKind.shuffle,
         );
-        if (shuffle.used) {
-          board = shuffle.board;
-          objective = shuffle.objective;
+        if (!shuffle.used || boardRules.usefulMoves(shuffle.board).isEmpty) {
+          // A revive that cannot produce a playable board is not honoured
+          // (third-pass audit P0.3) — the player is not charged for a no-op.
+          return;
         }
+        board = shuffle.board;
+        objective = shuffle.objective;
       case LevelFailReason.laneExhausted:
       case LevelFailReason.blockerRemaining:
       case LevelFailReason.objectiveImpossible:

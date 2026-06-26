@@ -2,13 +2,17 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shelf_rush_sort/application/game_session/game_session_controller.dart';
 import 'package:shelf_rush_sort/application/game_session/game_session_state.dart';
 import 'package:shelf_rush_sort/domain/boosters/booster_def.dart';
+import 'package:shelf_rush_sort/domain/boosters/booster_rules.dart';
 import 'package:shelf_rush_sort/domain/content/level_def.dart';
 import 'package:shelf_rush_sort/domain/core/value_objects.dart';
+import 'package:shelf_rush_sort/domain/game/board_rules.dart';
 import 'package:shelf_rush_sort/domain/game/fail_reason.dart';
 import 'package:shelf_rush_sort/domain/game/move.dart';
 import 'package:shelf_rush_sort/domain/game/objective.dart';
 import 'package:shelf_rush_sort/domain/game/replay.dart';
+import 'package:shelf_rush_sort/domain/game/timer.dart';
 import 'package:shelf_rush_sort/domain/moving_lanes/moving_lane_def.dart';
+import 'package:shelf_rush_sort/domain/moving_lanes/moving_lane_state.dart';
 import 'package:shelf_rush_sort/infrastructure/analytics/analytics_service.dart';
 
 void main() {
@@ -239,6 +243,59 @@ void main() {
       expect(solo.canUseBooster(BoosterKind.shuffle).canUse, isFalse);
       solo.dispose();
     },
+  );
+
+  test('a shuffle cannot rescue an all-distinct board, gating revive (P0.3)', () {
+    const BoardRules boardRules = BoardRules();
+    final LevelDef level = _allDistinctFullLevel();
+    final board = boardRules.resolveBoard(level.createBoardState()).state;
+    final BoosterContext context = BoosterContext(
+      board: board,
+      objective: const ObjectiveRules().initialState(
+        requirement: level.objective,
+        board: board,
+      ),
+      timer: LevelTimer.fromSeconds(null),
+      lanes: const <MovingLaneState>[],
+      selectedCell: null,
+      seed: level.seed,
+      level: level,
+    );
+
+    final BoosterUseResult shuffle = const BoosterRules().useBooster(
+      context,
+      BoosterKind.shuffle,
+    );
+
+    // A shuffle only permutes distinct products; no triple is ever possible, so
+    // the board still has no useful move. canRevive/revive gate on exactly this
+    // (shuffle.used && usefulMoves(board).isNotEmpty), so a jam revive that
+    // cannot rescue the player is refused (third-pass audit P0.3).
+    expect(boardRules.usefulMoves(shuffle.board), isEmpty);
+  });
+}
+
+LevelDef _allDistinctFullLevel() {
+  // Every cell filled with a distinct SKU: no empty cell -> no legal move ->
+  // boardJammed, and a shuffle can only permute distinct products (never a
+  // triple), so it can never rescue the board.
+  return LevelDef(
+    id: 'level_full_distinct',
+    levelNumber: 8,
+    title: 'Full Distinct',
+    seed: 8,
+    objective: ObjectiveRequirement(type: ObjectiveType.clearAll),
+    compartments: <CompartmentDef>[
+      for (var index = 0; index < 15; index += 1)
+        CompartmentDef(
+          index: index,
+          cells: <String?>[
+            'sku_${(index * 3).toString().padLeft(3, '0')}',
+            'sku_${(index * 3 + 1).toString().padLeft(3, '0')}',
+            'sku_${(index * 3 + 2).toString().padLeft(3, '0')}',
+          ],
+        ),
+    ],
   );
 }
 

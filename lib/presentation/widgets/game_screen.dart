@@ -133,6 +133,7 @@ final class _GameScreenState extends ConsumerState<GameScreen>
           if (session.status == GameSessionStatus.failed && _endOverlayVisible)
             LossPanel(
               session: session,
+              canRevive: _controller?.canRevive ?? false,
               onRetry: () => _loadLevel(_levelNumber),
               onRevive: _reviveWithRewardedAd,
             ),
