@@ -104,6 +104,25 @@ void main() {
         lessThan(compartmentCount),
         reason: 'level $levelNumber should not dump the full rack',
       );
+      // P1.7: star thresholds are seeded from the solver optimum so 3 stars is
+      // actually achievable. The generic par heuristic under-counts staging and
+      // blocker moves and can make 3 stars impossible; the seeded threshold must
+      // equal the live solver minimum so it never drifts out of sync.
+      expect(
+        level.score,
+        isNotNull,
+        reason: 'level $levelNumber needs seeded star thresholds',
+      );
+      expect(
+        level.score!.threeStarMoves,
+        metrics.minSolutionMoves,
+        reason: 'level $levelNumber 3-star must equal the solver optimum',
+      );
+      expect(
+        level.score!.twoStarMoves,
+        greaterThan(level.score!.threeStarMoves),
+        reason: 'level $levelNumber 2-star must exceed the 3-star threshold',
+      );
     }
   });
 

@@ -376,6 +376,10 @@
         "curriculumTag": "second_clear",
         "difficultyTarget": "tutorial",
         "humanReviewGrade": "reviewed"
+      },
+      "score": {
+        "threeStarMoves": 2,
+        "twoStarMoves": 4
       }
     },
     {
@@ -563,6 +567,10 @@
         "curriculumTag": "empty_space",
         "difficultyTarget": "easy",
         "humanReviewGrade": "reviewed"
+      },
+      "score": {
+        "threeStarMoves": 3,
+        "twoStarMoves": 5
       }
     },
     {
@@ -753,6 +761,10 @@
         "curriculumTag": "first_hidden",
         "difficultyTarget": "easy",
         "humanReviewGrade": "reviewed"
+      },
+      "score": {
+        "threeStarMoves": 3,
+        "twoStarMoves": 5
       }
     },
     {
@@ -945,6 +957,10 @@
         "curriculumTag": "first_mystery_bag",
         "difficultyTarget": "easy",
         "humanReviewGrade": "reviewed"
+      },
+      "score": {
+        "threeStarMoves": 2,
+        "twoStarMoves": 4
       }
     },
     {
@@ -1132,6 +1148,10 @@
         "curriculumTag": "first_timer",
         "difficultyTarget": "easy",
         "humanReviewGrade": "reviewed"
+      },
+      "score": {
+        "threeStarMoves": 2,
+        "twoStarMoves": 4
       }
     },
     {
@@ -1322,6 +1342,10 @@
         "curriculumTag": "combine_hidden_staging",
         "difficultyTarget": "normal",
         "humanReviewGrade": "reviewed"
+      },
+      "score": {
+        "threeStarMoves": 3,
+        "twoStarMoves": 5
       }
     },
     {
@@ -1517,6 +1541,10 @@
         "curriculumTag": "combine_bag_hidden",
         "difficultyTarget": "hard",
         "humanReviewGrade": "reviewed"
+      },
+      "score": {
+        "threeStarMoves": 3,
+        "twoStarMoves": 5
       }
     },
     {
@@ -1704,6 +1732,10 @@
         "curriculumTag": "timer_under_pressure",
         "difficultyTarget": "hard",
         "humanReviewGrade": "reviewed"
+      },
+      "score": {
+        "threeStarMoves": 4,
+        "twoStarMoves": 6
       }
     },
     {
@@ -1899,6 +1931,10 @@
         "curriculumTag": "capstone",
         "difficultyTarget": "superHard",
         "humanReviewGrade": "reviewed"
+      },
+      "score": {
+        "threeStarMoves": 4,
+        "twoStarMoves": 6
       }
     },
     {

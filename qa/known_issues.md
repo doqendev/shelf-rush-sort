@@ -19,7 +19,7 @@ State as of the QA bundle. Third-pass audit Phase A + the achievable P1s are don
 - **Levels 11–15**: still generated/full-rack — only levels 1–10 are the hand-authored curriculum so far.
 - **Lanes (P1.3) + obstacle blockers (deferred)**: conveyor rendering is still prototype-grade (rebuilt per tick, no carried-lane drag), and the obstacle blockers tape/frost/frozen/cover/crate have no gameplay clear — they are hammer-booster-only. Both are deliberately kept out of the 1–10 curriculum, which uses mystery bags (the one blocker clearable through normal play) for its "first obstacle" beat. They wait on later sprints rather than shipping the weakest systems in the first-session funnel.
 - **Responsive (P1.9)**: phone fit is tested. Product scope is **mobile-only** — tablet/desktop layouts are explicitly out of scope (product-owner decision). The 320×568 small-phone objective-strip clip (P1.4) is still in scope.
-- **P1.7 seeding**: star thresholds currently come from the (improved) heuristic; per-level `score` is not yet seeded from solver minimum moves.
+- **P1.7 seeding (levels 11–15 only)**: the curriculum (levels 1–10) now has per-level `score` thresholds seeded from the solver's minimum solution moves (so 3 stars is achievable and fair); the generated levels 11+ still fall back to the par heuristic until they are curated.
 - **P1.6 edge**: a hidden product that is revealed and then cleared mid-session may not be recorded as discovered (the recorder is conservative — it counts front cells + still-visible products).
 
 ## Content note
