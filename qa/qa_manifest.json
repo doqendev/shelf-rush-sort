@@ -1,0 +1,44 @@
+{
+  "commit": "d4cc4d5",
+  "builtWith": "flutter build web --release --dart-define=SHELF_RUSH_ENV=qa --pwa-strategy=none --base-href \"/\"",
+  "startRoute": "/",
+  "bridge": "window.shelfRushQa",
+  "bridgeDocs": "QA_BRIDGE.md",
+  "notes": "App boots into a playable level at '/'. Drive and verify via window.shelfRushQa (present in this qa build only). Cells are addressed as (compartment, cell); read getState().board to map shelves to products.",
+  "testViewports": [
+    [320, 568],
+    [390, 844],
+    [430, 932],
+    [768, 1024],
+    [1366, 768]
+  ],
+  "flows": [
+    {
+      "name": "level_1_guided_match",
+      "description": "Level 1's guided first move completes a triple (shelf 1 cell 0 -> shelf 0 cell 2).",
+      "setup": ["shelfRushQa.resetSave()", "shelfRushQa.goToLevel(1)"],
+      "steps": [
+        {
+          "call": "shelfRushQa.dragCellToCell(1, 0, 0, 2)",
+          "expect": { "moveCount": 1, "status": "playing" }
+        }
+      ]
+    },
+    {
+      "name": "booster_no_consume_on_noop_P0_1",
+      "description": "An owned booster used where it cannot apply must NOT be consumed. Hammer needs a selected product; using it with nothing selected is a no-op, so the count is unchanged.",
+      "setup": ["shelfRushQa.resetSave()", "shelfRushQa.goToLevel(2)"],
+      "steps": [
+        { "read": "shelfRushQa.getState().boosterCounts.hammer", "as": "before" },
+        { "call": "shelfRushQa.useBooster('hammer')" },
+        { "read": "shelfRushQa.getState().boosterCounts.hammer", "as": "after" },
+        { "expect": "after === before" }
+      ]
+    },
+    {
+      "name": "replay_grants_no_coins_P0_2",
+      "description": "Re-winning an already-completed level grants no coins, and the win panel shows no coin row. Win a level, record getState (or the coin HUD), replay and win again; the coin balance must not increase the second time.",
+      "setup": ["shelfRushQa.resetSave()"]
+    }
+  ]
+}
