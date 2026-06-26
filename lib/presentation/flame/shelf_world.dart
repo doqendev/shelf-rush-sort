@@ -15,6 +15,7 @@ import '../../infrastructure/platform/audio_service.dart';
 import '../../infrastructure/platform/haptics_service.dart';
 import 'board/board_layout_calculator.dart';
 import 'board/cell_target_component.dart';
+import 'board/compartment_component.dart';
 import 'board/dragged_product_component.dart';
 import 'board/hidden_preview_component.dart';
 import 'board/product_component.dart';
@@ -146,6 +147,20 @@ final class ShelfWorld extends World {
     );
     for (final CompartmentState compartment in _state.board.compartments) {
       final Rect compartmentRect = _layout.compartmentRect(compartment.index);
+      if (!compartment.interactable) {
+        // Locked/decorative compartments are inactive: draw a clearly covered
+        // shelf and add no interactive target cells, so they can't be mistaken
+        // for valid empty slots (second-pass audit P0.5).
+        await add(
+          CompartmentComponent(
+            locked: compartment.locked,
+            decorative: compartment.decorative,
+            position: Vector2(compartmentRect.left, compartmentRect.top),
+            size: Vector2(compartmentRect.width, compartmentRect.height),
+          ),
+        );
+        continue;
+      }
       if (compartment.hasHiddenProducts) {
         await add(
           HiddenPreviewComponent(
