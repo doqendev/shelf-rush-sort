@@ -131,6 +131,13 @@ void main() {
         );
         expect(level.tutorialCopy!.headline, isNotEmpty);
         expect(level.tutorialCopy!.body, isNotEmpty);
+        // P1.4: every curriculum level (including level 1) carries star
+        // thresholds, so the bridge and map can treat them uniformly.
+        expect(
+          level.score,
+          isNotNull,
+          reason: 'level $levelNumber needs authored star thresholds',
+        );
       }
     },
   );

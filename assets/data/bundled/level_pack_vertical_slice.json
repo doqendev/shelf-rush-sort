@@ -193,6 +193,10 @@
       "tutorialCopy": {
         "headline": "Make a match",
         "body": "Drag matching products together to clear a shelf."
+      },
+      "score": {
+        "threeStarMoves": 2,
+        "twoStarMoves": 4
       }
     },
     {

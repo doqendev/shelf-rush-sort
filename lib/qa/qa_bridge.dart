@@ -269,15 +269,23 @@ class QaBridge {
         ? null
         : (s.level.timeLimitSeconds! - s.timer.elapsed.inSeconds);
     final bool won = s.status == GameSessionStatus.won;
+    // The objective strip counts hidden products too; mirror it so the bridge's
+    // remaining text matches the player-facing HUD (hands-on v4 P2.1).
+    final int hiddenRemaining = s.board.compartments.fold<int>(
+      0,
+      (int sum, CompartmentState c) => sum + c.hiddenStack.length,
+    );
+    final int totalRemaining = s.board.visibleProductCount + hiddenRemaining;
     return <String, Object?>{
       'level': s.level.levelNumber,
       'levelId': s.level.id,
       'status': s.status.name,
       'moveCount': s.moveCount,
       'visibleProductCount': s.board.visibleProductCount,
+      'totalRemainingProductCount': totalRemaining,
       'objectiveType': s.objective.requirement.type.name,
       'objectiveText': _objectiveText(s),
-      'remainingText': '${s.board.visibleProductCount} left',
+      'remainingText': '$totalRemaining left',
       'selectedCell': s.selectedCell?.key,
       'failReason': s.failReason.name,
       'timerSeconds': timerSeconds,
