@@ -1,10 +1,10 @@
 {
-  "commit": "5cc4c72",
+  "commit": "d173e55",
   "builtWith": "flutter build web --release --dart-define=SHELF_RUSH_ENV=qa --pwa-strategy=none --no-web-resources-cdn --base-href \"/\"",
   "startRoute": "/",
   "bridge": "window.shelfRushQa",
   "bridgeDocs": "QA_BRIDGE.md",
-  "notes": "App boots into a playable level at '/'. Drive and verify via window.shelfRushQa (present in this qa build only). Cells are addressed as (compartment, cell); read getState().board to map shelves to products. NEW since the last package: levels 1-10 are a hand-authored curriculum (one new model per level), per-level star thresholds are seeded from the solver optimum (getState().level... use levelStars after a win), and the 320px objective strip no longer clips. Poll shelfRushQa.ready().ok before the first call (the container now binds at app root, so resetSave()/getState() work before any level loads - v3 P1.1). getState() also exposes suggestedMove (the hint booster's output) and score (3-star/2-star move thresholds).",
+  "notes": "App boots into a playable level at '/'. Drive and verify via window.shelfRushQa (present in this qa build only). Cells are addressed as (compartment, cell); read getState().board to map shelves to products. NEW since the last package: levels 1-10 are a hand-authored curriculum (one new model per level), per-level star thresholds are seeded from the solver optimum (getState().level... use levelStars after a win), and the 320px objective strip no longer clips. Poll shelfRushQa.ready().ok before the first call (the container now binds at app root, so resetSave()/getState() work before any level loads - v3 P1.1). getState() also exposes suggestedMove (the hint booster's output) and score (3-star/2-star move thresholds). Levels 1-10 now show a player-facing teaching banner (the level's lesson) below the objective until the first move - watch for it at level start.",
   "testViewports": [
     [320, 568],
     [390, 844],
