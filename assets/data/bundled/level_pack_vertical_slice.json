@@ -202,7 +202,7 @@
     {
       "id": "vertical_level_0002",
       "levelNumber": 2,
-      "title": "Two to Sort",
+      "title": "Combo!",
       "seed": 2002,
       "difficulty": "tutorial",
       "timeLimitSeconds": null,
@@ -219,15 +219,19 @@
             "sku_000",
             null
           ],
-          "hidden": [],
+          "hidden": [
+            "sku_001",
+            "sku_001",
+            "sku_001"
+          ],
           "locked": false,
           "decorative": false
         },
         {
           "index": 1,
           "cells": [
-            "sku_001",
-            "sku_001",
+            "sku_000",
+            null,
             null
           ],
           "hidden": [],
@@ -237,8 +241,8 @@
         {
           "index": 2,
           "cells": [
-            "sku_000",
-            "sku_001",
+            "sku_002",
+            "sku_002",
             null
           ],
           "hidden": [],
@@ -248,34 +252,34 @@
         {
           "index": 3,
           "cells": [
-            null,
+            "sku_002",
             null,
             null
           ],
           "hidden": [],
-          "locked": true,
+          "locked": false,
           "decorative": false
         },
         {
           "index": 4,
           "cells": [
-            null,
-            null,
+            "sku_003",
+            "sku_003",
             null
           ],
           "hidden": [],
-          "locked": true,
+          "locked": false,
           "decorative": false
         },
         {
           "index": 5,
           "cells": [
-            null,
+            "sku_003",
             null,
             null
           ],
           "hidden": [],
-          "locked": true,
+          "locked": false,
           "decorative": false
         },
         {
@@ -380,24 +384,24 @@
       ],
       "humanReview": {
         "author": "studio-curriculum",
-        "intent": "Reinforce the very first lesson: two independent triples of two SKUs, no guided hint. Confirms the player can find and complete a match alone.",
-        "curriculumTag": "second_clear",
+        "intent": "Fun-first reinforcement of the match: three obvious moves, four clears, and the opening move sets off a cascade so it lands as a payoff, not a chore.",
+        "curriculumTag": "combo_intro",
         "difficultyTarget": "tutorial",
         "humanReviewGrade": "reviewed"
       },
       "score": {
-        "threeStarMoves": 2,
-        "twoStarMoves": 4
+        "threeStarMoves": 3,
+        "twoStarMoves": 5
       },
       "tutorialCopy": {
-        "headline": "Your turn",
-        "body": "Now sort both pairs yourself."
+        "headline": "Combo!",
+        "body": "Clear a shelf and the chain keeps going."
       }
     },
     {
       "id": "vertical_level_0003",
       "levelNumber": 3,
-      "title": "Make Room",
+      "title": "Chain Reaction!",
       "seed": 2003,
       "difficulty": "normal",
       "timeLimitSeconds": null,
@@ -412,18 +416,25 @@
           "cells": [
             "sku_000",
             "sku_000",
-            "sku_001"
+            null
           ],
-          "hidden": [],
+          "hidden": [
+            "sku_001",
+            "sku_001",
+            "sku_001",
+            "sku_002",
+            "sku_002",
+            "sku_002"
+          ],
           "locked": false,
           "decorative": false
         },
         {
           "index": 1,
           "cells": [
-            "sku_001",
-            "sku_001",
-            "sku_000"
+            "sku_000",
+            null,
+            null
           ],
           "hidden": [],
           "locked": false,
@@ -432,8 +443,8 @@
         {
           "index": 2,
           "cells": [
-            null,
-            null,
+            "sku_003",
+            "sku_003",
             null
           ],
           "hidden": [],
@@ -443,34 +454,34 @@
         {
           "index": 3,
           "cells": [
-            null,
+            "sku_003",
             null,
             null
           ],
           "hidden": [],
-          "locked": true,
+          "locked": false,
           "decorative": false
         },
         {
           "index": 4,
           "cells": [
-            null,
-            null,
+            "sku_004",
+            "sku_004",
             null
           ],
           "hidden": [],
-          "locked": true,
+          "locked": false,
           "decorative": false
         },
         {
           "index": 5,
           "cells": [
-            null,
+            "sku_004",
             null,
             null
           ],
           "hidden": [],
-          "locked": true,
+          "locked": false,
           "decorative": false
         },
         {
@@ -575,8 +586,8 @@
       ],
       "humanReview": {
         "author": "studio-curriculum",
-        "intent": "Teach empty-space management: every full shelf blocks itself, so the only free cells are one empty shelf the player must use to stage the odd product before completing each triple.",
-        "curriculumTag": "empty_space",
+        "intent": "The dopamine hook: one obvious move detonates a three-clear cascade, then two more clears. Trivial to play, exciting to watch.",
+        "curriculumTag": "cascade_hook",
         "difficultyTarget": "easy",
         "humanReviewGrade": "reviewed"
       },
@@ -585,8 +596,8 @@
         "twoStarMoves": 5
       },
       "tutorialCopy": {
-        "headline": "Make room",
-        "body": "Use the empty shelf to stage a product and free up space."
+        "headline": "Chain reaction!",
+        "body": "One match can set off a whole cascade."
       }
     },
     {
@@ -773,7 +784,7 @@
       ],
       "humanReview": {
         "author": "studio-curriculum",
-        "intent": "Introduce hidden products: clearing the front triple reveals two new products tucked behind it, which the player must then match. Exactly one new mental model on top of the staging learned in level 3.",
+        "intent": "Introduce hidden products explicitly: clearing the front triple reveals two products tucked behind it, which the player then matches.",
         "curriculumTag": "first_hidden",
         "difficultyTarget": "easy",
         "humanReviewGrade": "reviewed"

@@ -9,6 +9,7 @@ import 'package:shelf_rush_sort/domain/content/product_def.dart';
 import 'package:shelf_rush_sort/domain/core/value_objects.dart';
 import 'package:shelf_rush_sort/domain/game/board_rules.dart';
 import 'package:shelf_rush_sort/domain/game/move.dart';
+import 'package:shelf_rush_sort/domain/game/objective.dart';
 import 'package:shelf_rush_sort/domain/solver/solver.dart';
 import 'package:shelf_rush_sort/domain/solver/validation_report.dart';
 
@@ -17,6 +18,52 @@ import 'package:shelf_rush_sort/domain/solver/validation_report.dart';
 const int curatedThrough = 15;
 
 void main() {
+  test('a stacked hidden layer cascades: one move clears a chain', () {
+    // The engagement engine: completing a front triple over a stacked hidden
+    // layer reveals a full triple that auto-clears, which reveals the next, and
+    // so on — one player move detonates a multi-clear cascade (the dopamine
+    // hit) while staying trivial to play and cheap for the solver.
+    const BoardRules rules = BoardRules();
+    final LevelDef level = LevelDef(
+      id: 'cascade_probe',
+      levelNumber: 1,
+      title: 'Cascade',
+      seed: 1,
+      objective: ObjectiveRequirement(type: ObjectiveType.clearAll),
+      compartments: <CompartmentDef>[
+        CompartmentDef(
+          index: 0,
+          cells: const <String?>['sku_000', 'sku_000', null],
+          hidden: const <String>[
+            'sku_001', 'sku_001', 'sku_001', //
+            'sku_002', 'sku_002', 'sku_002', //
+          ],
+        ),
+        CompartmentDef(index: 1, cells: const <String?>['sku_000', null, null]),
+        for (var index = 2; index < compartmentCount; index += 1)
+          CompartmentDef(
+            index: index,
+            cells: const <String?>[null, null, null],
+          ),
+      ],
+    );
+    final result = rules.applyMove(
+      level.createBoardState(),
+      MoveAction(
+        source: CellAddress.fromCompartmentIndex(1, 0),
+        target: CellAddress.fromCompartmentIndex(0, 2),
+      ),
+    );
+    expect(result.isValid, isTrue);
+    expect(
+      result.clearedTriples.length,
+      greaterThanOrEqualTo(3),
+      reason: 'one move should cascade sku_000 -> sku_001 -> sku_002',
+    );
+    expect(result.comboCount, greaterThanOrEqualTo(3));
+    expect(result.state.visibleProductCount, 0);
+  });
+
   test('level 1 is a gentle, collision-free teaching board', () async {
     final LevelPack pack = await _verticalSlicePack();
     final LevelDef level = pack.levelByNumber(1);
