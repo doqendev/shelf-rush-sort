@@ -16,6 +16,56 @@ import 'package:shelf_rush_sort/domain/moving_lanes/moving_lane_state.dart';
 import 'package:shelf_rush_sort/infrastructure/analytics/analytics_service.dart';
 
 void main() {
+  test('an idle player is shown a hint after a few seconds (v4 P1.3)', () {
+    final GameSessionController controller = GameSessionController(
+      level: _idleLevel(),
+      analytics: DebugAnalyticsService(),
+    );
+    expect(controller.state.suggestedMove, isNull);
+    // The game ticks the controller ~10x/sec; idle for ~6s.
+    for (var i = 0; i < 60; i += 1) {
+      controller.tick(const Duration(milliseconds: 100));
+    }
+    expect(
+      controller.state.suggestedMove,
+      isNotNull,
+      reason: 'idle should surface a hint so a stuck player recovers',
+    );
+  });
+
+  test('idle hint does not appear before the threshold (v4 P1.3)', () {
+    final GameSessionController controller = GameSessionController(
+      level: _idleLevel(),
+      analytics: DebugAnalyticsService(),
+    );
+    for (var i = 0; i < 30; i += 1) {
+      controller.tick(const Duration(milliseconds: 100)); // ~3s < 5s
+    }
+    expect(controller.state.suggestedMove, isNull);
+  });
+
+  test('interacting resets the idle-hint timer (v4 P1.3)', () {
+    final GameSessionController controller = GameSessionController(
+      level: _idleLevel(),
+      analytics: DebugAnalyticsService(),
+    );
+    for (var i = 0; i < 40; i += 1) {
+      controller.tick(
+        const Duration(milliseconds: 100),
+      ); // ~4s, below threshold
+    }
+    controller.selectCell(CellAddress.fromCompartmentIndex(1, 0));
+    controller.selectCell(CellAddress.fromCompartmentIndex(1, 0)); // deselect
+    for (var i = 0; i < 40; i += 1) {
+      controller.tick(const Duration(milliseconds: 100)); // ~4s since the reset
+    }
+    expect(
+      controller.state.suggestedMove,
+      isNull,
+      reason: 'interaction must reset the idle countdown',
+    );
+  });
+
   test('revive resumes a failed timer level and emits analytics', () {
     final DebugAnalyticsService analytics = DebugAnalyticsService();
     final GameSessionController controller = GameSessionController(
@@ -273,6 +323,27 @@ void main() {
     // cannot rescue the player is refused (third-pass audit P0.3).
     expect(boardRules.usefulMoves(shuffle.board), isEmpty);
   });
+}
+
+LevelDef _idleLevel() {
+  // A simple board with an obvious completing move available, so the idle hint
+  // has something to surface.
+  return LevelDef(
+    id: 'idle_level',
+    levelNumber: 1,
+    title: 'Idle',
+    seed: 1,
+    objective: ObjectiveRequirement(type: ObjectiveType.clearAll),
+    compartments: <CompartmentDef>[
+      CompartmentDef(
+        index: 0,
+        cells: const <String?>['sku_000', 'sku_000', null],
+      ),
+      CompartmentDef(index: 1, cells: const <String?>['sku_000', null, null]),
+      for (var index = 2; index < 15; index += 1)
+        CompartmentDef(index: index, cells: const <String?>[null, null, null]),
+    ],
+  );
 }
 
 LevelDef _allDistinctFullLevel() {

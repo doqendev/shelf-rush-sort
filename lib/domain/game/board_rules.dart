@@ -244,6 +244,41 @@ final class BoardRules {
     return moves;
   }
 
+  /// The best move to surface as a hint — the highest-quality legal move
+  /// (prefers completing a triple, then a reveal, ... down to badButLegal).
+  /// Null when there is no legal move. Shared by the hint booster and the
+  /// idle-hint assist (hands-on v4 P1.3).
+  LegalMove? bestHintMove(BoardState state) {
+    LegalMove? best;
+    var bestScore = -1;
+    for (final LegalMove move in generateLegalMoves(state)) {
+      final int score = _hintScore(
+        classifyMove(
+          state,
+          MoveAction(source: move.source, target: move.target),
+        ),
+      );
+      if (score > bestScore) {
+        best = move;
+        bestScore = score;
+      }
+    }
+    return best;
+  }
+
+  static int _hintScore(MoveQuality quality) {
+    return switch (quality) {
+      MoveQuality.completesTriple => 100,
+      MoveQuality.revealEnabling => 95,
+      MoveQuality.laneSave => 90,
+      MoveQuality.createsPair => 75,
+      MoveQuality.reserveSafe => 45,
+      MoveQuality.neutral => 10,
+      MoveQuality.riskyReserve => 5,
+      MoveQuality.badButLegal => 0,
+    };
+  }
+
   bool wouldComplete(BoardState state, SkuId skuId, CellAddress target) {
     final CompartmentState compartment = state.compartmentAtAddress(target);
     final List<ShelfCell> occupied = compartment.frontCells

@@ -83,6 +83,12 @@ final class GameSessionController {
   GameSessionState _state;
   bool _paused = false;
 
+  /// Time since the player last interacted; after [_idleHintAfter] of
+  /// inactivity an idle hint is surfaced so a stuck player recovers without the
+  /// hint booster (hands-on v4 P1.3).
+  Duration _idleSinceInteraction = Duration.zero;
+  static const Duration _idleHintAfter = Duration(seconds: 5);
+
   GameSessionState get state => _state;
 
   Stream<GameSessionState> get states => _states.stream;
@@ -150,6 +156,7 @@ final class GameSessionController {
     if (_state.isEnded) {
       return;
     }
+    _idleSinceInteraction = Duration.zero;
     final ProductInstance? product = _state.board.productAt(address);
     if (product == null) {
       if (!tutorialController.allowsPlacement(
@@ -202,6 +209,7 @@ final class GameSessionController {
     if (_state.isEnded) {
       return;
     }
+    _idleSinceInteraction = Duration.zero;
     final MovingLaneState? heldLane = _state.laneHoldingProduct;
     if (heldLane != null) {
       placeHeldLaneProduct(target);
@@ -339,10 +347,31 @@ final class GameSessionController {
     );
   }
 
+  /// Surfaces the best legal move as a hint once the player has been idle for
+  /// [_idleHintAfter] without a selection or move (hands-on v4 P1.3). Input is
+  /// never blocked — this only highlights, and it backs off once the player
+  /// engages or a hint is already showing.
+  void _maybeShowIdleHint(Duration delta) {
+    if (_state.suggestedMove != null || _state.selectedCell != null) {
+      _idleSinceInteraction = Duration.zero;
+      return;
+    }
+    _idleSinceInteraction += delta;
+    if (_idleSinceInteraction < _idleHintAfter) {
+      return;
+    }
+    final LegalMove? hint = boardRules.bestHintMove(_state.board);
+    if (hint != null) {
+      _emit(_state.copyWith(suggestedMove: hint));
+    }
+    _idleSinceInteraction = Duration.zero;
+  }
+
   void tick(Duration delta) {
     if (_paused || _state.isEnded) {
       return;
     }
+    _maybeShowIdleHint(delta);
     if (_state.timer.limit == null && _state.lanes.isEmpty) {
       return;
     }

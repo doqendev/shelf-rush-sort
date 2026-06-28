@@ -158,22 +158,7 @@ final class _HintCommand extends BoosterCommand {
 
   @override
   BoosterUseResult apply(BoosterContext context) {
-    final List<LegalMove> legalMoves = boardRules.generateLegalMoves(
-      context.board,
-    );
-    LegalMove? bestMove;
-    var bestScore = -1;
-    for (final LegalMove move in legalMoves) {
-      final MoveQuality quality = boardRules.classifyMove(
-        context.board,
-        MoveAction(source: move.source, target: move.target),
-      );
-      final int score = _score(quality);
-      if (score > bestScore) {
-        bestMove = move;
-        bestScore = score;
-      }
-    }
+    final LegalMove? bestMove = boardRules.bestHintMove(context.board);
     if (bestMove == null) {
       return invalid(context, 'no_legal_hint');
     }
@@ -190,19 +175,6 @@ final class _HintCommand extends BoosterCommand {
         'target': bestMove.target.key,
       },
     );
-  }
-
-  int _score(MoveQuality quality) {
-    return switch (quality) {
-      MoveQuality.completesTriple => 100,
-      MoveQuality.revealEnabling => 95,
-      MoveQuality.laneSave => 90,
-      MoveQuality.createsPair => 75,
-      MoveQuality.reserveSafe => 45,
-      MoveQuality.neutral => 10,
-      MoveQuality.riskyReserve => 5,
-      MoveQuality.badButLegal => 0,
-    };
   }
 }
 
