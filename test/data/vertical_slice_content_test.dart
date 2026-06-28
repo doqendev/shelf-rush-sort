@@ -14,7 +14,7 @@ import 'package:shelf_rush_sort/domain/solver/validation_report.dart';
 
 /// Levels 2..[curatedThrough] are the hand-authored Sprint B curriculum; the
 /// rest of the opening pack still uses the full rack until curated too.
-const int curatedThrough = 10;
+const int curatedThrough = 15;
 
 void main() {
   test('level 1 is a gentle, collision-free teaching board', () async {
@@ -119,10 +119,10 @@ void main() {
   });
 
   test(
-    'curriculum levels 1-10 carry player-facing teaching copy (v3 P1.2)',
+    'curriculum levels 1-15 carry teaching copy + star thresholds (v3 P1.2)',
     () async {
       final LevelPack pack = await _verticalSlicePack();
-      for (var levelNumber = 1; levelNumber <= 10; levelNumber += 1) {
+      for (var levelNumber = 1; levelNumber <= 15; levelNumber += 1) {
         final LevelDef level = pack.levelByNumber(levelNumber);
         expect(
           level.tutorialCopy,
