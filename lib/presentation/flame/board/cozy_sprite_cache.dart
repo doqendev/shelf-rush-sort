@@ -21,9 +21,15 @@ class CozySpriteCache {
   final Map<String, ui.Image> _images = <String, ui.Image>{};
   bool _loaded = false;
 
+  /// Whether the platform can GPU-blit product sprites. Set false at bootstrap
+  /// on a no-WebGL web browser (CPU CanvasKit cannot draw the product sprite
+  /// path) so products fall back to colour-blob silhouettes instead of
+  /// rendering blank (hands-on v4 P1.1).
+  bool spritesRenderable = true;
+
   /// Preloads every cozy product sprite into memory. Safe to call repeatedly.
   Future<void> ensureLoaded(Images images) async {
-    if (_loaded) {
+    if (_loaded || !spritesRenderable) {
       return;
     }
     for (final String name in kCozyProducts) {
@@ -37,5 +43,6 @@ class CozySpriteCache {
   /// The stable product sprite key for [skuId].
   String spriteNameForSku(String skuId) => productVisualForSku(skuId);
 
-  ui.Image? imageForSku(String skuId) => _images[spriteNameForSku(skuId)];
+  ui.Image? imageForSku(String skuId) =>
+      spritesRenderable ? _images[spriteNameForSku(skuId)] : null;
 }

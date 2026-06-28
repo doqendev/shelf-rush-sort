@@ -11,6 +11,7 @@ import '../domain/core/value_objects.dart';
 import '../domain/game/board_state.dart';
 import '../domain/game/objective.dart';
 import '../infrastructure/save/save_repository.dart';
+import '../presentation/flame/board/cozy_sprite_cache.dart';
 import '../presentation/flame/shelf_rush_game.dart';
 
 /// Debug-only automation surface for QA builds. Exposes deterministic entry
@@ -301,6 +302,9 @@ class QaBridge {
       'winRewardAvailable': won && firstCompletion,
       'doubleRewardAvailable': won && firstCompletion,
       'presentationBusy': game?.isPresentationBusy ?? false,
+      // QA-only render diagnostic: false means the platform can't GPU-blit
+      // sprites and products are drawing as colour-blob fallbacks (v4 P1.1).
+      'spritesRenderable': CozySpriteCache.instance.spritesRenderable,
       // The hint booster's suggested move and the authored star thresholds, so
       // a reviewer can verify hint output and the 3-star path (v3 P2.4 / P1.5).
       'suggestedMove': s.suggestedMove == null

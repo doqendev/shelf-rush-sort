@@ -90,4 +90,42 @@ void main() {
       reason: 'a loaded product sprite must rasterize visible pixels',
     );
   });
+
+  test(
+    'no-WebGL bypasses the sprite cache so products draw blobs (v4 P1.1)',
+    () async {
+      await CozySpriteCache.instance.ensureLoaded(Images());
+      expect(
+        CozySpriteCache.instance.imageForSku('sku_000'),
+        isNotNull,
+        reason: 'sanity: the sprite is available when renderable',
+      );
+      CozySpriteCache.instance.spritesRenderable = false;
+      try {
+        // With no WebGL the cache must report no image, so the renderer falls back
+        // to the colour-blob path rather than drawing a blank product.
+        expect(CozySpriteCache.instance.imageForSku('sku_000'), isNull);
+        final double covered = await paintedFraction((
+          Canvas canvas,
+          Rect rect,
+        ) {
+          ProductRenderer.render(
+            canvas,
+            rect,
+            productDef: product,
+            selected: false,
+            cellBlocker: BlockerKind.none,
+            productBlocker: BlockerKind.none,
+          );
+        });
+        expect(
+          covered,
+          greaterThan(0.15),
+          reason: 'a no-WebGL product must still draw a visible body',
+        );
+      } finally {
+        CozySpriteCache.instance.spritesRenderable = true;
+      }
+    },
+  );
 }

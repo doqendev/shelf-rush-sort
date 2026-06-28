@@ -13,6 +13,8 @@ import '../infrastructure/iap/purchase_service.dart';
 import '../infrastructure/platform/device_info_service.dart';
 import '../infrastructure/save/local_save_repository.dart';
 import '../infrastructure/save/save_repository.dart';
+import '../presentation/flame/board/cozy_sprite_cache.dart';
+import '../presentation/flame/board/render_capabilities.dart';
 import '../qa/qa_bridge.dart';
 import '../qa/qa_install.dart';
 import 'environment.dart';
@@ -22,6 +24,10 @@ import 'shelf_rush_app.dart';
 Future<void> bootstrap({EnvironmentConfig? environmentConfig}) async {
   WidgetsFlutterBinding.ensureInitialized();
   setUrlStrategy(const HashUrlStrategy());
+  // On a no-WebGL web browser CanvasKit cannot blit product sprites, so fall
+  // back to colour-blob silhouettes rather than rendering blank products
+  // (hands-on v4 P1.1). Native platforms always report true.
+  CozySpriteCache.instance.spritesRenderable = spritesRenderable();
   final EnvironmentConfig resolvedEnvironment =
       environmentConfig ?? EnvironmentConfig.fromDartDefine();
   // Expose the QA automation bridge (window.shelfRushQa) in non-production
