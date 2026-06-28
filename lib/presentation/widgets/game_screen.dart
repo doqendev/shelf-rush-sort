@@ -426,8 +426,18 @@ final class _GameScreenState extends ConsumerState<GameScreen>
         .levelPack
         .levels
         .length;
-    final int nextLevel = (session.level.levelNumber + 1).clamp(1, maxLevel);
-    _loadLevel(nextLevel);
+    // Finishing the last curated level returns to the map — a deliberate
+    // "chapter complete" — instead of silently clamp-replaying the final level
+    // (v4 capture review: post-level-15 must be intentional, not a silent clamp
+    // or a jump into generated content; the runtime pack is exactly the curated
+    // levels, with no generated fallback).
+    if (session.level.levelNumber >= maxLevel) {
+      if (mounted) {
+        context.go('/home');
+      }
+      return;
+    }
+    _loadLevel(session.level.levelNumber + 1);
   }
 
   Future<void> _commitWinIfNeeded(GameSessionState session) async {

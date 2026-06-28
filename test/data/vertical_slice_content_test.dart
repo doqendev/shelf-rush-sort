@@ -119,6 +119,73 @@ void main() {
   });
 
   test(
+    'mastery levels 11-15 complete via the documented bridge moves',
+    () async {
+      // These (compartment, cell, compartment, cell) sequences are exactly the
+      // solution flows published in qa_manifest.json, so the reviewer's bridge
+      // certification of 11-15 is guaranteed to reach a won board (v4 capture
+      // review P1.2).
+      final LevelPack pack = await _verticalSlicePack();
+      const BoardRules rules = BoardRules();
+      final Map<int, List<List<int>>> flows = <int, List<List<int>>>{
+        11: <List<int>>[
+          <int>[2, 2, 0, 2],
+          <int>[3, 2, 1, 2],
+          <int>[4, 0, 2, 2],
+          <int>[4, 1, 3, 2],
+        ],
+        12: <List<int>>[
+          <int>[1, 0, 0, 2],
+          <int>[2, 0, 1, 0],
+          <int>[3, 0, 2, 0],
+        ],
+        13: <List<int>>[
+          <int>[1, 0, 0, 2],
+          <int>[2, 0, 1, 0],
+          <int>[3, 1, 2, 0],
+          <int>[3, 0, 0, 2],
+        ],
+        14: <List<int>>[
+          <int>[1, 0, 0, 2],
+          <int>[2, 0, 1, 0],
+          <int>[3, 2, 0, 2],
+          <int>[2, 1, 3, 2],
+        ],
+        15: <List<int>>[
+          <int>[1, 0, 0, 2],
+          <int>[2, 0, 1, 0],
+          <int>[3, 0, 2, 0],
+          <int>[3, 1, 0, 2],
+        ],
+      };
+      for (final MapEntry<int, List<List<int>>> entry in flows.entries) {
+        final LevelDef level = pack.levelByNumber(entry.key);
+        var board = level.createBoardState();
+        for (final List<int> m in entry.value) {
+          final result = rules.applyMove(
+            board,
+            MoveAction(
+              source: CellAddress.fromCompartmentIndex(m[0], m[1]),
+              target: CellAddress.fromCompartmentIndex(m[2], m[3]),
+            ),
+          );
+          expect(
+            result.isValid,
+            isTrue,
+            reason: 'level ${entry.key}: move $m must be valid',
+          );
+          board = result.state;
+        }
+        expect(
+          board.visibleProductCount,
+          0,
+          reason: 'level ${entry.key} must complete via its documented moves',
+        );
+      }
+    },
+  );
+
+  test(
     'curriculum levels 1-15 carry teaching copy + star thresholds (v3 P1.2)',
     () async {
       final LevelPack pack = await _verticalSlicePack();

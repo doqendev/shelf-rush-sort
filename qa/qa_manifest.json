@@ -70,6 +70,68 @@
       "name": "replay_grants_no_coins_P0_2",
       "description": "Re-winning an already-completed level grants no coins, and the win panel shows no coin row. Win a level, record getState (or the coin HUD), replay and win again; the coin balance must not increase the second time.",
       "setup": ["shelfRushQa.resetSave()"]
+    },
+    {
+      "name": "level_11_stock_up_completes",
+      "description": "L11 'Stock Up' (hard, 4 SKUs) completes via light staging (v4 P1.2). 3-star at 4 moves.",
+      "setup": ["shelfRushQa.ready()", "shelfRushQa.resetSave()", "shelfRushQa.goToLevel(11)"],
+      "steps": [
+        { "call": "shelfRushQa.dragCellToCell(2,2,0,2)" },
+        { "call": "shelfRushQa.dragCellToCell(3,2,1,2)" },
+        { "call": "shelfRushQa.dragCellToCell(4,0,2,2)" },
+        { "call": "shelfRushQa.dragCellToCell(4,1,3,2)", "expect": "status 'won', visibleProductCount 0" }
+      ]
+    },
+    {
+      "name": "level_12_rush_hour_completes",
+      "description": "L12 'Rush Hour' (hard, 45s): open the mystery bag then finish under the clock. 3-star at 3 moves.",
+      "setup": ["shelfRushQa.ready()", "shelfRushQa.resetSave()", "shelfRushQa.goToLevel(12)"],
+      "steps": [
+        { "call": "shelfRushQa.dragCellToCell(1,0,0,2)", "expect": "the bag opens; shelf 0 clears" },
+        { "call": "shelfRushQa.dragCellToCell(2,0,1,0)" },
+        { "call": "shelfRushQa.dragCellToCell(3,0,2,0)", "expect": "status 'won', visibleProductCount 0" }
+      ]
+    },
+    {
+      "name": "level_13_warehouse_completes",
+      "description": "L13 'Warehouse' (hard, 50s): four SKUs with a hidden reveal, timed. 3-star at 4 moves.",
+      "setup": ["shelfRushQa.ready()", "shelfRushQa.resetSave()", "shelfRushQa.goToLevel(13)"],
+      "steps": [
+        { "call": "shelfRushQa.dragCellToCell(1,0,0,2)", "expect": "front clears and reveals 2 hidden products" },
+        { "call": "shelfRushQa.dragCellToCell(2,0,1,0)" },
+        { "call": "shelfRushQa.dragCellToCell(3,1,2,0)" },
+        { "call": "shelfRushQa.dragCellToCell(3,0,0,2)", "expect": "status 'won', visibleProductCount 0" }
+      ]
+    },
+    {
+      "name": "level_14_last_call_completes",
+      "description": "L14 'Last Call' (superHard, 55s): bag + hidden reveal + staging, timed. 3-star at 4 moves.",
+      "setup": ["shelfRushQa.ready()", "shelfRushQa.resetSave()", "shelfRushQa.goToLevel(14)"],
+      "steps": [
+        { "call": "shelfRushQa.dragCellToCell(1,0,0,2)", "expect": "bag opens, front clears, reveals 2 hidden" },
+        { "call": "shelfRushQa.dragCellToCell(2,0,1,0)" },
+        { "call": "shelfRushQa.dragCellToCell(3,2,0,2)" },
+        { "call": "shelfRushQa.dragCellToCell(2,1,3,2)", "expect": "status 'won', visibleProductCount 0" }
+      ]
+    },
+    {
+      "name": "level_15_grand_opening_completes",
+      "description": "L15 'Grand Opening' (superHard, 70s): the capstone - bag + hidden + four SKUs. 3-star at 4 moves.",
+      "setup": ["shelfRushQa.ready()", "shelfRushQa.resetSave()", "shelfRushQa.goToLevel(15)"],
+      "steps": [
+        { "call": "shelfRushQa.dragCellToCell(1,0,0,2)", "expect": "bag opens, front clears, reveals 2 hidden" },
+        { "call": "shelfRushQa.dragCellToCell(2,0,1,0)" },
+        { "call": "shelfRushQa.dragCellToCell(3,0,2,0)" },
+        { "call": "shelfRushQa.dragCellToCell(3,1,0,2)", "expect": "status 'won', visibleProductCount 0" }
+      ]
+    },
+    {
+      "name": "post_level_15_behavior",
+      "description": "After winning level 15 (the last curated level) the win panel's Next returns to the map (/home) - a deliberate chapter-complete - rather than silently replaying level 15. There is NO level 16: the runtime pack is exactly the 15 curated levels with no generated fallback, and goToLevel(16) clamps to 15.",
+      "setup": ["shelfRushQa.resetSave()"],
+      "steps": [
+        { "call": "shelfRushQa.goToLevel(16)", "expect": "getState().level === 15 (clamped; no level 16, no generated content)" }
+      ]
     }
   ]
 }
